@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎄 Christmas LED Tree - 3D WLED Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            overflow: hidden;
+            height: 100vh;
+            color: #333;
+        }
+        
+        /* Estrellas de fondo */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* Layout principal */
+        .main-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Visualización del árbol */
+        .tree-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .tree-container {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            max-width: 800px;
+            max-height: 900px;
+        }
+        
+        /* Canvas para el árbol 3D */
+        #treeCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        #treeCanvas:active {
+            cursor: grabbing;
+        }
+        
+        /* Panel de control */
+        .control-panel {
+            width: 450px;
+            background: rgba(255, 255, 255, 0.98);
+            overflow-y: auto;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .panel-header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        
+        .panel-content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Conexión */
+        .connection-status {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Botones */
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        }
+        
+        button.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.6);
+        }
+        
+        button.danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+         button.danger:hover {
+             box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+         }
+        
+        /* Control de color */
+        .color-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 0;
+            background-color: transparent;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+            border: 3px solid #ddd;
+            border-radius: 8px;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 5px;
+        }
+         input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 5px;
+        }
+        
+        /* Brillo */
+        .brightness-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+             background: #5568cc;
+        }
+        
+        .brightness-value {
+            font-weight: bold;
+            font-size: 1.1em;
+            min-width: 50px;
+            text-align: right;
+            color: #667eea;
+        }
+        
+        /* Grid de botones */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        /* Diseños guardados */
+        .design-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .design-item span {
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 10px;
+        }
+        
+        .design-item button {
+            margin: 0;
+            width: auto;
+            padding: 8px 16px;
+            font-size: 12px;
+            margin-bottom: 0;
+        }
+        
+        .design-item .delete-btn {
+            background: #dc3545;
+            padding: 8px 12px;
+            margin-left: 10px;
+        }
+        .design-item .delete-btn:hover {
+            background: #c82333;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+        }
+        
+        /* Input fields */
+        input[type="text"],
+        input[type="number"],
+        input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="time"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        /* Timer */
+        .time-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .time-input input {
+            flex: 1;
+            text-align: center;
+        }
+        
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Status message */
+        .status-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s, fadeOut 0.5s 2.5s forwards;
+            z-index: 1000;
+            font-weight: 600;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, 100px);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translate(-50%, 100px);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .main-container {
+                flex-direction: column-reverse; /* Panel abajo */
+                height: auto;
+            }
+            
+            .control-panel {
+                width: 100%;
+                height: 50vh; /* Ocupa la mitad inferior */
+                box-shadow: 0 -5px 30px rgba(0,0,0,0.3);
+            }
+            
+            .tree-view {
+                height: 50vh; /* Ocupa la mitad superior */
+                padding: 10px;
+            }
+
+            .tree-container {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="main-container">
+        <div class="tree-view">
+            <div class="tree-container">
+                <canvas id="treeCanvas"></canvas>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <div class="panel-header">
+                <h1>🎄 Christmas LED Tree</h1>
+                <p>3D WLED Edition</p>
+            </div>
+            
+            <div class="panel-content">
+                <div class="section">
+                    <div class="section-title">🔌 Conexión</div>
+                    <input type="text" id="wledIP" placeholder="IP de WLED (ej: 192.168.0.30)">
+                    <button onclick="testConnection()">Probar y Sincronizar</button>
+                    <div id="connectionStatus" class="connection-status disconnected">
+                        Desconectado
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🎨 LED Color</div>
+                    <div class="color-selector">
+                        <input type="color" id="colorPicker" value="#ff0000">
+                        <button id="paintModeBtn" onclick="togglePaintMode()">Activar Paint Mode</button>
+                    </div>
+                    <p id="paintModeInfo" style="display:none; color: #667eea; font-weight: 600; margin-top: 10px;">
+                        🖌️ Paint Mode activo - Haz click en los LEDs del árbol 3D
+                    </p>
+                </div>
+                
+                <div class="section" id="saveDesignSection" style="display:none;">
+                    <div class="section-title">💾 Guardar Diseño</div>
+                    <input type="text" id="designName" placeholder="Nombre del diseño">
+                    <button onclick="saveDesign()">Guardar Diseño Actual</button>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">💡 Brightness</div>
+                    <div class="brightness-control">
+                        <input type="range" id="brightness" min="0" max="255" value="128" 
+                                oninput="updateBrightness(this.value, false)"
+                                onchange="updateBrightness(this.value, true)">
+                        <span id="brightVal" class="brightness-value">50%</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">✨ Effects</div>
+                    <div class="button-grid">
+                        <button class="danger" onclick="turnOff()">OFF</button>
+                        <button onclick="solidColor(event)">Solid</button>
+                        <button onclick="setEffect(event, 9)">Rainbow</button>
+                        <button onclick="setEffect(event, 13)">Fire</button>
+                        <button onclick="setEffect(event, 28)">Chase</button>
+                        <button onclick="setEffect(event, 42)">Twinkle</button>
+                        <button onclick="setEffect(event, 47)">Sparkle</button>
+                        <button onclick="setEffect(event, 72)">Ripple</button>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📁 My Designs</div>
+                    <div id="designsList">
+                        <p style="color: #666; font-size: 14px;">No hay diseños guardados.</p>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">🌊 Animated Effects</div>
+                    <div class="button-grid">
+                        <button onclick="setEffect(event, 1)">Blink</button>
+                        <button onclick="setEffect(event, 3)">Scan</button>
+                        <button onclick="setEffect(event, 7)">Waves</button>
+                        <button onclick="setEffect(event, 59)">Fairy</button>
+                        <button onclick="setEffect(event, 6)">Flow</button>
+                        <button onclick="setEffect(event, 0)" class="danger">Stop (Set Static)</button>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">⏰ Auto Timer</div>
+                    <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                        <span>Enable Timer</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="timerEnabled" onchange="updateTimer()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </label>
+                    
+                    <div class="time-input">
+                        <div style="flex: 1;">
+                            <label style="display: block; margin-bottom: 5px; font-size: 12px;">ON</label>
+                            <input type="time" id="onTime" value="18:00" onchange="updateTimer()">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display: block; margin-bottom: 5px; font-size: 12px;">OFF</label>
+                            <input type="time" id="offTime" value="07:00" onchange="updateTimer()">
+                        </div>
+                    </div>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Current: <span id="currentTime">--:--</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // =====================================================
+        // CONFIGURACIÓN Y VARIABLES GLOBALES
+        // =====================================================
+        
+        let WLED_IP = localStorage.getItem('wledIP') || '192.168.0.30';
+        let paintMode = false;
+        let ledColors = {}; // Almacena el color de cada LED: {0: '#ff0000', 1: '#00ff00', ...}
+        const totalLeds = 300;
+        let globalBrightness = 128; // 0-255
+        let currentEffect = null; // 'rainbow', 'fire', etc.
+        let hue = 0; // Para la animación rainbow
+        
+        // --- Variables 3D ---
+        let scene, camera, renderer, controls;
+        let ledGeometry, ledPoints, ledColorsArray; // <-- Volvemos a THREE.Points
+        let star, starMaterial;
+        const treeHeight = 10;
+        const treeRadius = 4;
+        const defaultColor = new THREE.Color(0x333333); // Color LED apagado
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+
+        // =====================================================
+        // INICIALIZACIÓN
+        // =====================================================
+        
+        window.onload = function() {
+            document.getElementById('wledIP').value = WLED_IP;
+            
+            init3DTree();
+            generateStars();
+            
+            setTimeout(testConnection, 500);
+            
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            loadTimerSettings();
+            setInterval(checkTimer, 30000); // Chequear cada 30 segundos
+            
+            loadDesigns();
+
+            // Listeners para el 3D
+            document.getElementById('treeCanvas').addEventListener('click', onCanvasClick);
+            window.addEventListener('resize', onWindowResize);
+        };
+
+        // =====================================================
+        // LÓGICA 3D (THREE.JS)
+        // =====================================================
+
+        function init3DTree() {
+            const container = document.getElementById('treeCanvas');
+            
+            // 1. Escena
+            scene = new THREE.Scene();
+            
+            // 2. Cámara
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, treeHeight / 2, 15);
+            
+            // 3. Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: container, antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            
+            // 4. Luces
+            scene.add(new THREE.AmbientLight(0x404040, 2));
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 10, 7.5);
+            scene.add(directionalLight);
+
+            // 5. Controles de órbita
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.target.set(0, treeHeight / 2, 0); // Centrar en el árbol
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.1;
+            controls.minDistance = 5;
+            controls.maxDistance = 30;
+
+            // 6. Geometría del Árbol (Cono)
+            const treeMaterial = new THREE.MeshPhongMaterial({ color: 0x004d00, shininess: 30 }); // Verde oscuro
+            const treeGeometry = new THREE.ConeGeometry(treeRadius, treeHeight, 32);
+            const tree = new THREE.Mesh(treeGeometry, treeMaterial);
+            tree.position.y = treeHeight / 2;
+            scene.add(tree);
+
+            // 7. Tronco (Cilindro)
+            const trunkMaterial = new THREE.MeshPhongMaterial({ color: 0x5C3A21 }); // Marrón
+            const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.5, treeHeight / 4, 16);
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.y = (treeHeight / 4) / 2; // Base en el suelo
+            scene.add(trunk);
+            
+            // 8. Estrella 3D
+            const starShape = new THREE.Shape();
+            const outerRadius = 1;
+            const innerRadius = 0.4;
+            starShape.moveTo(0, outerRadius);
+            for (let i = 1; i < 10; i++) {
+                const radius = (i % 2 === 0) ? outerRadius : innerRadius;
+                const angle = i * Math.PI / 5;
+                starShape.lineTo(radius * Math.sin(angle), radius * Math.cos(angle));
+            }
+            starShape.closePath();
+
+            const extrudeSettings = { depth: 0.2, bevelEnabled: false };
+            const starGeometry = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
+            
+            starMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffff00,
+                emissive: 0xffff00, // Hace que brille
+                emissiveIntensity: 1,
+                side: THREE.DoubleSide
+            });
+            
+            star = new THREE.Mesh(starGeometry, starMaterial);
+            star.position.set(0, treeHeight + 0.5, -0.1); // En la punta del cono
+            star.rotation.x = Math.PI; // Orientarla
+            star.scale.set(0.7, 0.7, 0.7);
+            scene.add(star);
+
+            // 9. Luz de la estrella
+            const starLight = new THREE.PointLight(0xffff00, 1.5, 10);
+            starLight.position.set(0, treeHeight + 0.5, 0);
+            scene.add(starLight);
+
+            // 10. Generar LEDs 3D
+            generate3DLEDs();
+
+            // 11. Iniciar loop de render
+            animate3D();
+        }
+
+        /**
+         * Crea una textura de canvas para el sprite del LED (un círculo difuminado).
+         */
+        function createLedSprite() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32;
+            canvas.height = 32;
+            const context = canvas.getContext('2d');
+            
+            const gradient = context.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, 0, 
+                canvas.width / 2, canvas.height / 2, canvas.width / 2
+            );
+            gradient.addColorStop(0, 'rgba(255,255,255,1)');
+            gradient.addColorStop(0.2, 'rgba(255,255,255,0.8)');
+            gradient.addColorStop(0.8, 'rgba(255,255,255,0.2)');
+            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function generate3DLEDs() {
+            ledGeometry = new THREE.BufferGeometry();
+            const positions = [];
+            const colors = [];
+
+            const spiralTurns = 12;
+            const totalAngle = spiralTurns * 2 * Math.PI;
+
+            for (let i = 0; i < totalLeds; i++) {
+                const progress = i / (totalLeds - 1); // 0 a 1
+                
+                // Posición Y (de abajo hacia arriba)
+                const y = progress * treeHeight;
+                
+                // Radio del cono en esta altura Y
+                const radiusAtY = treeRadius * (1 - (y / treeHeight));
+                
+                // Ángulo en la espiral
+                const angle = totalAngle * progress;
+
+                // Posición X y Z
+                const x = Math.cos(angle) * radiusAtY;
+                const z = Math.sin(angle) * radiusAtY;
+
+                positions.push(x, y, z);
+                colors.push(defaultColor.r, defaultColor.g, defaultColor.b);
+                ledColors[i] = '#333333'; // Inicializar estado de color local
+            }
+
+            ledGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            ledGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            ledColorsArray = ledGeometry.attributes.color.array; // Referencia para updates rápidos
+
+            // Material de los LEDs (AHORA CON SPRITE CIRCULAR)
+            const ledSprite = createLedSprite(); // <--- Usamos la textura
+            const ledMaterial = new THREE.PointsMaterial({
+                size: 0.4, // <--- Tamaño ajustado para que el círculo se vea bien
+                map: ledSprite, // <--- La textura circular
+                vertexColors: true,
+                sizeAttenuation: true,
+                transparent: false,
+		opacity: 1.0,
+                depthWrite: true, // Mejora el blending de sprites
+                blending: THREE.AdditiveBlending // <-- Efecto de "luz" que suma colores
+            });
+
+            ledPoints = new THREE.Points(ledGeometry, ledMaterial);
+            scene.add(ledPoints);
+        }
+        
+        function onWindowResize() {
+            const container = document.getElementById('treeCanvas');
+            if (!container) return;
+            
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // Loop principal de renderizado 3D y animación
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            controls.update(); // Actualizar controles de órbita
+
+            // --- Lógica de animación local (MEJORADA) ---
+            if (currentEffect) {
+                let needsUpdate = true;
+                const time = Date.now() * 0.005;
+                
+                if (currentEffect === 'rainbow') {
+                    hue = (hue + 1) % 360;
+                    for (let i = 0; i < totalLeds; i++) {
+                        const offset = (i / totalLeds) * 360;
+                        const color = new THREE.Color(`hsl(${(hue + offset) % 360}, 100%, 50%)`);
+                        updateLEDVisual(i, `#${color.getHexString()}`, false);
+                    }
+                } else if (currentEffect === 'fire') {
+                     for (let i = 0; i < totalLeds; i++) {
+                        const flicker = Math.random();
+                        let color;
+                        if (flicker > 0.9) color = '#FFFF00'; // Amarillo
+                        else if (flicker > 0.7) color = '#FF4500'; // Naranja brillante
+                        else if (flicker > 0.4) color = '#FF6600'; // Naranja
+                        else color = '#CC3300'; // Rojo oscuro
+                        updateLEDVisual(i, color, false);
+                    }
+                } else if (currentEffect === 'twinkle') {
+                     for (let i = 0; i < totalLeds; i++) {
+                        if (Math.random() > 0.98) { // 2% chance de estar encendido
+                            updateLEDVisual(i, '#ffffff', false);
+                        } else {
+                            updateLEDVisual(i, '#333333', false); // Apagado
+                        }
+                    }
+                } else if (currentEffect === 'chase') {
+                    const position = Math.floor(time * 10) % totalLeds;
+                    const chaseLength = 20;
+                    for (let i = 0; i < totalLeds; i++) {
+                        const distance = (i - position + totalLeds) % totalLeds;
+                        if (distance < chaseLength) {
+                            const brightness = 1 - (distance / chaseLength);
+                            const color = new THREE.Color(0x00ff00).multiplyScalar(brightness);
+                            updateLEDVisual(i, `#${color.getHexString()}`, false);
+                        } else {
+                            updateLEDVisual(i, '#333333', false);
+                        }
+                    }
+                } else if (currentEffect === 'sparkle') {
+                      const baseColor = new THREE.Color('#ff0000'); // Fondo rojo (ejemplo)
+                      for (let i = 0; i < totalLeds; i++) {
+                          if (Math.random() > 0.99) { // 1% chance de brillar blanco
+                              updateLEDVisual(i, '#ffffff', false);
+                          } else {
+                              updateLEDVisual(i, `#${baseColor.getHexString()}`, false);
+                          }
+                      }
+                } else if (currentEffect === 'ripple') {
+                      const center = Math.floor(totalLeds / 2 * (1 + Math.sin(time * 0.5))); // Centro oscilante
+                      const waveColor = new THREE.Color(0x0088ff);
+                      for (let i = 0; i < totalLeds; i++) {
+                          const distance = Math.abs(i - center);
+                          const brightness = Math.max(0, 1 - (distance / 30)); // Ancho de onda 30
+                          const color = waveColor.clone().multiplyScalar(brightness);
+                          if (brightness <= 0.05) {
+                              updateLEDVisual(i, '#333333', false);
+                          } else {
+                              updateLEDVisual(i, `#${color.getHexString()}`, false);
+                          }
+                      }
+                } else if (currentEffect === 'blink') {
+                      const isOn = Math.sin(time * 3) > 0; // Parpadeo
+                      const color = isOn ? '#ff0000' : '#333333'; // Parpadea en rojo
+                      for (let i = 0; i < totalLeds; i++) {
+                          updateLEDVisual(i, color, false);
+                      }
+                } else if (currentEffect === 'scan') {
+                      const position = (time * 20) % (totalLeds * 2); // Sube y baja
+                      const realPos = (position < totalLeds) ? position : (totalLeds * 2) - position;
+                      const scanColor = new THREE.Color(0xff0000); // Scanner rojo
+                      for (let i = 0; i < totalLeds; i++) {
+                          const distance = Math.abs(i - realPos);
+                          const brightness = Math.max(0, 1 - (distance / 10)); // Ancho 10
+                          const color = scanColor.clone().multiplyScalar(brightness);
+                           if (brightness <= 0.05) {
+                              updateLEDVisual(i, '#333333', false);
+                          } else {
+                              updateLEDVisual(i, `#${color.getHexString()}`, false);
+                          }
+                      }
+                } else if (currentEffect === 'waves') {
+                       for (let i = 0; i < totalLeds; i++) {
+                           const wave = Math.sin((i / 20) + (time * 2)); // 20 LEDs por onda
+                           const brightness = (wave + 1) / 2; // Normalizar 0-1
+                           const color = new THREE.Color(0x0000ff).multiplyScalar(brightness); // Onda azul
+                           updateLEDVisual(i, `#${color.getHexString()}`, false);
+                       }
+                } else if (currentEffect === 'fairy') {
+                       for (let i = 0; i < totalLeds; i++) {
+                           if (Math.random() > 0.995) {
+                               // Pone un nuevo color aleatorio
+                               ledColors[i] = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                           }
+                           
+                           // Desvanece todos los colores existentes
+                           const currentColor = new THREE.Color(ledColors[i] || '#333333');
+                           currentColor.multiplyScalar(0.95); // Se apaga lentamente
+                           
+                           if (currentColor.getHexString() === '000000') {
+                               ledColors[i] = '#333333';
+                               updateLEDVisual(i, '#333333', false);
+                           } else {
+                               const hex = `#${currentColor.getHexString()}`;
+                               ledColors[i] = hex;
+                               updateLEDVisual(i, hex, false);
+                           }
+                       }
+                } else if (currentEffect === 'flow') {
+                       hue = (hue + 1) % 360;
+                       const color = new THREE.Color(`hsl(${hue}, 100%, 50%)`);
+                       for (let i = 0; i < totalLeds; i++) {
+                           updateLEDVisual(i, `#${color.getHexString()}`, false);
+                       }
+                } else {
+                    needsUpdate = false;
+                }
+
+                if (needsUpdate) {
+                    ledGeometry.attributes.color.needsUpdate = true;
+                }
+            }
+            // --- Fin lógica animación ---
+            
+            // --- Animación de la estrella 3D
+            const pulse = Math.sin(Date.now() * 0.003) * 0.1 + 1.0; // Pulsa entre 1.0 y 1.1
+            if (star) { // Comprueba que la estrella exista
+                star.scale.set(0.7 * pulse, 0.7 * pulse, 0.7);
+                starMaterial.emissiveIntensity = pulse;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function onCanvasClick(event) {
+            if (!paintMode) return;
+
+            // Calcular posición del mouse en coordenadas normalizadas (-1 a +1)
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            // Actualizar el raycaster
+            raycaster.setFromCamera(mouse, camera);
+            raycaster.params.Points.threshold = 0.2; // Aumentar umbral para facilitar clic
+
+            // Encontrar intersecciones (EL MÉTODO SIMPLE Y FUNCIONAL)
+            const intersects = raycaster.intersectObject(ledPoints);
+
+            if (intersects.length > 0) {
+                // Ordenar por distancia y tomar el más cercano
+                intersects.sort((a, b) => a.distanceToRay - b.distanceToRay);
+                const index = intersects[0].index;
+                
+                if (index !== undefined) {
+                    handleLEDClick(index);
+                }
+            }
+        }
+        
+        /**
+         * Actualiza el color visual de un LED en el árbol 3D.
+         * @param {number} index - El índice del LED.
+         * @param {string} hexColor - El color en formato hex (ej: '#ff0000').
+         * @param {boolean} [needsUpdate=true] - Marcar la geometría para actualización.
+         */
+        function updateLEDVisual(index, hexColor, needsUpdate = true) {
+            const color = new THREE.Color(hexColor);
+            
+            // Aplicar brillo global (excepto si el color es negro/apagado)
+            if (color.getHexString() !== '000000' && color.getHexString() !== '333333') {
+                 color.multiplyScalar(globalBrightness / 255);
+            }
+
+            ledColorsArray[index * 3] = color.r;
+            ledColorsArray[index * 3 + 1] = color.g;
+            ledColorsArray[index * 3 + 2] = color.b;
+            
+            if (needsUpdate) {
+                ledGeometry.attributes.color.needsUpdate = true;
+            }
+        }
+
+        /** Sincroniza todos los LEDs locales con un array de colores de WLED */
+        function syncLocalLEDs(wledColors) {
+            stopAllAnimations();
+            ledColors = {}; // Resetear
+            for (let i = 0; i < totalLeds; i++) {
+                let colorHex = '#333333';
+                if (wledColors[i]) {
+                    const [r, g, b] = wledColors[i];
+                    colorHex = rgbToHex(r, g, b);
+                }
+                ledColors[i] = colorHex;
+                updateLEDVisual(i, colorHex, false);
+            }
+            ledGeometry.attributes.color.needsUpdate = true;
+            showStatus('✓ Árbol sincronizado');
+        }
+
+        // =====================================================
+        // COMUNICACIÓN CON WLED
+        // =====================================================
+
+        function getWLEDUrl() {
+            const ip = document.getElementById('wledIP').value.trim();
+            if (!ip) {
+                showStatus('❌ Ingresa una dirección IP válida', true);
+                return null;
+            }
+            
+            // Agregar http:// si no está presente
+            if (!ip.startsWith('http://') && !ip.startsWith('https://')) {
+                return `http://${ip}`;
+            }
+            return ip;
+        }
+        
+        async function testConnection() {
+            const baseUrl = getWLEDUrl();
+            if (!baseUrl) return;
+            
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.textContent = 'Conectando...';
+            statusDiv.className = 'connection-status';
+            
+            try {
+                // Intentar obtener el estado de WLED
+                const response = await fetch(`${baseUrl}/json/state`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Verificar que realmente es WLED
+                if (data && typeof data.on !== 'undefined') {
+                    statusDiv.textContent = `✓ Conectado - ${data.on ? 'Encendido' : 'Apagado'}`;
+                    statusDiv.className = 'connection-status connected';
+                    
+                    // Guardar IP
+                    localStorage.setItem('wledIP', document.getElementById('wledIP').value.trim());
+                    
+                    // Sincronizar estado
+                    await syncWLEDState();
+                    
+                    showStatus('✓ Conexión exitosa con WLED');
+                } else {
+                    throw new Error('Respuesta inválida del servidor');
+                }
+                
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                statusDiv.textContent = '✗ Error de conexión';
+                statusDiv.className = 'connection-status disconnected';
+                
+                showStatus(`❌ No se pudo conectar: ${error.message}`, true);
+            }
+        }
+        
+        async function syncWLEDState() {
+            const baseUrl = getWLEDUrl();
+            if (!baseUrl) return;
+            
+            try {
+                const response = await fetch(`${baseUrl}/json/state`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) return;
+                
+                const state = await response.json();
+                
+                // Actualizar brillo
+                if (state.bri !== undefined) {
+                    document.getElementById('brightness').value = state.bri;
+                    updateBrightnessLabel(state.bri);
+                }
+                
+                // Actualizar color si está en modo sólido
+                if (state.seg && state.seg[0]) {
+                    const seg = state.seg[0];
+                    if (seg.col && seg.col[0]) {
+                        const [r, g, b] = seg.col[0];
+                        const hex = rgbToHex(r, g, b);
+                        document.getElementById('ledColor').value = hex;
+                        selectedColor = hex;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error al sincronizar estado:', error);
+            }
+        }
+        
+        async function sendToWLED(payload) {
+            const baseUrl = getWLEDUrl();
+            if (!baseUrl) return false;
+            
+            try {
+                const response = await fetch(`${baseUrl}/json/state`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Error al enviar a WLED:', error);
+                showStatus(`❌ Error: ${error.message}`, true);
+                return false;
+            }
+        }
+        
+        async function sendIndividualLED(index, hexColor) {
+            const rgb = hexToRgb(hexColor);
+            const payload = {
+                "on": true,
+                "seg": [{
+                    "i": [index, [rgb.r, rgb.g, rgb.b]]
+                }]
+            };
+            await sendToWLED(payload);
+        }
+
+        // =====================================================
+        // LÓGICA DEL PANEL DE CONTROL
+        // =====================================================
+
+        function stopAllAnimations() {
+            currentEffect = null;
+            // Desactivar todos los botones de efectos
+            document.querySelectorAll('.button-grid button.active').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+
+        function setActiveButton(button) {
+             if (!button) return;
+            // Desactivar otros botones en el mismo grid
+            button.closest('.button-grid').querySelectorAll('button.active').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+        }
+        
+        function turnOff() {
+            stopAllAnimations();
+            sendToWLED({"on": false});
+            showStatus('✓ Apagado');
+            
+            ledColors = {};
+            for (let i = 0; i < totalLeds; i++) {
+                updateLEDVisual(i, '#333333', false);
+                ledColors[i] = '#333333';
+            }
+            ledGeometry.attributes.color.needsUpdate = true;
+        }
+
+        /**
+         * Aplica un color sólido a todos los LEDs.
+         * @param {Event} event - El evento del clic (para activar el botón).
+         * @param {string} [color] - Color opcional (usado por otras funciones).
+         */
+        function solidColor(event, color = null) {
+            stopAllAnimations();
+            const hex = color || document.getElementById('colorPicker').value;
+            const rgb = hexToRgb(hex);
+            
+            sendToWLED({
+                "on": true,
+                "seg": [{
+                    "fx": 0, // 0 = Modo Estático
+                    "col": [[rgb.r, rgb.g, rgb.b]]
+                }]
+            });
+            
+            showStatus('✓ Color sólido aplicado');
+            
+            ledColors = {}; // Resetear
+            for (let i = 0; i < totalLeds; i++) {
+                updateLEDVisual(i, hex, false);
+                ledColors[i] = hex; // Guardar para "Save Design"
+            }
+            ledGeometry.attributes.color.needsUpdate = true;
+            
+            if (event) setActiveButton(event.target);
+        }
+
+        /**
+         * Envía un comando de efecto a WLED y activa la simulación local.
+         * @param {Event} event - El evento del clic.
+         * @param {number} effectId - El ID del efecto en WLED.
+         */
+        function setEffect(event, effectId) {
+            stopAllAnimations();
+            ledColors = {}; // Limpia el estado de 'fairy' o 'paint'
+            
+            sendToWLED({"on": true, "seg": [{"fx": effectId}]});
+            
+            const button = event.target;
+            showStatus(`✓ Efecto ${button.textContent} activado`);
+            setActiveButton(button);
+
+            // Activar simulación local
+            currentEffect = button.textContent.toLowerCase().split(' ')[0];
+        }
+
+        function togglePaintMode() {
+            paintMode = !paintMode;
+            const btn = document.getElementById('paintModeBtn');
+            const info = document.getElementById('paintModeInfo');
+            const saveSection = document.getElementById('saveDesignSection');
+            
+            if (paintMode) {
+                stopAllAnimations();
+                // Poner WLED en modo estático para recibir LEDs individuales
+                sendToWLED({"seg": [{"fx": 0}]});
+                
+                btn.textContent = 'Desactivar Paint Mode';
+                btn.classList.add('active');
+                info.style.display = 'block';
+                saveSection.style.display = 'block';
+                showStatus('🖌️ Paint Mode Activado');
+            } else {
+                btn.textContent = 'Activar Paint Mode';
+                btn.classList.remove('active');
+                info.style.display = 'none';
+                saveSection.style.display = 'none';
+                showStatus('🖌️ Paint Mode Desactivado');
+            }
+        }
+        
+        function handleLEDClick(index) {
+            if (!paintMode) return;
+            
+            const color = document.getElementById('colorPicker').value;
+            const rgb = hexToRgb(color);
+            
+            // 1. Enviar a WLED
+            sendIndividualLED(index, rgb);
+            
+            // 2. Actualizar visualización 3D
+            updateLEDVisual(index, color);
+
+            // 3. Guardar en estado local
+            ledColors[index] = color;
+        }
+
+        /**
+         * Actualiza el brillo.
+         * @param {string} value - Valor del slider (0-255).
+         * @param {boolean} send - true si debe enviar el comando (onchange), false si solo actualiza UI (oninput).
+         */
+        function updateBrightness(value, send) {
+            globalBrightness = parseInt(value);
+            updateBrightnessLabel(globalBrightness);
+
+            if (send) {
+                sendToWLED({"bri": globalBrightness});
+                showStatus(`✓ Brillo fijado a ${Math.round(globalBrightness / 2.55)}%`);
+            }
+            
+            // Re-renderizar los LEDs locales con el nuevo brillo (si no hay efecto)
+            if (currentEffect === null) {
+                for (let i = 0; i < totalLeds; i++) {
+                    updateLEDVisual(i, ledColors[i] || '#333333', false);
+                }
+                ledGeometry.attributes.color.needsUpdate = true;
+            }
+            // Si hay un efecto, el loop animate3D() usará globalBrightness
+        }
+
+        function updateBrightnessLabel(value) {
+            const percent = Math.round(value / 2.55);
+            document.getElementById('brightVal').textContent = `${percent}%`;
+        }
+
+        // =====================================================
+        // DISEÑOS (LOCALSTORAGE)
+        // =====================================================
+
+        function saveDesign() {
+            const name = document.getElementById('designName').value.trim();
+            if (!name) {
+                showStatus('❌ Escribe un nombre para el diseño.', true);
+                return;
+            }
+            
+            // Solo guardar los LEDs que no están apagados
+            const designToSave = {};
+            for(const [index, color] of Object.entries(ledColors)) {
+                if (color !== '#333333' && color !== '#000000') {
+                    designToSave[index] = color;
+                }
+            }
+
+            if (Object.keys(designToSave).length === 0) {
+                 showStatus('❌ No hay LEDs encendidos para guardar.', true);
+                return;
+            }
+
+            let designs = JSON.parse(localStorage.getItem('wledDesigns')) || {};
+            designs[name] = designToSave;
+            localStorage.setItem('wledDesigns', JSON.stringify(designs));
+            
+            showStatus(`✓ Diseño "${name}" guardado.`);
+            document.getElementById('designName').value = '';
+            loadDesigns();
+        }
+
+        function loadDesigns() {
+            const designs = JSON.parse(localStorage.getItem('wledDesigns')) || {};
+            const listDiv = document.getElementById('designsList');
+            listDiv.innerHTML = '';
+            
+            if (Object.keys(designs).length === 0) {
+                listDiv.innerHTML = '<p style="color: #666; font-size: 14px;">No hay diseños guardados.</p>';
+                return;
+            }
+            
+            Object.keys(designs).forEach(name => {
+                const item = document.createElement('div');
+                item.className = 'design-item';
+                item.innerHTML = `
+                    <span>${escapeHTML(name)}</span>
+                    <div>
+                        <button onclick="applyDesign('${escapeHTML(name)}')">Cargar</button>
+                        <button class="delete-btn" onclick="deleteDesign('${escapeHTML(name)}')">X</button>
+                    </div>
+                `;
+                listDiv.appendChild(item);
+            });
+        }
+
+        function applyDesign(name) {
+            const designs = JSON.parse(localStorage.getItem('wledDesigns')) || {};
+            const design = designs[name];
+            
+            if (!design) {
+                showStatus('❌ No se encontró el diseño.', true);
+                return;
+            }
+
+            stopAllAnimations();
+            
+            // 1. Poner WLED en modo estático
+            // 2. Construir el payload de LEDs individuales
+            const payload_i = [];
+            ledColors = {}; // Resetear estado local
+            
+            // Apagar todos primero
+            for (let i = 0; i < totalLeds; i++) {
+                ledColors[i] = '#333333';
+                updateLEDVisual(i, '#333333', false);
+            }
+            
+            // Aplicar los colores del diseño
+            for(const [index, color] of Object.entries(design)) {
+                const rgb = hexToRgb(color);
+                payload_i.push(parseInt(index), [rgb.r, rgb.g, rgb.b]);
+                
+                ledColors[index] = color;
+                updateLEDVisual(parseInt(index), color, false);
+            }
+
+            // Enviar a WLED
+            sendToWLED({
+                "on": true,
+                "seg": [{ "fx": 0, "i": payload_i }]
+            });
+            
+            ledGeometry.attributes.color.needsUpdate = true;
+            showStatus(`✓ Diseño "${name}" cargado.`);
+        }
+
+        function deleteDesign(name) {
+            if (!confirm(`¿Seguro que quieres borrar el diseño "${name}"?`)) {
+                return;
+            }
+            let designs = JSON.parse(localStorage.getItem('wledDesigns')) || {};
+            delete designs[name];
+            localStorage.setItem('wledDesigns', JSON.stringify(designs));
+            showStatus(`✓ Diseño "${name}" borrado.`);
+            loadDesigns();
+        }
+
+        // =====================================================
+        // TIMER
+        // =====================================================
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        function loadTimerSettings() {
+            const settings = JSON.parse(localStorage.getItem('wledTimer')) || {};
+            document.getElementById('timerEnabled').checked = settings.enabled || false;
+            document.getElementById('onTime').value = settings.on || '18:00';
+            document.getElementById('offTime').value = settings.off || '07:00';
+        }
+
+        function updateTimer() {
+            const settings = {
+                enabled: document.getElementById('timerEnabled').checked,
+                on: document.getElementById('onTime').value,
+                off: document.getElementById('offTime').value
+            };
+            localStorage.setItem('wledTimer', JSON.stringify(settings));
+            showStatus('✓ Configuración del timer guardada.');
+            
+            // Aquí se podría enviar a WLED si se usa su sistema de macros/timer
+            // sendToWLED({"nt": {...}});
+        }
+
+        function checkTimer() {
+            const settings = JSON.parse(localStorage.getItem('wledTimer')) || {};
+            if (!settings.enabled) return;
+
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            const [onH, onM] = settings.on.split(':').map(Number);
+            const onTime = onH * 60 + onM;
+            
+            const [offH, offM] = settings.off.split(':').map(Number);
+            const offTime = offH * 60 + offM;
+            
+            // Lógica simple de encendido/apagado (no maneja cruce de medianoche perfectamente)
+            if (currentTime === onTime) {
+                showStatus('⏰ Timer: Encendiendo luces');
+                sendToWLED({"on": true});
+            } else if (currentTime === offTime) {
+                showStatus('⏰ Timer: Apagando luces');
+                sendToWLED({"on": false});
+            }
+        }
+        
+        // =====================================================
+        // UTILIDADES
+        // =====================================================
+        
+        function generateStars() {
+            const starsContainer = document.getElementById('stars');
+            for(let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function showStatus(message, isError = false) {
+            // Eliminar mensaje anterior si existe
+            const oldMessage = document.querySelector('.status-message');
+            if (oldMessage) oldMessage.remove();
+            
+            const status = document.createElement('div');
+            status.className = 'status-message';
+            status.textContent = message;
+            if (isError) {
+                status.style.background = '#dc3545';
+            }
+            document.body.appendChild(status);
+            
+            setTimeout(() => {
+                status.remove();
+            }, 3000);
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+        
+        function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[m];
+            });
+        }
+
+    </script>
+</body>
+</html>
