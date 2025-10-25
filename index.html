@@ -430,7 +430,7 @@
                 <!-- CONEXIÓN -->
                 <div class="section">
                     <div class="section-title">🔌 Conexión</div>
-                    <input type="text" id="wledIP" placeholder="192.168.0.36" value="192.168.0.36">
+                    <input type="text" id="wledIP" placeholder="Vittence.com" value="Vittence.com">
                     <button onclick="testConnection()">Probar y Sincronizar</button>
                     <button class="danger" onclick="resetWLED()">🔄 Reset WLED</button>
                     <div id="connectionStatus" class="connection-status disconnected">
@@ -554,12 +554,16 @@
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     
     <script>
         // =====================================================
         // VARIABLES GLOBALES
         // =====================================================
         
+	// MQTT Client
+	let mqttClient = null;
+
         let scene, camera, renderer;
         let ledGroup;
         let ledMeshes = [];
@@ -589,64 +593,144 @@
         
         // Función directa para enviar a WLED con protección anti-spam
         async function sendToWLED(payload) {
-            // PROTECCIÓN: Si hay una petición en proceso, ignorar
-            if (isProcessingRequest) {
-                console.log('⏭️ Petición ignorada (otra en proceso)');
-                return false;
-            }
+    	   // PROTECCIÓN: Si hay una petición en proceso, ignorar
+    	   if (isProcessingRequest) {
+        	console.log('⏭️ Petición ignorada (otra en proceso)');
+        	return false;
+    	   }
+    
+    	// ============================================
+    	// PRIORIDAD 1: MQTT (si está conectado)
+    	// ============================================
+    	   if (mqttClient && mqttClient.connected) {
+        	isProcessingRequest = true;
+        	console.log('📤 MQTT → Enviando:', JSON.stringify(payload).substring(0, 100));
+        
+        	try {
+           	 // Publicar al topic de API de WLED
+            	mqttClient.publish('wled/tree/api', JSON.stringify(payload), { qos: 0 });
+            	console.log('✅ Enviado vía MQTT');
             
-            const baseUrl = getWLEDUrl();
-            if (!baseUrl) {
-                console.log('Sin conexión WLED');
-                return false;
-            }
+            	// Pequeño delay para dar tiempo al ESP
+            	await new Promise(resolve => setTimeout(resolve, 50));
+            	return true;
             
-            // Esperar intervalo mínimo desde última petición
-            const now = Date.now();
-            const timeSinceLastRequest = now - lastRequestTime;
-            if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
-                const waitTime = MIN_REQUEST_INTERVAL - timeSinceLastRequest;
-                console.log(`⏳ Esperando ${waitTime}ms...`);
-                await new Promise(resolve => setTimeout(resolve, waitTime));
-            }
+        	} catch (error) {
+            	   console.error('❌ Error al enviar MQTT:', error);
+            	   showStatus('❌ Error MQTT', true);
+            	   return false;
             
-            isProcessingRequest = true;
-            console.log('📤 Enviando:', JSON.stringify(payload));
-            
-            try {
-                lastRequestTime = Date.now();
-                
-                const response = await fetch(`${baseUrl}/json/state`, {
-                    method: 'POST',
-                    mode: 'cors',
-                    cache: 'no-cache',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                    signal: AbortSignal.timeout(3000)
-                });
-                
-                if (!response.ok) {
-                    console.error(`❌ HTTP ${response.status}`);
-                    return false;
-                }
-                
-                await response.json();
-                console.log('✅ OK');
-                return true;
-                
-            } catch (error) {
-                if (error.name === 'TimeoutError' || error.name === 'AbortError') {
-                    console.error('❌ Timeout');
-                } else {
-                    console.error('❌ Error:', error.message);
-                }
-                return false;
-            } finally {
-                isProcessingRequest = false;
-            }
+        	} finally {
+            	   isProcessingRequest = false;
+        	}
+    	   }
+    
+    	// ============================================
+    	// FALLBACK: HTTP Local (si MQTT no está disponible)
+    	// ============================================
+    	const baseUrl = getWLEDUrl();
+    	if (!baseUrl) {
+           console.log('❌ Sin conexión (ni MQTT ni HTTP)');
+           showStatus('❌ Sin conexión con WLED', true);
+           return false;
+    	}
+    
+    	// Esperar intervalo mínimo desde última petición
+    	const now = Date.now();
+    	const timeSinceLastRequest = now - lastRequestTime;
+    	if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
+           const waitTime = MIN_REQUEST_INTERVAL - timeSinceLastRequest;
+           console.log(`⏳ Esperando ${waitTime}ms...`);
+           await new Promise(resolve => setTimeout(resolve, waitTime));
+    	}
+    
+    	isProcessingRequest = true;
+    	console.log('📤 HTTP → Enviando:', JSON.stringify(payload));
+    
+    	try {
+           lastRequestTime = Date.now();
+        
+        const response = await fetch(`${baseUrl}/json/state`, {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+            signal: AbortSignal.timeout(3000)
+        });
+        
+        if (!response.ok) {
+            console.error(`❌ HTTP ${response.status}`);
+            return false;
         }
+        
+        await response.json();
+        console.log('✅ OK vía HTTP');
+        return true;
+        
+    	} catch (error) {
+        	if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+            	console.error('❌ Timeout HTTP');
+        } else {
+            console.error('❌ Error HTTP:', error.message);
+        }
+        return false;
+    	} finally {
+        	isProcessingRequest = false;
+    	   }
+	}
+
+	// =====================================================
+	// MQTT CONNECTION
+	// =====================================================
+
+	function initMQTT() {
+    		console.log('🔌 Iniciando conexión MQTT...');
+    
+    		// Conectar al broker usando WebSocket seguro
+    		const broker = 'wss://mqtt.vittence.com:8884/mqtt';
+    
+   		 mqttClient = mqtt.connect(broker, {
+       		 username: 'wled_user',
+       		 password: '123456789@Ab',  // ⚠️ CAMBIA ESTO por tu password de HiveMQ
+       	 	clientId: 'web-controller-' + Math.random().toString(16).substr(2, 8),
+       	 	clean: true,
+       		 reconnectPeriod: 5000,
+       	 	connectTimeout: 10000
+    	});
+    
+    	mqttClient.on('connect', () => {
+        	console.log('✅ Conectado a MQTT Broker');
+        	showStatus('✅ Conectado a MQTT');
+        
+         // Suscribirse para recibir estados del ESP
+       	 mqttClient.subscribe('wled/tree/#', (err) => {
+        	 if (!err) {
+         	       console.log('📡 Suscrito a topics WLED');
+        	 }
+      	     });
+   	 });
+   	 
+   	 mqttClient.on('error', (err) => {
+    	    console.error('❌ Error MQTT:', err);
+    	    showStatus('❌ Error MQTT: ' + err.message, true);
+    	});
+    
+    	mqttClient.on('reconnect', () => {
+    	    console.log('🔄 Reconectando MQTT...');
+  	  });
+    
+  	  mqttClient.on('offline', () => {
+   	     console.log('⚠️ MQTT offline');
+  	      showStatus('⚠️ Desconectado de MQTT', true);
+ 	   });
+    
+   	   mqttClient.on('message', (topic, message) => {
+   	     		console.log('📨 Mensaje recibido:', topic, message.toString());
+    	   });
+	}
         
         // Función para convertir RGB según el orden correcto
         function applyColorOrder(r, g, b) {
@@ -673,19 +757,25 @@
         // =====================================================
         
         window.onload = function() {
-            initThreeJS();
-            generateStars();
-            loadDesigns();
-            loadTimerSettings();
-            updateClock();
-            setInterval(updateClock, 1000);
-            setInterval(checkTimer, 60000);
-            
-            const savedIP = localStorage.getItem('wledIP');
-            if (savedIP) {
-                document.getElementById('wledIP').value = savedIP;
-            }
-        };
+    	   console.log('🚀 Iniciando aplicación...');
+    
+    	   // IMPORTANTE: Iniciar MQTT primero
+    	   initMQTT();
+    
+    	   // Luego el resto de inicializaciones
+    	   initThreeJS();
+    	   generateStars();
+    	   loadDesigns();
+    	   loadTimerSettings();
+    	   updateClock();
+    	   setInterval(updateClock, 1000);
+    	   setInterval(checkTimer, 60000);
+    
+    	   const savedIP = localStorage.getItem('wledIP');
+    	   if (savedIP) {
+        	document.getElementById('wledIP').value = savedIP;
+    	   }
+	};
         
         // =====================================================
         // THREE.JS
@@ -852,10 +942,13 @@
         // =====================================================
         
         function getWLEDUrl() {
-            const ip = document.getElementById('wledIP').value.trim();
-            if (!ip) return null;
-            return ip.startsWith('http') ? ip : `http://${ip}`;
-        }
+    			const ip = document.getElementById('wledIP').value.trim();
+    			if (!ip) return null;
+    			// Auto-detectar HTTP o HTTPS según cómo se carga la página
+    			if (ip.startsWith('http')) return ip;
+   			 const protocol = window.location.protocol === 'https:' ? 'https://' : 'http://';
+    			return `${protocol}${ip}`;
+	}
         
         async function testConnection() {
             const ip = document.getElementById('wledIP').value.trim();
