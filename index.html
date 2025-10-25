@@ -690,10 +690,10 @@
     		console.log('🔌 Iniciando conexión MQTT...');
     
     		// Usar el puerto 8884 para WebSocket seguro (wss://)
-    		const broker = 'wss://broker.emqx.io:8884/mqtt'; // ⬅️ CAMBIO AQUÍ (8883 a 8884)
+    		const broker = 'wss://90717923c01b4a4da3718559007344ac.s1.eu.hivemq.cloud:8884/mqtt'; // ⬅️ CAMBIO AQUÍ (8883 a 8884)
    		 	mqttClient = mqtt.connect(broker, {
-       		 username: '',
-       		 password: '',  
+       		 username: 'wled_user',
+       		 password: 'WledMqtt2024!',  
        	 	clientId: 'web-controller-' + Math.random().toString(16).substr(2, 8),
        	 	clean: true,
        		 reconnectPeriod: 5000,
