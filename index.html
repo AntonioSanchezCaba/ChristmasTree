@@ -608,7 +608,7 @@
         
         	try {
            	 // Publicar al topic de API de WLED
-            	mqttClient.publish('wled/tree/set', JSON.stringify(payload), { qos: 0 });
+            	mqttClient.publish('wled/tree', JSON.stringify(payload), { qos: 0 });
             	console.log('✅ Enviado vía MQTT');
             
             	// Pequeño delay para dar tiempo al ESP
@@ -690,10 +690,10 @@
     		console.log('🔌 Iniciando conexión MQTT...');
     
     		// Usar el puerto 8884 para WebSocket seguro (wss://)
-    		const broker = 'wss://90717923c01b4a4da3718559007344ac.s1.eu.hivemq.cloud:8884/mqtt'; // ⬅️ CAMBIO AQUÍ (8883 a 8884)
+    		const broker = 'wss://broker.emqx.io:8884/mqtt'; // ⬅️ CAMBIO AQUÍ (8883 a 8884)
    		 	mqttClient = mqtt.connect(broker, {
-       		 username: 'wled_user',
-       		 password: 'WledMqtt2024!',  
+       		 username: '',
+       		 password: '',  
        	 	clientId: 'web-controller-' + Math.random().toString(16).substr(2, 8),
        	 	clean: true,
        		 reconnectPeriod: 5000,
