@@ -1197,13 +1197,15 @@
             
             const orderedRgb = applyColorOrder(rgb.r, rgb.g, rgb.b);
             
-            await sendToWLED({
-                "on": true,
-                "seg": [{
-                    "fx": 0,
-                    "i": [index, orderedRgb]
-                }]
-            });
+            // CÓDIGO CORREGIDO (Desempaqueta el array [R, G, B])
+			await sendToWLED({
+    			"on": true,
+    			"seg": [{
+        		"fx": 0,
+        		// Usamos el operador spread (...) para pasar R, G, B como elementos individuales
+        		"i": [index, ...orderedRgb] 
+    			}]
+			});
         }
         
         function updateLEDVisual(index, color, needsUpdate = true) {
@@ -1787,7 +1789,7 @@
             for(const [index, color] of Object.entries(design)) {
                 const rgb = hexToRgb(color);
                 const idx = parseInt(index);
-                payload_i.push(idx, [rgb.r, rgb.g, rgb.b]);
+                payload_i.push(idx, ...rgb);
                 
                 ledColors[idx] = color;
                 updateLEDVisual(idx, color, false);
