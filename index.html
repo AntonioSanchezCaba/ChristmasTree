@@ -600,30 +600,37 @@
     	   }
     
     	// ============================================
-    	// PRIORIDAD 1: MQTT (si está conectado)
-    	// ============================================
-    	   if (mqttClient && mqttClient.connected) {
-        	isProcessingRequest = true;
-        	console.log('📤 MQTT → Enviando:', JSON.stringify(payload).substring(0, 100));
+		// PRIORIDAD 1: MQTT (solo para comandos simples)
+		// ============================================
+		if (mqttClient && mqttClient.connected) {
+  		  const payloadStr = JSON.stringify(payload);
+    
+   		 // LIMITAR MQTT solo a comandos pequeños (<200 caracteres)
+   		 if (payloadStr.length < 200) {
+     		   isProcessingRequest = true;
+      		  console.log('📤 MQTT → Enviando:', payloadStr.substring(0, 100));
         
-        	try {
-           	 // Publicar al topic de API de WLED
-            	mqttClient.publish('wled/tree/api', JSON.stringify(payload), { qos: 1, retain: false });
-            	console.log('✅ Enviado vía MQTT');
+      		  try {
+        		    mqttClient.publish('wled/tree/api', payloadStr, { qos: 1, retain: false });
+      		      console.log('✅ Enviado vía MQTT');
             
-            	// Pequeño delay para dar tiempo al ESP
-            	await new Promise(resolve => setTimeout(resolve, 50));
-            	return true;
+           		 await new Promise(resolve => setTimeout(resolve, 100));
+           		 return true;
             
-        	} catch (error) {
-            	   console.error('❌ Error al enviar MQTT:', error);
-            	   showStatus('❌ Error MQTT', true);
-            	   return false;
+        		} catch (error) {
+          		  console.error('❌ Error MQTT:', error);
+           		 showStatus('❌ Error MQTT', true);
+          		  return false;
             
-        	} finally {
-            	   isProcessingRequest = false;
-        	}
-    	   }
+      		  } finally {
+           		 isProcessingRequest = false;
+        		}
+    		} else {
+        		// Payload muy grande → usar HTTP
+        		console.log('⚠️ Payload grande, usando HTTP en lugar de MQTT');
+        		// Continuar con HTTP abajo...
+    		}
+		}
     
     	// ============================================
     	// FALLBACK: HTTP Local (si MQTT no está disponible)
@@ -658,7 +665,7 @@
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(payload),
-            signal: AbortSignal.timeout(3000)
+            signal: AbortSignal.timeout(5000)  // 5 segundos
         });
         
         if (!response.ok) {
@@ -1187,26 +1194,23 @@
         }
         
         async function updateLEDColor(index, color) {
-            if (index < 0 || index >= totalLeds) return;
-            
-            ledColors[index] = color;
-            updateLEDVisual(index, color, true);
-            
-            const rgb = hexToRgb(color);
-            if (!rgb) return;
-            
-            const orderedRgb = applyColorOrder(rgb.r, rgb.g, rgb.b);
-            
-            // CÓDIGO CORREGIDO (Desempaqueta el array [R, G, B])
-			await sendToWLED({
-    			"on": true,
-    			"seg": [{
-        		"fx": 0,
-        		// Usamos el operador spread (...) para pasar R, G, B como elementos individuales
-        		"i": [index, ...orderedRgb] 
-    			}]
-			});
-        }
+    		if (index < 0 || index >= totalLeds) return;
+    
+   		 ledColors[index] = color;
+   		 updateLEDVisual(index, color, true);
+    
+    		const rgb = hexToRgb(color);
+    		if (!rgb) return;
+    
+   		 const orderedRgb = applyColorOrder(rgb.r, rgb.g, rgb.b);
+    
+   		 // Comando simplificado para un LED
+    		await sendToWLED({
+       		 "seg": [{
+         		   "i": [index, orderedRgb]  // Solo este LED
+       		 }]
+    		});
+		}
         
         function updateLEDVisual(index, color, needsUpdate = true) {
             if (index < 0 || index >= totalLeds || !ledMeshes[index]) return;
