@@ -607,7 +607,7 @@
         		console.log('📤 MQTT → Enviando:', payloadStr.substring(0, 100));
 
         		try {
-            		mqttClient.publish('wled/tree/api', payloadStr, { qos: 1, retain: false });
+            		mqttClient.publish('AntonioSC79/feeds/christmastree', payloadStr, { qos: 1, retain: false });
             		console.log('✅ Enviado vía MQTT');
             		await new Promise(resolve => setTimeout(resolve, 100)); // Pequeña pausa
             		return true;
@@ -643,12 +643,13 @@
     	// Si tu broker HiveMQ usa un puerto diferente para WSS (ej: 8884 o 8084), debes usarlo, 
     	// pero recuerda que 8884 tiene alta probabilidad de ser bloqueado por Hostinger.
 		//const broker = 'wss://mqtt.vittence.com:8884/mqtt';
-    	const broker = 'wss://90717923c01b4a4da3718559007344ac.s1.eu.hivemq.cloud:8884/mqtt'
+		const broker = 'wss://io.adafruit.com:443';
+    	//const broker = 'wss://90717923c01b4a4da3718559007344ac.s1.eu.hivemq.cloud:8884/mqtt'
 
     	mqttClient = mqtt.connect(broker, {
-       	 username: 'wled_user',
+       	 username: 'AntonioSC79',
         	// ⚠️ ASEGÚRATE DE QUE ESTE ES TU PASSWORD REAL DE HIVEQ.
-        	password: 'WledMqtt2024!', 
+        	password: 'aio_vpjE352aZA1L6cTZ1gIAVdXoNvr7', 
         	clientId: 'web-controller-' + Math.random().toString(16).substr(2, 8),
         	clean: true,
         	reconnectPeriod: 5000,
@@ -665,7 +666,7 @@
         
         	// Suscribirse para recibir estados del ESP (WLED)
         	// Se recomienda suscribirse a los topics de estado de WLED para recibir feedback.
-        	mqttClient.subscribe('wled/tree/status/#', (err) => { // wled/CLIENT_ID/status/#
+        	mqttClient.subscribe('AntonioSC79/feeds/christmastree', (err) => { // wled/CLIENT_ID/status/#
              	if (!err) {
                 	 console.log('📡 Suscrito a topics de estado WLED');
              	}
