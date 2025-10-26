@@ -607,7 +607,7 @@
         		console.log('📤 MQTT → Enviando:', payloadStr.substring(0, 100));
 
         		try {
-            		mqttClient.publish('AntonioSC79/feeds/ChristmasTree', payloadStr, { qos: 1, retain: false });
+            		mqttClient.publish('AntonioSC79/feeds/christmastree', payloadStr, { qos: 1, retain: false });
             		console.log('✅ Enviado vía MQTT');
             		await new Promise(resolve => setTimeout(resolve, 100)); // Pequeña pausa
             		return true;
@@ -666,7 +666,7 @@
         
         	// Suscribirse para recibir estados del ESP (WLED)
         	// Se recomienda suscribirse a los topics de estado de WLED para recibir feedback.
-        	mqttClient.subscribe('AntonioSC79/feeds/ChristmasTree', (err) => { // wled/CLIENT_ID/status/#
+        	mqttClient.subscribe('AntonioSC79/feeds/christmastree', (err) => { // wled/CLIENT_ID/status/#
              	if (!err) {
                 	 console.log('📡 Suscrito a topics de estado WLED');
              	}
