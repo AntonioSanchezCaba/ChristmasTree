@@ -593,101 +593,43 @@
         
         // Función directa para enviar a WLED con protección anti-spam
         async function sendToWLED(payload) {
-    	   // PROTECCIÓN: Si hay una petición en proceso, ignorar
-    	   if (isProcessingRequest) {
-        	console.log('⏭️ Petición ignorada (otra en proceso)');
-        	return false;
-    	   }
-    
-    	// ============================================
-		// PRIORIDAD 1: MQTT (solo para comandos simples)
-		// ============================================
-		if (mqttClient && mqttClient.connected) {
-  		  const payloadStr = JSON.stringify(payload);
-    
-   		 // LIMITAR MQTT solo a comandos pequeños (<200 caracteres)
-   		 if (payloadStr.length < 200) {
-     		   isProcessingRequest = true;
-      		  console.log('📤 MQTT → Enviando:', payloadStr.substring(0, 100));
-        
-      		  try {
-        		    mqttClient.publish('wled/tree/api', payloadStr, { qos: 1, retain: false });
-      		      console.log('✅ Enviado vía MQTT');
-            
-           		 await new Promise(resolve => setTimeout(resolve, 100));
-           		 return true;
+    		if (isProcessingRequest) {
+        		console.log('⏭️ Petición ignorada (otra en proceso)');
+        		return false;
+    		}
+
+    		// ============================================
+    		// PRIORIDAD ÚNICA: MQTT
+    		// ============================================
+    		if (mqttClient && mqttClient.connected) {
+        		const payloadStr = JSON.stringify(payload);
+        		isProcessingRequest = true;
+        		console.log('📤 MQTT → Enviando:', payloadStr.substring(0, 100));
+
+        		try {
+            		mqttClient.publish('wled/tree/api', payloadStr, { qos: 1, retain: false });
+            		console.log('✅ Enviado vía MQTT');
+            		await new Promise(resolve => setTimeout(resolve, 100)); // Pequeña pausa
+            		return true;
             
         		} catch (error) {
-          		  console.error('❌ Error MQTT:', error);
-           		 showStatus('❌ Error MQTT', true);
-          		  return false;
+            		console.error('❌ Error MQTT:', error);
+            		showStatus('❌ Error al enviar MQTT', true);
+            		return false;
             
-      		  } finally {
-           		 isProcessingRequest = false;
+        		} finally {
+            		isProcessingRequest = false;
         		}
+        
     		} else {
-        		// Payload muy grande → usar HTTP
-        		console.log('⚠️ Payload grande, usando HTTP en lugar de MQTT');
-        		// Continuar con HTTP abajo...
+        		// Si MQTT no está conectado, simplemente falla.
+        		console.log('❌ Fallo: MQTT no está conectado. No se puede enviar comando.');
+        		showStatus('❌ MQTT Desconectado', true);
+        		return false;
     		}
+    
+    		// La sección de FALLBACK HTTP ha sido eliminada.
 		}
-    
-    	// ============================================
-    	// FALLBACK: HTTP Local (si MQTT no está disponible)
-    	// ============================================
-    	const baseUrl = getWLEDUrl();
-    	if (!baseUrl) {
-           console.log('❌ Sin conexión (ni MQTT ni HTTP)');
-           showStatus('❌ Sin conexión con WLED', true);
-           return false;
-    	}
-    
-    	// Esperar intervalo mínimo desde última petición
-    	const now = Date.now();
-    	const timeSinceLastRequest = now - lastRequestTime;
-    	if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
-           const waitTime = MIN_REQUEST_INTERVAL - timeSinceLastRequest;
-           console.log(`⏳ Esperando ${waitTime}ms...`);
-           await new Promise(resolve => setTimeout(resolve, waitTime));
-    	}
-    
-    	isProcessingRequest = true;
-    	console.log('📤 HTTP → Enviando:', JSON.stringify(payload));
-    
-    	try {
-           lastRequestTime = Date.now();
-        
-        const response = await fetch(`${baseUrl}/json/state`, {
-            method: 'POST',
-            mode: 'cors',
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-            signal: AbortSignal.timeout(5000)  // 5 segundos
-        });
-        
-        if (!response.ok) {
-            console.error(`❌ HTTP ${response.status}`);
-            return false;
-        }
-        
-        await response.json();
-        console.log('✅ OK vía HTTP');
-        return true;
-        
-    	} catch (error) {
-        	if (error.name === 'TimeoutError' || error.name === 'AbortError') {
-            	console.error('❌ Timeout HTTP');
-        } else {
-            console.error('❌ Error HTTP:', error.message);
-        }
-        return false;
-    	} finally {
-        	isProcessingRequest = false;
-    	   }
-	}
 
 	// =====================================================
 	// MQTT CONNECTION
