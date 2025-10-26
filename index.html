@@ -694,30 +694,42 @@
 	// =====================================================
 
 	function initMQTT() {
-    		console.log('🔌 Iniciando conexión MQTT...');
+    	console.log('🔌 Iniciando conexión MQTT...');
     
-    		// Conectar al broker usando WebSocket seguro
-    		const broker = 'wss://mqtt.vittence.com/mqtt';
-   		 mqttClient = mqtt.connect(broker, {
-       		 username: 'wled_user',
-       		 password: 'WledMqtt2024!',  // ⚠️ CAMBIA ESTO por tu password de HiveMQ
-       	 	clientId: 'web-controller-' + Math.random().toString(16).substr(2, 8),
-       	 	clean: true,
-       		 reconnectPeriod: 5000,
-       	 	connectTimeout: 10000
+   	 // CAMBIO CLAVE: Usar WSS en el puerto 443 o la URL simple
+    	// Asegúrate de que tu configuración de HiveMQ soporta WSS en el puerto 443.
+    	// Si tu broker HiveMQ usa un puerto diferente para WSS (ej: 8884 o 8084), debes usarlo, 
+    	// pero recuerda que 8884 tiene alta probabilidad de ser bloqueado por Hostinger.
+    	const broker = 'wss://mqtt.vittence.com/mqtt'; // HiveMQ suele resolver el puerto 443 automáticamente
+
+    	mqttClient = mqtt.connect(broker, {
+       	 username: 'wled_user',
+        	// ⚠️ ASEGÚRATE DE QUE ESTE ES TU PASSWORD REAL DE HIVEQ.
+        	password: 'WledMqtt2024!', 
+        	clientId: 'web-controller-' + Math.random().toString(16).substr(2, 8),
+        	clean: true,
+        	reconnectPeriod: 5000,
+        	connectTimeout: 10000,
+        	// Añadir una propiedad para el protocolo si el cliente mqtt.js lo requiere para WSS.
+        	protocol: 'wss' 
     	});
     
+    	// ... (El resto de manejadores de eventos 'connect', 'error', 'reconnect', etc., está bien)
+    	// ...
     	mqttClient.on('connect', () => {
         	console.log('✅ Conectado a MQTT Broker');
         	showStatus('✅ Conectado a MQTT');
         
-         // Suscribirse para recibir estados del ESP
-       	 mqttClient.subscribe('wled/tree/#', (err) => {
-        	 if (!err) {
-         	       console.log('📡 Suscrito a topics WLED');
-        	 }
-      	     });
-   	 });
+        	// Suscribirse para recibir estados del ESP (WLED)
+        	// Se recomienda suscribirse a los topics de estado de WLED para recibir feedback.
+        	mqttClient.subscribe('wled/tree/status/#', (err) => { // wled/CLIENT_ID/status/#
+             	if (!err) {
+                	 console.log('📡 Suscrito a topics de estado WLED');
+             	}
+         	});
+         
+        // El topic de comando que usas es 'wled/tree/api'
+    	});
    	 
    	 mqttClient.on('error', (err) => {
     	    console.error('❌ Error MQTT:', err);
