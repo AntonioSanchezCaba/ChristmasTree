@@ -608,7 +608,7 @@
         
         	try {
            	 // Publicar al topic de API de WLED
-            	mqttClient.publish('wled/tree/set', JSON.stringify(payload), { qos: 0 });
+            	mqttClient.publish('wled/tree/api', JSON.stringify(payload), { qos: 0 });
             	console.log('✅ Enviado vía MQTT');
             
             	// Pequeño delay para dar tiempo al ESP
