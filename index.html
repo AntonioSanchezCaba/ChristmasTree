@@ -375,6 +375,10 @@
                                 <input type="radio" name="connectionMode" value="http-auto">
                                 <strong>HTTP Auto</strong> (Detecta red automáticamente)
                             </label>
+                            <label style="background: #e8f5e9; border-left: 3px solid #4caf50;">
+                                <input type="radio" name="connectionMode" value="firebase">
+                                <strong>🔥 Firebase Cloud</strong> (Sin acceso al router - Recomendado)
+                            </label>
                             <label>
                                 <input type="radio" name="connectionMode" value="mqtt-public">
                                 <strong>MQTT Público</strong> (test.mosquitto.org)
@@ -413,7 +417,49 @@
                             📖 <a href="SETUP_REMOTO.md" target="_blank" style="color: #667eea;">Ver guía de configuración remota</a>
                         </small>
                     </div>
-                    
+
+                    <!-- Configuración Firebase -->
+                    <div class="connection-config" id="config-firebase">
+                        <div style="background: #e8f5e9; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #4caf50;">
+                            <strong style="color: #2e7d32;">✅ Solución sin acceso al router</strong><br>
+                            <span style="font-size: 12px; color: #555;">
+                                Funciona desde cualquier lugar sin configurar nada en el router.
+                            </span>
+                        </div>
+
+                        <label style="font-size: 12px; font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Device ID:</label>
+                        <input type="text" id="firebaseDeviceId" placeholder="tree1" value="tree1">
+
+                        <div id="firebaseStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; font-size: 12px; text-align: center; background: #fff3cd;">
+                            <span id="firebaseStatusText">⚙️ Configura Firebase primero</span>
+                        </div>
+
+                        <details style="margin-top: 12px; cursor: pointer;">
+                            <summary style="font-size: 13px; font-weight: 600; color: #666; padding: 8px; background: #f5f5f5; border-radius: 6px;">
+                                🔧 Configuración Avanzada (Opcional)
+                            </summary>
+                            <div style="padding: 10px; background: #fafafa; border-radius: 6px; margin-top: 5px;">
+                                <label style="font-size: 11px; color: #666; display: block; margin-bottom: 3px;">Polling Interval (ms):</label>
+                                <input type="number" id="firebasePollingInterval" value="2000" min="1000" max="10000" style="width: 100%; padding: 6px; font-size: 12px;">
+                                <small style="color: #999; font-size: 10px;">Frecuencia de verificación de comandos (por defecto: 2000ms)</small>
+                            </div>
+                        </details>
+
+                        <small style="color: #666; display: block; margin-top: 10px;">
+                            📖 <a href="FIREBASE_SETUP.md" target="_blank" style="color: #4caf50; font-weight: 600;">Ver guía completa de Firebase</a>
+                        </small>
+
+                        <div style="margin-top: 12px; padding: 10px; background: #fff9c4; border-radius: 6px; border-left: 3px solid #fbc02d;">
+                            <strong style="font-size: 12px; color: #f57f17;">⚠️ Configuración requerida:</strong>
+                            <ol style="font-size: 11px; color: #666; margin: 5px 0 0 15px; padding: 0;">
+                                <li>Crea proyecto en Firebase Console</li>
+                                <li>Configura Realtime Database</li>
+                                <li>Edita este HTML con tu firebaseConfig</li>
+                                <li>Sube código al ESP (ver FIREBASE_SETUP.md)</li>
+                            </ol>
+                        </div>
+                    </div>
+
                     <!-- Configuración MQTT Público -->
                     <div class="connection-config" id="config-mqtt-public">
                         <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
@@ -467,10 +513,14 @@
     
     <!-- Three.js desde CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
+
     <!-- MQTT.js desde CDN -->
     <script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
-    
+
+    <!-- Firebase SDK desde CDN -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
     <script>
         // =====================================================
         // VARIABLES GLOBALES
@@ -494,9 +544,34 @@
         let currentWLEDUrl = '';
         let networkDetected = false;
 
+        // Firebase
+        let firebaseApp = null;
+        let firebaseDb = null;
+        let firebaseConnected = false;
+        let firebaseDeviceId = 'tree1';
+
         // Configuración del árbol
         const totalLeds = 200;
         const COLOR_ORDER = 'GRB';
+
+        // =====================================================
+        // CONFIGURACIÓN DE FIREBASE
+        // =====================================================
+
+        // 🔧 CONFIGURA TU FIREBASE AQUÍ:
+        // Reemplaza esta configuración con la tuya desde Firebase Console
+        const firebaseConfig = {
+            apiKey: "AIza...TU-API-KEY-AQUI",
+            authDomain: "tu-proyecto.firebaseapp.com",
+            databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
+            projectId: "tu-proyecto",
+            storageBucket: "tu-proyecto.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abc123..."
+        };
+
+        // Variable para saber si Firebase está configurado
+        const isFirebaseConfigured = !firebaseConfig.apiKey.includes("TU-API-KEY-AQUI");
         
         // =====================================================
         // MANEJO DE MODO DE CONEXIÓN
@@ -535,6 +610,11 @@
             // Si cambió a modo HTTP Auto, detectar red
             if (connectionMode === 'http-auto') {
                 detectNetwork();
+            }
+
+            // Si cambió a modo Firebase, inicializar
+            if (connectionMode === 'firebase') {
+                initFirebase();
             }
 
             showStatus(`Modo cambiado a: ${connectionMode.toUpperCase()}`);
@@ -678,7 +758,132 @@
                 console.error('❌ Error cargando configuración:', error);
             }
         }
-        
+
+        // =====================================================
+        // FIREBASE REALTIME DATABASE
+        // =====================================================
+
+        function initFirebase() {
+            const statusDiv = document.getElementById('firebaseStatus');
+            const statusText = document.getElementById('firebaseStatusText');
+
+            console.log('🔥 Iniciando Firebase...');
+
+            // Verificar si Firebase está configurado
+            if (!isFirebaseConfigured) {
+                console.warn('⚠️ Firebase no está configurado');
+                statusText.innerHTML = '⚠️ Firebase no configurado<br><small>Ver FIREBASE_SETUP.md</small>';
+                statusDiv.style.background = '#f8d7da';
+                showStatus('⚠️ Configura Firebase primero', true);
+                return;
+            }
+
+            statusText.textContent = '🔄 Conectando a Firebase...';
+            statusDiv.style.background = '#fff3cd';
+
+            try {
+                // Inicializar Firebase si no está inicializado
+                if (!firebaseApp) {
+                    firebaseApp = firebase.initializeApp(firebaseConfig);
+                    firebaseDb = firebase.database();
+                }
+
+                // Obtener Device ID
+                firebaseDeviceId = document.getElementById('firebaseDeviceId').value.trim() || 'tree1';
+
+                // Probar conexión
+                const testRef = firebaseDb.ref(`wled/${firebaseDeviceId}/state/connected`);
+
+                testRef.set(true).then(() => {
+                    firebaseConnected = true;
+                    statusText.innerHTML = '✅ Conectado a Firebase<br><small>Device: ' + firebaseDeviceId + '</small>';
+                    statusDiv.style.background = '#d4edda';
+                    showStatus('✅ Firebase conectado');
+
+                    document.getElementById('connectionStatus').className = 'connection-status connected';
+                    document.getElementById('connectionStatus').textContent = '✅ Conectado a Firebase';
+
+                    console.log('✅ Firebase conectado correctamente');
+                    console.log('   Device ID:', firebaseDeviceId);
+                    console.log('   Database URL:', firebaseConfig.databaseURL);
+
+                    // Guardar configuración
+                    localStorage.setItem('firebaseDeviceId', firebaseDeviceId);
+
+                }).catch((error) => {
+                    throw error;
+                });
+
+            } catch (error) {
+                firebaseConnected = false;
+                statusText.innerHTML = '❌ Error al conectar<br><small>' + error.message + '</small>';
+                statusDiv.style.background = '#f8d7da';
+                showStatus('❌ Error de Firebase: ' + error.message, true);
+
+                document.getElementById('connectionStatus').className = 'connection-status disconnected';
+                document.getElementById('connectionStatus').textContent = '❌ Error Firebase';
+
+                console.error('❌ Error al conectar Firebase:', error);
+                console.error('   Verifica:');
+                console.error('   - firebaseConfig es correcto');
+                console.error('   - Las reglas de Firebase permiten escritura');
+                console.error('   - databaseURL es correcto');
+            }
+        }
+
+        async function sendViaFirebase(payload) {
+            if (!firebaseConnected || !firebaseDb) {
+                showStatus('❌ Firebase no conectado', true);
+                return false;
+            }
+
+            const timestamp = Date.now();
+            const commandsRef = firebaseDb.ref(`wled/${firebaseDeviceId}/commands`);
+
+            console.log('📤 Firebase → Enviando:', JSON.stringify(payload).substring(0, 100));
+
+            try {
+                await commandsRef.set({
+                    timestamp: timestamp,
+                    command: payload
+                });
+
+                console.log('✅ Comando enviado a Firebase');
+                showStatus('✓ Comando enviado (esperando ESP...)');
+
+                // Opcional: Esperar confirmación del ESP
+                // await waitForESPConfirmation(timestamp);
+
+                return true;
+
+            } catch (error) {
+                console.error('❌ Error al enviar a Firebase:', error);
+                showStatus('❌ Error Firebase: ' + error.message, true);
+                return false;
+            }
+        }
+
+        async function waitForESPConfirmation(commandTimestamp, timeout = 5000) {
+            return new Promise((resolve, reject) => {
+                const statusRef = firebaseDb.ref(`wled/${firebaseDeviceId}/status`);
+                const timeoutId = setTimeout(() => {
+                    statusRef.off();
+                    console.warn('⏱️ Timeout esperando confirmación del ESP');
+                    resolve(false);
+                }, timeout);
+
+                statusRef.on('value', (snapshot) => {
+                    const status = snapshot.val();
+                    if (status && status.lastCommand >= commandTimestamp && !status.processing) {
+                        clearTimeout(timeoutId);
+                        statusRef.off();
+                        console.log('✅ ESP confirmó ejecución');
+                        resolve(true);
+                    }
+                });
+            });
+        }
+
         // =====================================================
         // ENVÍO A WLED - VERSIÓN MEJORADA
         // =====================================================
@@ -688,18 +893,23 @@
                 console.log('⏭️ Petición ignorada (otra en proceso)');
                 return false;
             }
-            
+
             isProcessingRequest = true;
-            
+
             try {
+                // Firebase si está habilitado y conectado
+                if (connectionMode === 'firebase' && firebaseConnected) {
+                    return await sendViaFirebase(payload);
+                }
+
                 // MQTT si está habilitado y conectado
                 if (connectionMode.startsWith('mqtt-') && mqttClient && mqttClient.connected) {
                     return await sendViaMQTT(payload);
                 }
-                
+
                 // HTTP como alternativa o primaria
                 return await sendViaHTTP(payload);
-                
+
             } catch (error) {
                 console.error('❌ Error general:', error);
                 showStatus('❌ Error al enviar comando', true);
@@ -1145,6 +1355,13 @@
                 document.getElementById('wledIP').value = savedIP;
             }
 
+            // Cargar Device ID de Firebase si existe
+            const savedFirebaseDeviceId = localStorage.getItem('firebaseDeviceId');
+            if (savedFirebaseDeviceId && document.getElementById('firebaseDeviceId')) {
+                document.getElementById('firebaseDeviceId').value = savedFirebaseDeviceId;
+                firebaseDeviceId = savedFirebaseDeviceId;
+            }
+
             // Actualizar interfaz según modo de conexión
             updateConnectionConfig();
 
@@ -1162,6 +1379,13 @@
                 setTimeout(() => {
                     detectNetwork();
                 }, 1000);
+            }
+
+            // Si estamos en modo Firebase, inicializar después de 500ms
+            if (connectionMode === 'firebase') {
+                setTimeout(() => {
+                    initFirebase();
+                }, 500);
             }
         };
     </script>
