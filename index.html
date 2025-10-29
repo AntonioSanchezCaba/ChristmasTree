@@ -369,7 +369,11 @@
                         <div class="radio-group">
                             <label>
                                 <input type="radio" name="connectionMode" value="http" checked>
-                                <strong>HTTP Directo</strong> (Recomendado para LAN)
+                                <strong>HTTP Directo</strong> (Conexión directa)
+                            </label>
+                            <label>
+                                <input type="radio" name="connectionMode" value="http-auto">
+                                <strong>HTTP Auto</strong> (Detecta red automáticamente)
                             </label>
                             <label>
                                 <input type="radio" name="connectionMode" value="mqtt-public">
@@ -381,11 +385,33 @@
                             </label>
                         </div>
                     </div>
-                    
+
                     <!-- Configuración HTTP -->
                     <div class="connection-config active" id="config-http">
                         <input type="text" id="wledIP" placeholder="192.168.x.x o vittence.com" value="vittence.com">
                         <small style="color: #666;">Ingresa la IP local o dominio de WLED</small>
+                    </div>
+
+                    <!-- Configuración HTTP Auto (Local + Remoto) -->
+                    <div class="connection-config" id="config-http-auto">
+                        <label style="font-size: 12px; font-weight: 600; color: #333; display: block; margin-bottom: 5px;">IP Local (LAN):</label>
+                        <input type="text" id="wledIPLocal" placeholder="192.168.1.100" value="192.168.1.100">
+
+                        <label style="font-size: 12px; font-weight: 600; color: #333; display: block; margin-top: 10px; margin-bottom: 5px;">Dominio Remoto:</label>
+                        <input type="text" id="wledIPRemote" placeholder="mi-arbol.duckdns.org:8080" value="">
+
+                        <div style="background: #e3f2fd; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 12px;">
+                            <strong>🔍 Detección Automática</strong><br>
+                            La app detectará si estás en tu red local o desde internet y usará la configuración apropiada.
+                        </div>
+
+                        <div id="networkDetection" style="margin-top: 10px; padding: 8px; border-radius: 6px; font-size: 12px; text-align: center;">
+                            <span id="detectionStatus">🔄 Detectando red...</span>
+                        </div>
+
+                        <small style="color: #666; display: block; margin-top: 10px;">
+                            📖 <a href="SETUP_REMOTO.md" target="_blank" style="color: #667eea;">Ver guía de configuración remota</a>
+                        </small>
                     </div>
                     
                     <!-- Configuración MQTT Público -->
@@ -462,7 +488,12 @@
         // MQTT
         let mqttClient = null;
         let connectionMode = 'http'; // Por defecto HTTP
-        
+
+        // Configuración de red
+        let isLocalNetwork = false;
+        let currentWLEDUrl = '';
+        let networkDetected = false;
+
         // Configuración del árbol
         const totalLeds = 200;
         const COLOR_ORDER = 'GRB';
@@ -486,22 +517,166 @@
             document.querySelectorAll('.connection-config').forEach(config => {
                 config.classList.remove('active');
             });
-            
+
             // Mostrar la configuración activa
             document.getElementById(`config-${connectionMode}`).classList.add('active');
-            
+
             // Desconectar MQTT si estaba conectado
             if (mqttClient && mqttClient.connected) {
                 mqttClient.end();
                 mqttClient = null;
             }
-            
+
             // Si cambió a modo MQTT, inicializar
             if (connectionMode.startsWith('mqtt-')) {
                 initMQTT();
             }
-            
+
+            // Si cambió a modo HTTP Auto, detectar red
+            if (connectionMode === 'http-auto') {
+                detectNetwork();
+            }
+
             showStatus(`Modo cambiado a: ${connectionMode.toUpperCase()}`);
+        }
+
+        // =====================================================
+        // DETECCIÓN AUTOMÁTICA DE RED
+        // =====================================================
+
+        async function detectNetwork() {
+            const detectionDiv = document.getElementById('networkDetection');
+            const detectionStatus = document.getElementById('detectionStatus');
+
+            if (!detectionDiv || !detectionStatus) return;
+
+            detectionStatus.textContent = '🔄 Detectando red...';
+            detectionDiv.style.background = '#fff3cd';
+
+            // Intentar detectar si estamos en red local
+            const localIP = document.getElementById('wledIPLocal')?.value.trim();
+            const remoteIP = document.getElementById('wledIPRemote')?.value.trim();
+
+            if (!localIP && !remoteIP) {
+                detectionStatus.textContent = '⚠️ Configura IPs primero';
+                detectionDiv.style.background = '#f8d7da';
+                return;
+            }
+
+            // Probar conexión local primero
+            if (localIP) {
+                const localUrl = formatUrl(localIP);
+                const isLocalReachable = await testEndpoint(localUrl, 2000);
+
+                if (isLocalReachable) {
+                    isLocalNetwork = true;
+                    currentWLEDUrl = localUrl;
+                    networkDetected = true;
+
+                    detectionStatus.innerHTML = '✅ Red Local Detectada<br><small>Usando: ' + localIP + '</small>';
+                    detectionDiv.style.background = '#d4edda';
+
+                    saveConfig();
+                    return;
+                }
+            }
+
+            // Si local falla, probar remoto
+            if (remoteIP) {
+                const remoteUrl = formatUrl(remoteIP);
+                const isRemoteReachable = await testEndpoint(remoteUrl, 5000);
+
+                if (isRemoteReachable) {
+                    isLocalNetwork = false;
+                    currentWLEDUrl = remoteUrl;
+                    networkDetected = true;
+
+                    detectionStatus.innerHTML = '🌐 Acceso Remoto Detectado<br><small>Usando: ' + remoteIP + '</small>';
+                    detectionDiv.style.background = '#cfe2ff';
+
+                    saveConfig();
+                    return;
+                }
+            }
+
+            // No se pudo conectar a ninguno
+            isLocalNetwork = false;
+            networkDetected = false;
+            detectionStatus.innerHTML = '❌ No se pudo conectar<br><small>Verifica configuración</small>';
+            detectionDiv.style.background = '#f8d7da';
+        }
+
+        async function testEndpoint(url, timeout = 3000) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+                const response = await fetch(`${url}/json/info`, {
+                    method: 'GET',
+                    signal: controller.signal,
+                    mode: 'cors'
+                });
+
+                clearTimeout(timeoutId);
+                return response.ok;
+            } catch (error) {
+                console.log(`❌ No se pudo conectar a ${url}:`, error.message);
+                return false;
+            }
+        }
+
+        function formatUrl(ip) {
+            if (!ip) return null;
+            if (ip.startsWith('http://') || ip.startsWith('https://')) {
+                return ip.replace(/\/$/, '');
+            }
+
+            // Detectar si es HTTPS o HTTP
+            const protocol = window.location.protocol === 'https:' ? 'https://' : 'http://';
+            return `${protocol}${ip}`;
+        }
+
+        function saveConfig() {
+            const config = {
+                localIP: document.getElementById('wledIPLocal')?.value || '',
+                remoteIP: document.getElementById('wledIPRemote')?.value || '',
+                connectionMode: connectionMode,
+                isLocalNetwork: isLocalNetwork,
+                currentWLEDUrl: currentWLEDUrl
+            };
+
+            localStorage.setItem('wledAutoConfig', JSON.stringify(config));
+            console.log('✅ Configuración guardada:', config);
+        }
+
+        function loadConfig() {
+            const saved = localStorage.getItem('wledAutoConfig');
+            if (!saved) return;
+
+            try {
+                const config = JSON.parse(saved);
+
+                if (config.localIP && document.getElementById('wledIPLocal')) {
+                    document.getElementById('wledIPLocal').value = config.localIP;
+                }
+
+                if (config.remoteIP && document.getElementById('wledIPRemote')) {
+                    document.getElementById('wledIPRemote').value = config.remoteIP;
+                }
+
+                if (config.connectionMode) {
+                    connectionMode = config.connectionMode;
+                    const radio = document.querySelector(`input[name="connectionMode"][value="${config.connectionMode}"]`);
+                    if (radio) radio.checked = true;
+                }
+
+                isLocalNetwork = config.isLocalNetwork || false;
+                currentWLEDUrl = config.currentWLEDUrl || '';
+
+                console.log('✅ Configuración cargada:', config);
+            } catch (error) {
+                console.error('❌ Error cargando configuración:', error);
+            }
         }
         
         // =====================================================
@@ -551,14 +726,20 @@
         }
         
         async function sendViaHTTP(payload) {
-            const baseUrl = getWLEDUrl();
+            let baseUrl = getWLEDUrl();
+
+            // Si estamos en modo auto y ya detectamos la red, usar la URL detectada
+            if (connectionMode === 'http-auto' && currentWLEDUrl) {
+                baseUrl = currentWLEDUrl;
+            }
+
             if (!baseUrl) {
                 showStatus('❌ Introduce la IP de WLED', true);
                 return false;
             }
-            
+
             console.log('📤 HTTP → Enviando a:', baseUrl);
-            
+
             try {
                 const response = await fetch(`${baseUrl}/json/state`, {
                     method: 'POST',
@@ -566,7 +747,7 @@
                     body: JSON.stringify(payload),
                     signal: AbortSignal.timeout(5000)
                 });
-                
+
                 if (response.ok) {
                     console.log('✅ Enviado vía HTTP');
                     return true;
@@ -575,9 +756,57 @@
                 }
             } catch (error) {
                 console.error('❌ Error HTTP:', error);
+
+                // Si falla y estamos en modo auto, intentar fallback
+                if (connectionMode === 'http-auto') {
+                    return await tryFallback(payload);
+                }
+
                 showStatus(`❌ Error HTTP: ${error.message}`, true);
                 return false;
             }
+        }
+
+        async function tryFallback(payload) {
+            console.log('🔄 Intentando conexión alternativa...');
+
+            const localIP = document.getElementById('wledIPLocal')?.value.trim();
+            const remoteIP = document.getElementById('wledIPRemote')?.value.trim();
+
+            // Intentar con la que NO estamos usando actualmente
+            const fallbackIP = isLocalNetwork ? remoteIP : localIP;
+
+            if (!fallbackIP) {
+                showStatus('❌ No hay conexión alternativa configurada', true);
+                return false;
+            }
+
+            const fallbackUrl = formatUrl(fallbackIP);
+            console.log('📤 Probando fallback a:', fallbackUrl);
+
+            try {
+                const response = await fetch(`${fallbackUrl}/json/state`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    signal: AbortSignal.timeout(5000)
+                });
+
+                if (response.ok) {
+                    console.log('✅ Fallback exitoso');
+                    // Actualizar configuración a la que funcionó
+                    isLocalNetwork = !isLocalNetwork;
+                    currentWLEDUrl = fallbackUrl;
+                    saveConfig();
+                    showStatus('✓ Conectado vía ruta alternativa');
+                    return true;
+                }
+            } catch (error) {
+                console.error('❌ Fallback también falló:', error);
+            }
+
+            showStatus('❌ No se pudo conectar por ninguna ruta', true);
+            return false;
         }
         
         // =====================================================
@@ -664,23 +893,52 @@
                 }
                 return;
             }
-            
-            // Test HTTP
+
+            // Si estamos en modo auto, ejecutar detección
+            if (connectionMode === 'http-auto') {
+                showStatus('🔄 Detectando red y sincronizando...');
+                await detectNetwork();
+
+                // Si se detectó correctamente, probar sincronización
+                if (networkDetected && currentWLEDUrl) {
+                    try {
+                        const response = await fetch(`${currentWLEDUrl}/json/state`, {
+                            method: 'GET',
+                            signal: AbortSignal.timeout(3000)
+                        });
+
+                        if (response.ok) {
+                            document.getElementById('connectionStatus').className = 'connection-status connected';
+                            document.getElementById('connectionStatus').textContent = '✅ Conectado (' + (isLocalNetwork ? 'Local' : 'Remoto') + ')';
+                            showStatus(`✓ Conectado a WLED - ${totalLeds} LEDs`);
+                            return;
+                        }
+                    } catch (error) {
+                        // La función detectNetwork ya manejó el error
+                    }
+                }
+
+                document.getElementById('connectionStatus').className = 'connection-status disconnected';
+                document.getElementById('connectionStatus').textContent = '❌ Desconectado';
+                return;
+            }
+
+            // Test HTTP directo (modo http normal)
             const ip = document.getElementById('wledIP').value.trim();
             if (!ip) {
                 showStatus('❌ Introduce la IP de WLED', true);
                 return;
             }
-            
+
             const baseUrl = getWLEDUrl();
             showStatus('🔄 Conectando...');
-            
+
             try {
                 const response = await fetch(`${baseUrl}/json/state`, {
                     method: 'GET',
                     signal: AbortSignal.timeout(3000)
                 });
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     document.getElementById('connectionStatus').className = 'connection-status connected';
@@ -877,20 +1135,33 @@
         
         window.onload = function() {
             console.log('🚀 Iniciando aplicación...');
-            
-            // Cargar IP guardada
+
+            // Cargar configuración guardada
+            loadConfig();
+
+            // Cargar IP guardada (modo http normal)
             const savedIP = localStorage.getItem('wledIP');
-            if (savedIP) {
+            if (savedIP && document.getElementById('wledIP')) {
                 document.getElementById('wledIP').value = savedIP;
             }
-            
+
+            // Actualizar interfaz según modo de conexión
+            updateConnectionConfig();
+
             // Inicializar Three.js
             initThreeJS();
             generateStars();
-            
+
             // Solo iniciar MQTT si está seleccionado
             if (connectionMode.startsWith('mqtt-')) {
                 initMQTT();
+            }
+
+            // Si estamos en modo auto, detectar red automáticamente después de 1 segundo
+            if (connectionMode === 'http-auto') {
+                setTimeout(() => {
+                    detectNetwork();
+                }, 1000);
             }
         };
     </script>
