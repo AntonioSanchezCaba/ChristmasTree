@@ -375,9 +375,13 @@
                                 <input type="radio" name="connectionMode" value="http-auto">
                                 <strong>HTTP Auto</strong> (Detecta red automáticamente)
                             </label>
+                            <label style="background: #e3f2fd; border-left: 3px solid #2196f3;">
+                                <input type="radio" name="connectionMode" value="mqtt-oracle">
+                                <strong>☁️ MQTT Oracle Cloud</strong> (VPS Gratis - RECOMENDADO)
+                            </label>
                             <label style="background: #e8f5e9; border-left: 3px solid #4caf50;">
                                 <input type="radio" name="connectionMode" value="firebase">
-                                <strong>🔥 Firebase Cloud</strong> (Sin acceso al router - Recomendado)
+                                <strong>🔥 Firebase Cloud</strong> (Sin acceso al router)
                             </label>
                             <label>
                                 <input type="radio" name="connectionMode" value="mqtt-public">
@@ -456,6 +460,46 @@
                                 <li>Configura Realtime Database</li>
                                 <li>Edita este HTML con tu firebaseConfig</li>
                                 <li>Sube código al ESP (ver FIREBASE_SETUP.md)</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Configuración MQTT Oracle Cloud -->
+                    <div class="connection-config" id="config-mqtt-oracle">
+                        <div style="background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #2196f3;">
+                            <strong style="color: #1565c0;">✅ Tu Propio Broker MQTT Gratis</strong><br>
+                            <span style="font-size: 12px; color: #555;">
+                                Oracle Cloud Free Tier - Gratis para siempre. Control total.
+                            </span>
+                        </div>
+
+                        <label style="font-size: 12px; font-weight: 600; color: #333; display: block; margin-bottom: 5px;">IP de tu VPS Oracle Cloud:</label>
+                        <input type="text" id="oracleMqttIP" placeholder="132.145.67.89" value="">
+
+                        <label style="font-size: 12px; font-weight: 600; color: #333; display: block; margin-top: 10px; margin-bottom: 5px;">Puerto WebSocket:</label>
+                        <input type="number" id="oracleMqttPort" placeholder="8083" value="8083" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; margin-bottom: 10px;">
+
+                        <label style="font-size: 12px; font-weight: 600; color: #333; display: block; margin-bottom: 5px;">Usuario MQTT:</label>
+                        <input type="text" id="oracleMqttUser" placeholder="wled" value="wled">
+
+                        <label style="font-size: 12px; font-weight: 600; color: #333; display: block; margin-top: 10px; margin-bottom: 5px;">Contraseña MQTT:</label>
+                        <input type="password" id="oracleMqttPass" placeholder="WledMqtt2024!" value="">
+
+                        <div id="oracleMqttStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; font-size: 12px; text-align: center; background: #fff3cd;">
+                            <span id="oracleMqttStatusText">⚙️ Introduce la IP de tu VPS</span>
+                        </div>
+
+                        <small style="color: #666; display: block; margin-top: 10px;">
+                            📖 <a href="ORACLE_CLOUD_MOSQUITTO.md" target="_blank" style="color: #2196f3; font-weight: 600;">Ver guía completa de Oracle Cloud</a>
+                        </small>
+
+                        <div style="margin-top: 12px; padding: 10px; background: #fff9c4; border-radius: 6px; border-left: 3px solid #fbc02d;">
+                            <strong style="font-size: 12px; color: #f57f17;">⚠️ Configuración requerida:</strong>
+                            <ol style="font-size: 11px; color: #666; margin: 5px 0 0 15px; padding: 0;">
+                                <li>Crea cuenta Oracle Cloud (gratis)</li>
+                                <li>Crea VM gratuita (Always Free)</li>
+                                <li>Ejecuta script de instalación</li>
+                                <li>Configura WLED con la IP de tu VPS</li>
                             </ol>
                         </div>
                     </div>
@@ -1033,6 +1077,29 @@
                 broker = 'wss://test.mosquitto.org:8080/mqtt';
                 username = '';
                 password = '';
+            } else if (connectionMode === 'mqtt-oracle') {
+                // Tu servidor Oracle Cloud
+                const oracleIP = document.getElementById('oracleMqttIP').value.trim();
+                const oraclePort = document.getElementById('oracleMqttPort').value.trim() || '8083';
+                const oracleUser = document.getElementById('oracleMqttUser').value.trim() || 'wled';
+                const oraclePass = document.getElementById('oracleMqttPass').value.trim();
+
+                if (!oracleIP) {
+                    showStatus('❌ Introduce la IP de tu VPS Oracle', true);
+                    return;
+                }
+
+                broker = `ws://${oracleIP}:${oraclePort}/mqtt`;
+                username = oracleUser;
+                password = oraclePass;
+
+                // Guardar configuración
+                localStorage.setItem('oracleMqttIP', oracleIP);
+                localStorage.setItem('oracleMqttPort', oraclePort);
+                localStorage.setItem('oracleMqttUser', oracleUser);
+                localStorage.setItem('oracleMqttPass', oraclePass);
+
+                console.log('🔌 Conectando a Oracle Cloud MQTT:', broker);
             } else if (connectionMode === 'mqtt-hivemq') {
                 // Tu configuración HiveMQ actual
                 broker = 'wss://90717923c01b4a4da3718559007344ac.s1.eu.hivemq.cloud:8884/mqtt';
@@ -1360,6 +1427,25 @@
             if (savedFirebaseDeviceId && document.getElementById('firebaseDeviceId')) {
                 document.getElementById('firebaseDeviceId').value = savedFirebaseDeviceId;
                 firebaseDeviceId = savedFirebaseDeviceId;
+            }
+
+            // Cargar configuración de Oracle Cloud MQTT si existe
+            const savedOracleIP = localStorage.getItem('oracleMqttIP');
+            const savedOraclePort = localStorage.getItem('oracleMqttPort');
+            const savedOracleUser = localStorage.getItem('oracleMqttUser');
+            const savedOraclePass = localStorage.getItem('oracleMqttPass');
+
+            if (savedOracleIP && document.getElementById('oracleMqttIP')) {
+                document.getElementById('oracleMqttIP').value = savedOracleIP;
+            }
+            if (savedOraclePort && document.getElementById('oracleMqttPort')) {
+                document.getElementById('oracleMqttPort').value = savedOraclePort;
+            }
+            if (savedOracleUser && document.getElementById('oracleMqttUser')) {
+                document.getElementById('oracleMqttUser').value = savedOracleUser;
+            }
+            if (savedOraclePass && document.getElementById('oracleMqttPass')) {
+                document.getElementById('oracleMqttPass').value = savedOraclePass;
             }
 
             // Actualizar interfaz según modo de conexión
