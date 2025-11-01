@@ -377,7 +377,7 @@
                             </label>
                             <label>
                                 <input type="radio" name="connectionMode" value="mqtt-hivemq">
-                                <strong>MQTT HiveMQ</strong> (Tu configuración actual)
+                                <strong>MQTT EMQX Cloud</strong> (Tu configuración actual)
                             </label>
                         </div>
                     </div>
@@ -396,7 +396,7 @@
                         </p>
                     </div>
                     
-                    <!-- Configuración MQTT HiveMQ -->
+                    <!-- Configuración MQTT EMQX Cloud -->
                     <div class="connection-config" id="config-mqtt-hivemq">
                         <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
                             Usando tu cluster HiveMQ actual<br>
@@ -596,7 +596,7 @@
                 password = '';
             } else if (connectionMode === 'mqtt-hivemq') {
                 // Tu configuración HiveMQ actual
-                broker = 'wss://dc4fe100.ala.eu-central-1.emqxsl.com:8884/mqtt';
+                broker = 'wss://dc4fe100.ala.eu-central-1.emqxsl.com:8883/mqtt';
                 username = 'wled';
                 password = '123456789@';
             } else {
