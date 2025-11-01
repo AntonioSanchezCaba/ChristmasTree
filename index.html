@@ -585,33 +585,33 @@
         // =====================================================
         
         function initMQTT() {
-            console.log('🔌 Iniciando conexión MQTT...');
-            
-            let broker, username, password;
-            
-            if (connectionMode === 'mqtt-public') {
-                // Mosquitto test broker (puerto 8080 para WSS)
-                broker = 'wss://test.mosquitto.org:8080/mqtt';
-                username = '';
-                password = '';
-            } else if (connectionMode === 'mqtt-hivemq') {
-                // Tu configuración HiveMQ actual
-                broker = 'wss://mqtt.vittence.com:8883/mqtt';
-                username = 'wled';
-                password = '123456789@';
-            } else {
-                return; // No iniciar MQTT en modo HTTP
-            }
-            
-            mqttClient = mqtt.connect(broker, {
-                username: username,
-                password: password,
-                clientId: 'web-controller-' + Math.random().toString(16).substr(2, 8),
-                clean: true,
-                reconnectPeriod: 5000,
-                connectTimeout: 10000,
-                protocol: 'wss'
-            });
+        console.log('🔌 Iniciando conexión MQTT...');
+    
+        let broker, username, password;
+    
+        if (connectionMode === 'mqtt-public') {
+            broker = 'wss://test.mosquitto.org:8080/mqtt';
+            username = '';
+            password = '';
+        } else if (connectionMode === 'mqtt-hivemq') {
+            // Tu EMQX Cloud
+            broker = 'wss://dc4fe100.ala.us-central-1.emqxsl.com:8084/mqtt';
+            username = 'wled_user';     // Tu usuario EMQX
+            password = 'tu_password';    // Tu password EMQX
+        } else {
+            return;
+        }
+    
+        mqttClient = mqtt.connect(broker, {
+            username: username,
+            password: password,
+            clientId: 'web-controller-' + Math.random().toString(16).substr(2, 8),
+            clean: true,
+            reconnectPeriod: 5000,
+            connectTimeout: 10000,
+            protocol: 'wss',
+            rejectUnauthorized: false  // Agregar esto para SSL
+        });
             
             mqttClient.on('connect', () => {
                 console.log('✅ Conectado a MQTT Broker');
