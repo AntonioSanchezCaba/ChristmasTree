@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎄 Christmas LED Tree - 3D WLED Edition (FIXED)</title>
+    <title>🎄 Christmas LED Tree - Mosquitto</title>
     <style>
-        /* ... (manteniendo todos los estilos originales) ... */
         * {
             margin: 0;
             padding: 0;
@@ -20,57 +19,6 @@
             color: #333;
         }
         
-        .connection-mode-selector {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .connection-mode-selector h3 {
-            color: #856404;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-        
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .radio-group label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        
-        .radio-group label:hover {
-            background: rgba(0,0,0,0.05);
-        }
-        
-        .radio-group input[type="radio"] {
-            cursor: pointer;
-        }
-        
-        .connection-config {
-            display: none;
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 6px;
-        }
-        
-        .connection-config.active {
-            display: block;
-        }
-        
-        /* Todos los demás estilos originales se mantienen igual */
         .stars {
             position: fixed;
             top: 0;
@@ -127,6 +75,7 @@
             height: 100%;
             cursor: grab;
         }
+        
         #treeCanvas:active {
             cursor: grabbing;
         }
@@ -196,6 +145,49 @@
             color: #721c24;
         }
         
+        .connection-status.connecting {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .debug-log {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        
+        .debug-log div {
+            margin: 2px 0;
+            padding: 2px;
+        }
+        
+        .debug-log .success {
+            color: #28a745;
+        }
+        
+        .debug-log .error {
+            color: #dc3545;
+        }
+        
+        .debug-log .info {
+            color: #007bff;
+        }
+        
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -228,22 +220,9 @@
         button.danger {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
+        
         button.danger:hover {
             box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
-        }
-        
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
         }
         
         .color-selector {
@@ -265,15 +244,18 @@
             padding: 0;
             background-color: transparent;
         }
+        
         input[type="color"]::-webkit-color-swatch-wrapper {
             padding: 0;
             border: 3px solid #ddd;
             border-radius: 8px;
         }
+        
         input[type="color"]::-webkit-color-swatch {
             border: none;
             border-radius: 5px;
         }
+        
         input[type="color"]::-moz-color-swatch {
             border: none;
             border-radius: 5px;
@@ -351,72 +333,41 @@
         <div class="control-panel">
             <div class="panel-header">
                 <h1>🎄 Christmas LED Tree</h1>
-                <p style="font-size: 0.9em; opacity: 0.9;">3D WLED Controller (FIXED)</p>
+                <p style="font-size: 0.9em; opacity: 0.9;">MQTT Mosquitto Controller</p>
             </div>
             
             <div class="panel-content">
-                <!-- SECCIÓN DE CONEXIÓN MEJORADA -->
+                <!-- SECCIÓN DE CONEXIÓN MQTT -->
                 <div class="section">
-                    <div class="section-title">🔌 Conexión</div>
+                    <div class="section-title">🔌 Conexión MQTT</div>
                     
-                    <div class="connection-status disconnected" id="connectionStatus">
-                        ❌ Desconectado
+                    <div class="connection-status connecting" id="connectionStatus">
+                        🔄 Conectando...
                     </div>
                     
-                    <!-- SELECTOR DE MODO DE CONEXIÓN -->
-                    <div class="connection-mode-selector">
-                        <h3>⚙️ Modo de Conexión:</h3>
-                        <div class="radio-group">
-                            <label>
-                                <input type="radio" name="connectionMode" value="http" checked>
-                                <strong>HTTP Directo</strong> (Recomendado para LAN)
-                            </label>
-                            <label>
-                                <input type="radio" name="connectionMode" value="mqtt-public">
-                                <strong>MQTT Público</strong> (test.mosquitto.org)
-                            </label>
-                            <label>
-                                <input type="radio" name="connectionMode" value="mqtt-hivemq">
-                                <strong>MQTT EMQX Cloud</strong> (dc4fe100.emqxsl.com)
-                            </label>
-                        </div>
+                    <div class="info-box">
+                        <strong>📡 Servidor:</strong> mqtt.vittence.com<br>
+                        <strong>🔒 Protocolo:</strong> WebSocket Secure (WSS)<br>
+                        <strong>🎯 Topic:</strong> wled/tree/api
                     </div>
                     
-                    <!-- Configuración HTTP -->
-                    <div class="connection-config active" id="config-http">
-                        <input type="text" id="wledIP" placeholder="192.168.x.x o vittence.com" value="vittence.com">
-                        <small style="color: #666;">Ingresa la IP local o dominio de WLED</small>
-                    </div>
+                    <button onclick="reconnectMQTT()">🔄 Reconectar MQTT</button>
+                    <button onclick="sendTestMessage()">📤 Enviar Mensaje de Prueba</button>
+                    <button onclick="resetWLED()" class="danger">🔴 Apagar LEDs</button>
                     
-                    <!-- Configuración MQTT Público -->
-                    <div class="connection-config" id="config-mqtt-public">
-                        <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
-                            Usando <strong>test.mosquitto.org</strong> (puerto 8080 para WSS)<br>
-                            ⚠️ Debes configurar WLED para usar este broker
-                        </p>
-                    </div>
-                    
-                    <!-- Configuración MQTT EMQX Cloud -->
-                    <div class="connection-config" id="config-mqtt-hivemq">
-                        <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
-                            Usando tu cluster HiveMQ actual<br>
-                            ⚠️ Puede estar bloqueado por puerto 8884
-                        </p>
-                    </div>
-                    
-                    <button onclick="testConnection()">🔄 Probar y Sincronizar</button>
-                    <button onclick="resetWLED()" class="danger">🔴 Reset WLED</button>
+                    <div class="debug-log" id="debugLog"></div>
                 </div>
                 
-                <!-- Resto de secciones originales... -->
+                <!-- SECCIÓN DE CONTROL DE COLOR -->
                 <div class="section">
-                    <div class="section-title">💡 LED Color</div>
+                    <div class="section-title">💡 Control de Color</div>
                     <div class="color-selector">
                         <input type="color" id="ledColor" value="#ff0000" onchange="updateSelectedColor()">
                         <button onclick="activatePaintMode()" id="paintBtn">Activar Paint Mode</button>
                     </div>
                 </div>
                 
+                <!-- SECCIÓN DE BRILLO -->
                 <div class="section">
                     <div class="section-title">💡 Brillo</div>
                     <div class="brightness-control">
@@ -425,10 +376,11 @@
                     </div>
                 </div>
                 
+                <!-- SECCIÓN DE PRUEBAS DE COLOR -->
                 <div class="section">
-                    <div class="section-title">🧪 Diagnóstico de Colores</div>
+                    <div class="section-title">🧪 Pruebas de Color</div>
                     <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
-                        Prueba cada color individualmente en todos los LEDs:
+                        Prueba cada color en todos los LEDs:
                     </p>
                     <button onclick="testColorDirect('red')" style="background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);">🔴 Test ROJO</button>
                     <button onclick="testColorDirect('green')" style="background: linear-gradient(135deg, #44ff44 0%, #00cc00 100%);">🟢 Test VERDE</button>
@@ -452,275 +404,193 @@
         
         let scene, camera, renderer, ledGroup;
         let ledMeshes = [];
-        let ledColors = {};
-        let ledPositions = {};
         let selectedColor = '#ff0000';
         let paintMode = false;
         let currentBrightness = 128;
-        let isProcessingRequest = false;
         
-        // MQTT
+        // MQTT Configuration
         let mqttClient = null;
-        let connectionMode = 'http'; // Por defecto HTTP
+        const MQTT_CONFIG = {
+            broker: 'wss://mqtt.vittence.com:8083/mqtt',  // Puerto WebSocket SSL estándar
+            // Si 8083 no funciona, prueba: 8084, 9001, o contacta para confirmar el puerto
+            topic: 'wled/tree/api',
+            username: '',  // Deja vacío si no configuraste autenticación
+            password: ''   // Deja vacío si no configuraste autenticación
+        };
         
         // Configuración del árbol
         const totalLeds = 200;
         const COLOR_ORDER = 'GRB';
         
         // =====================================================
-        // MANEJO DE MODO DE CONEXIÓN
+        // DEBUG LOG
         // =====================================================
         
-        document.addEventListener('DOMContentLoaded', function() {
-            const radioButtons = document.querySelectorAll('input[name="connectionMode"]');
-            radioButtons.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    connectionMode = this.value;
-                    updateConnectionConfig();
-                });
-            });
-        });
-        
-        function updateConnectionConfig() {
-            // Ocultar todas las configuraciones
-            document.querySelectorAll('.connection-config').forEach(config => {
-                config.classList.remove('active');
-            });
+        function addDebugLog(message, type = 'info') {
+            const logDiv = document.getElementById('debugLog');
+            const entry = document.createElement('div');
+            entry.className = type;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
             
-            // Mostrar la configuración activa
-            document.getElementById(`config-${connectionMode}`).classList.add('active');
-            
-            // Desconectar MQTT si estaba conectado
-            if (mqttClient && mqttClient.connected) {
-                mqttClient.end();
-                mqttClient = null;
-            }
-            
-            // Si cambió a modo MQTT, inicializar
-            if (connectionMode.startsWith('mqtt-')) {
-                initMQTT();
-            }
-            
-            showStatus(`Modo cambiado a: ${connectionMode.toUpperCase()}`);
-        }
-        
-        // =====================================================
-        // ENVÍO A WLED - VERSIÓN MEJORADA
-        // =====================================================
-        
-        async function sendToWLED(payload) {
-            if (isProcessingRequest) {
-                console.log('⏭️ Petición ignorada (otra en proceso)');
-                return false;
-            }
-            
-            isProcessingRequest = true;
-            
-            try {
-                // MQTT si está habilitado y conectado
-                if (connectionMode.startsWith('mqtt-') && mqttClient && mqttClient.connected) {
-                    return await sendViaMQTT(payload);
-                }
-                
-                // HTTP como alternativa o primaria
-                return await sendViaHTTP(payload);
-                
-            } catch (error) {
-                console.error('❌ Error general:', error);
-                showStatus('❌ Error al enviar comando', true);
-                return false;
-            } finally {
-                isProcessingRequest = false;
-            }
-        }
-        
-        async function sendViaMQTT(payload) {
-            const payloadStr = JSON.stringify(payload);
-            console.log('📤 MQTT → Enviando:', payloadStr.substring(0, 100));
-            
-            try {
-                mqttClient.publish('wled/tree/api', payloadStr, { qos: 1, retain: false });
-                console.log('✅ Enviado vía MQTT');
-                await new Promise(resolve => setTimeout(resolve, 100));
-                return true;
-            } catch (error) {
-                console.error('❌ Error MQTT:', error);
-                showStatus('❌ Error MQTT - Probando HTTP...', true);
-                return await sendViaHTTP(payload);
-            }
-        }
-        
-        async function sendViaHTTP(payload) {
-            const baseUrl = getWLEDUrl();
-            if (!baseUrl) {
-                showStatus('❌ Introduce la IP de WLED', true);
-                return false;
-            }
-            
-            console.log('📤 HTTP → Enviando a:', baseUrl);
-            
-            try {
-                const response = await fetch(`${baseUrl}/json/state`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    signal: AbortSignal.timeout(5000)
-                });
-                
-                if (response.ok) {
-                    console.log('✅ Enviado vía HTTP');
-                    return true;
-                } else {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-            } catch (error) {
-                console.error('❌ Error HTTP:', error);
-                showStatus(`❌ Error HTTP: ${error.message}`, true);
-                return false;
+            // Limitar a 50 mensajes
+            while (logDiv.children.length > 50) {
+                logDiv.removeChild(logDiv.firstChild);
             }
         }
         
         // =====================================================
-        // MQTT CONNECTION - VERSIÓN MEJORADA
+        // CONEXIÓN MQTT
         // =====================================================
         
         function initMQTT() {
-            console.log('🔌 Iniciando conexión MQTT...');
-    
-            let broker, username, password;
-    
-            if (connectionMode === 'mqtt-public') {
-                // Mosquitto público
-                broker = 'wss://test.mosquitto.org:8080/mqtt';
-                username = '';
-                password = '';
-            } else if (connectionMode === 'mqtt-hivemq') {
-                // TU EMQX PRIVADO - CAMBIA ESTA PARTE
-                broker = 'wss://dc4fe100.ala.us-central-1.emqxsl.com:8083/mqtt';
-                username = 'wled';           // El usuario que creaste
-                password = '123456789@';     // La contraseña que pusiste
-            } else {
-                return;
+            addDebugLog('🔌 Iniciando conexión a Mosquitto...', 'info');
+            addDebugLog(`📡 Broker: ${MQTT_CONFIG.broker}`, 'info');
+            
+            const options = {
+                clientId: 'web-tree-' + Math.random().toString(16).substr(2, 8),
+                clean: true,
+                reconnectPeriod: 5000,
+                connectTimeout: 30000,
+                protocol: 'wss',
+                protocolVersion: 4,
+                rejectUnauthorized: true,  // true porque tienes SSL válido de certbot
+                keepalive: 60
+            };
+            
+            // Solo agregar credenciales si existen
+            if (MQTT_CONFIG.username) {
+                options.username = MQTT_CONFIG.username;
+                options.password = MQTT_CONFIG.password;
             }
-    
-            mqttClient = mqtt.connect(broker, {
-                    username: username,
-                    password: password,
-                    clientId: 'web-controller-' + Math.random().toString(16).substr(2, 8),
-                    clean: true,
-                    reconnectPeriod: 5000,
-                    connectTimeout: 30000,
-                    protocol: 'wss',
-                    protocolVersion: 4,
-                    rejectUnauthorized: false,  // Importante para SSL
-                    keepalive: 60,
-                    // Agrega estas opciones para debug
-                    will: {
-                        topic: 'wled/tree/status',
-                        payload: 'Web controller offline',
-                        qos: 0,
-                        retain: false
-                    }
-            });
-            // Más logs para debug
-            mqttClient.on('packetsend', (packet) => {
-                console.log('📤 Packet enviado:', packet.cmd);
-            });
-
-            mqttClient.on('packetreceive', (packet) => {
-                console.log('📥 Packet recibido:', packet.cmd);
-            });
-            
-            mqttClient.on('connect', () => {
-                console.log('✅ Conectado a MQTT Broker');
-                showStatus('✅ Conectado a MQTT');
-                
-                mqttClient.subscribe('wled/tree/#', (err) => {
-                    if (!err) {
-                        console.log('📡 Suscrito a topics de estado WLED');
-                    }
-                });
-            });
-            
-            mqttClient.on('error', (err) => {
-                console.error('❌ Error MQTT:', err);
-                showStatus('❌ Error MQTT: ' + err.message, true);
-            });
-            
-            mqttClient.on('reconnect', () => {
-                console.log('🔄 Reconectando MQTT...');
-            });
-            
-            mqttClient.on('offline', () => {
-                console.log('⚠️ MQTT offline');
-                showStatus('⚠️ Desconectado de MQTT', true);
-            });
-            
-            mqttClient.on('message', (topic, message) => {
-                console.log('📨 Mensaje recibido:', topic, message.toString());
-            });
-        }
-        
-        // =====================================================
-        // UTILIDADES
-        // =====================================================
-        
-        function getWLEDUrl() {
-            const ip = document.getElementById('wledIP').value.trim();
-            if (!ip) return null;
-            if (ip.startsWith('http')) return ip;
-            const protocol = window.location.protocol === 'https:' ? 'https://' : 'http://';
-            return `${protocol}${ip}`;
-        }
-        
-        async function testConnection() {
-            if (connectionMode.startsWith('mqtt-')) {
-                if (mqttClient && mqttClient.connected) {
-                    showStatus('✅ MQTT ya conectado');
-                } else {
-                    showStatus('🔄 Esperando conexión MQTT...');
-                }
-                return;
-            }
-            
-            // Test HTTP
-            const ip = document.getElementById('wledIP').value.trim();
-            if (!ip) {
-                showStatus('❌ Introduce la IP de WLED', true);
-                return;
-            }
-            
-            const baseUrl = getWLEDUrl();
-            showStatus('🔄 Conectando...');
             
             try {
-                const response = await fetch(`${baseUrl}/json/state`, {
-                    method: 'GET',
-                    signal: AbortSignal.timeout(3000)
-                });
+                mqttClient = mqtt.connect(MQTT_CONFIG.broker, options);
                 
-                if (response.ok) {
-                    const data = await response.json();
+                mqttClient.on('connect', () => {
+                    addDebugLog('✅ Conectado exitosamente a Mosquitto!', 'success');
                     document.getElementById('connectionStatus').className = 'connection-status connected';
                     document.getElementById('connectionStatus').textContent = '✅ Conectado';
-                    localStorage.setItem('wledIP', ip);
-                    showStatus(`✓ Conectado a WLED - ${totalLeds} LEDs`);
-                } else {
-                    throw new Error('Error de conexión');
-                }
+                    
+                    // Suscribirse a topics de respuesta
+                    mqttClient.subscribe('wled/tree/#', (err) => {
+                        if (!err) {
+                            addDebugLog('📡 Suscrito a topics WLED', 'success');
+                        } else {
+                            addDebugLog('⚠️ Error al suscribirse: ' + err.message, 'error');
+                        }
+                    });
+                });
+                
+                mqttClient.on('error', (err) => {
+                    addDebugLog('❌ Error MQTT: ' + err.message, 'error');
+                    document.getElementById('connectionStatus').className = 'connection-status disconnected';
+                    document.getElementById('connectionStatus').textContent = '❌ Error de conexión';
+                    
+                    // Sugerencias de troubleshooting
+                    if (err.message.includes('ENOTFOUND') || err.message.includes('getaddrinfo')) {
+                        addDebugLog('💡 Verifica que el DNS apunte correctamente', 'error');
+                    } else if (err.message.includes('ECONNREFUSED') || err.message.includes('timeout')) {
+                        addDebugLog('💡 Verifica que el puerto 8083 esté abierto en el firewall', 'error');
+                        addDebugLog('💡 Prueba cambiar 8083 por: 8084, 9001 en el código', 'error');
+                    }
+                });
+                
+                mqttClient.on('reconnect', () => {
+                    addDebugLog('🔄 Intentando reconectar...', 'info');
+                    document.getElementById('connectionStatus').className = 'connection-status connecting';
+                    document.getElementById('connectionStatus').textContent = '🔄 Reconectando...';
+                });
+                
+                mqttClient.on('offline', () => {
+                    addDebugLog('⚠️ Cliente MQTT offline', 'error');
+                    document.getElementById('connectionStatus').className = 'connection-status disconnected';
+                    document.getElementById('connectionStatus').textContent = '⚠️ Desconectado';
+                });
+                
+                mqttClient.on('message', (topic, message) => {
+                    addDebugLog(`📨 Mensaje: ${topic} = ${message.toString().substring(0, 50)}...`, 'success');
+                });
+                
+                // Debug adicional
+                mqttClient.on('packetsend', (packet) => {
+                    if (packet.cmd !== 'pingreq') {  // Ignorar pings
+                        addDebugLog(`📤 Enviando: ${packet.cmd}`, 'info');
+                    }
+                });
+                
+                mqttClient.on('packetreceive', (packet) => {
+                    if (packet.cmd !== 'pingresp') {  // Ignorar pongs
+                        addDebugLog(`📥 Recibido: ${packet.cmd}`, 'info');
+                    }
+                });
+                
             } catch (error) {
-                document.getElementById('connectionStatus').className = 'connection-status disconnected';
-                document.getElementById('connectionStatus').textContent = '❌ Desconectado';
-                showStatus('❌ No se pudo conectar. Verifica la IP.', true);
+                addDebugLog('❌ Error crítico al inicializar: ' + error.message, 'error');
+            }
+        }
+        
+        function reconnectMQTT() {
+            if (mqttClient) {
+                addDebugLog('🔄 Desconectando cliente anterior...', 'info');
+                mqttClient.end(true);
+                mqttClient = null;
+            }
+            setTimeout(() => {
+                initMQTT();
+            }, 500);
+        }
+        
+        // =====================================================
+        // ENVÍO DE COMANDOS
+        // =====================================================
+        
+        async function sendMQTTCommand(payload) {
+            if (!mqttClient || !mqttClient.connected) {
+                addDebugLog('❌ No hay conexión MQTT', 'error');
+                showStatus('❌ No conectado a MQTT', true);
+                return false;
+            }
+            
+            const payloadStr = JSON.stringify(payload);
+            addDebugLog(`📤 Enviando comando: ${payloadStr.substring(0, 80)}...`, 'info');
+            
+            try {
+                mqttClient.publish(MQTT_CONFIG.topic, payloadStr, { qos: 1, retain: false }, (err) => {
+                    if (err) {
+                        addDebugLog('❌ Error al publicar: ' + err.message, 'error');
+                    } else {
+                        addDebugLog('✅ Comando enviado correctamente', 'success');
+                    }
+                });
+                return true;
+            } catch (error) {
+                addDebugLog('❌ Excepción al publicar: ' + error.message, 'error');
+                return false;
+            }
+        }
+        
+        async function sendTestMessage() {
+            const testPayload = {
+                "test": true,
+                "timestamp": new Date().toISOString(),
+                "message": "Test desde interfaz web"
+            };
+            
+            addDebugLog('🧪 Enviando mensaje de prueba...', 'info');
+            const success = await sendMQTTCommand(testPayload);
+            
+            if (success) {
+                showStatus('✅ Mensaje de prueba enviado');
             }
         }
         
         async function resetWLED() {
-            if (!confirm('¿Resetear WLED? Esto apagará todas las luces.')) {
-                return;
-            }
+            addDebugLog('🔴 Apagando LEDs...', 'info');
             
-            await sendToWLED({
+            const payload = {
                 "on": false,
                 "seg": [{
                     "fx": 0,
@@ -729,9 +599,10 @@
                     "pal": 0,
                     "col": [[0,0,0]]
                 }]
-            });
+            };
             
-            showStatus('✓ WLED reseteado');
+            await sendMQTTCommand(payload);
+            showStatus('✓ LEDs apagados');
         }
         
         async function testColorDirect(color) {
@@ -750,7 +621,9 @@
                     return;
             }
             
-            await sendToWLED({
+            addDebugLog(`🧪 Test de color: ${color.toUpperCase()}`, 'info');
+            
+            await sendMQTTCommand({
                 "on": true,
                 "bri": currentBrightness,
                 "seg": [{
@@ -765,17 +638,20 @@
         
         async function testColorRGB() {
             showStatus('🌈 Iniciando ciclo RGB...');
+            addDebugLog('🌈 Ciclo RGB iniciado', 'info');
             
             for (let color of ['red', 'green', 'blue']) {
                 await testColorDirect(color);
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1500));
             }
             
+            addDebugLog('✅ Ciclo RGB completado', 'success');
             showStatus('✓ Ciclo RGB completado');
         }
         
         function updateSelectedColor() {
             selectedColor = document.getElementById('ledColor').value;
+            addDebugLog(`🎨 Color seleccionado: ${selectedColor}`, 'info');
         }
         
         function activatePaintMode() {
@@ -786,10 +662,12 @@
                 btn.classList.add('active');
                 btn.textContent = 'Paint Mode: ON';
                 showStatus('🎨 Paint Mode activado');
+                addDebugLog('🎨 Paint Mode activado', 'info');
             } else {
                 btn.classList.remove('active');
                 btn.textContent = 'Activar Paint Mode';
                 showStatus('Paint Mode desactivado');
+                addDebugLog('Paint Mode desactivado', 'info');
             }
         }
         
@@ -798,10 +676,14 @@
             const percent = Math.round((currentBrightness / 255) * 100);
             document.getElementById('brightVal').textContent = `${percent}%`;
             
-            await sendToWLED({
+            await sendMQTTCommand({
                 "bri": currentBrightness
             });
         }
+        
+        // =====================================================
+        // UTILIDADES
+        // =====================================================
         
         function applyColorOrder(r, g, b) {
             switch(COLOR_ORDER) {
@@ -820,15 +702,6 @@
                 default:
                     return [r, g, b];
             }
-        }
-        
-        function hexToRgb(hex) {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16)
-            } : null;
         }
         
         function generateStars() {
@@ -861,7 +734,7 @@
         }
         
         // =====================================================
-        // THREE.JS (Simplificado para el ejemplo)
+        // THREE.JS (Simplificado)
         // =====================================================
         
         function initThreeJS() {
@@ -873,12 +746,12 @@
             renderer.setSize(canvas.clientWidth, canvas.clientHeight);
             camera.position.z = 5;
             
-            // Crear grupo para LEDs
             ledGroup = new THREE.Group();
             scene.add(ledGroup);
             
-            // Aquí iría la creación del árbol 3D
-            // (Código omitido por brevedad)
+            // Luz ambiental
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
             
             animate();
         }
@@ -894,22 +767,16 @@
         // =====================================================
         
         window.onload = function() {
-            console.log('🚀 Iniciando aplicación...');
+            addDebugLog('🚀 Aplicación iniciada', 'success');
+            addDebugLog('📝 Versión simplificada para Mosquitto', 'info');
             
-            // Cargar IP guardada
-            const savedIP = localStorage.getItem('wledIP');
-            if (savedIP) {
-                document.getElementById('wledIP').value = savedIP;
-            }
-            
-            // Inicializar Three.js
             initThreeJS();
             generateStars();
             
-            // Solo iniciar MQTT si está seleccionado
-            if (connectionMode.startsWith('mqtt-')) {
+            // Iniciar conexión MQTT automáticamente
+            setTimeout(() => {
                 initMQTT();
-            }
+            }, 500);
         };
     </script>
 </body>
