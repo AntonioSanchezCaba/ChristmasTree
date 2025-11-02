@@ -347,9 +347,9 @@
                     
                     <div class="info-box">
                         <strong>📡 Servidor:</strong> mqtt.vittence.com<br>
-                        <strong>🔓 Protocolo:</strong> WebSocket (sin SSL) - Puerto 8080<br>
+                        <strong>🔒 Protocolo:</strong> WebSocket Secure (WSS) - Puerto 8084<br>
                         <strong>🎯 Topic:</strong> wled/tree/api<br>
-                        <strong>⚠️ Nota:</strong> Configuración temporal para diagnóstico
+                        <strong>✅ SSL:</strong> Certificado válido de Let's Encrypt
                     </div>
                     
                     <button onclick="reconnectMQTT()">🔄 Reconectar MQTT</button>
@@ -412,7 +412,7 @@
         // MQTT Configuration
         let mqttClient = null;
         const MQTT_CONFIG = {
-            broker: 'ws://mqtt.vittence.com:8080/mqtt',  // Puerto WebSocket SIN SSL
+            broker: 'wss://mqtt.vittence.com:8084/mqtt',  // Puerto WebSocket CON SSL
             topic: 'wled/tree/api',
             username: '',  // Deja vacío si no configuraste autenticación
             password: ''   // Deja vacío si no configuraste autenticación
@@ -454,8 +454,9 @@
                 clean: true,
                 reconnectPeriod: 5000,
                 connectTimeout: 30000,
-                protocol: 'ws',  // WebSocket sin SSL
+                protocol: 'wss',  // WebSocket con SSL
                 protocolVersion: 4,
+                rejectUnauthorized: true,  // Verificar certificado SSL
                 keepalive: 60
             };
             
