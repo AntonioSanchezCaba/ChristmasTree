@@ -413,7 +413,7 @@
         // MQTT Configuration
         let mqttClient = null;
         const MQTT_CONFIG = {
-            broker: 'ws://mqtt.vittence.com:8080/mqtt',  // Puerto sin SSL (compatible con WLED)
+            broker: 'wss://mqtt.vittence.com:8084/mqtt',,  // Puerto sin SSL (compatible con WLED)
             topic: 'wled/tree/api',
             username: '',
             password: ''
@@ -455,8 +455,9 @@
                 clean: true,
                 reconnectPeriod: 5000,
                 connectTimeout: 30000,
-                protocol: 'ws',
+                protocol: 'wss',
                 protocolVersion: 4,
+                rejectUnauthorized: true,
                 keepalive: 60
             };
             
