@@ -203,13 +203,22 @@
             height: 40px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
-        
+
         .close-schedule:hover {
             background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .close-schedule:active {
+            transform: rotate(90deg) scale(0.95);
         }
         
         .schedule-body {
@@ -710,7 +719,7 @@
         <div class="schedule-container">
             <div class="schedule-header">
                 <h2>📅 Programación de Horarios LED</h2>
-                <button class="close-schedule" onclick="closeSchedule()">✕</button>
+                <button class="close-schedule" onclick="closeSchedule()" aria-label="Cerrar">✕</button>
             </div>
             
             <div class="schedule-body">
@@ -993,14 +1002,22 @@
         // =====================================================
         
         function openSchedule() {
-            document.getElementById('scheduleModal').classList.add('active');
+            const modal = document.getElementById('scheduleModal');
+            modal.classList.remove('closing');
+            modal.classList.add('active');
             loadSchedules();
             renderScheduleGrid();
             updateSchedulerStatus();
         }
         
         function closeSchedule() {
-            document.getElementById('scheduleModal').classList.remove('active');
+            const modal = document.getElementById('scheduleModal');
+            modal.classList.add('closing');
+    
+            setTimeout(() => {
+                modal.classList.remove('active');
+                modal.classList.remove('closing');
+            }, 300);
         }
         
         // =====================================================
@@ -1259,34 +1276,76 @@
             if (!document.getElementById('schedulerEnabled').checked) {
                 return;
             }
-            
+    
             const activeSchedule = getActiveSchedule();
             const shouldBeOn = activeSchedule !== null;
-            
+    
             if (lastScheduleState !== shouldBeOn) {
                 lastScheduleState = shouldBeOn;
-                
+        
                 if (shouldBeOn) {
                     addDebugLog('⏰ Horario activo - Encendiendo LEDs', 'success');
                     showStatus('⏰ Horario: Encendiendo LEDs');
-                    
+            
+                    // COMANDO CORRECTO PARA ENCENDER CON WLED
                     await sendMQTTCommand({
                         "on": true,
-                        "bri": currentBrightness
+                        "bri": currentBrightness,
+                        "seg": [{
+                            "id": 0,
+                            "on": true,
+                            "bri": currentBrightness
+                        }]
                     });
-                    
+            
                 } else {
                     addDebugLog('⏰ Fuera de horario - Apagando LEDs', 'info');
                     showStatus('⏰ Horario: Apagando LEDs');
-                    
+            
+                    // COMANDO CORRECTO PARA APAGAR CON WLED A TRAVÉS DE MQTT
                     await sendMQTTCommand({
-                        "on": false
+                        "on": false,
+                        "bri": 0,
+                        "seg": [{
+                            "id": 0,
+                            "on": false,
+                            "bri": 0,
+                            "fx": 0,
+                            "col": [[0,0,0], [0,0,0], [0,0,0]]
+                        }],
+                        "transition": 0
                     });
+            
+                    // Actualizar visual
                     updateAllLEDsVisual('#000000');
                 }
             }
-            
+    
             updateSchedulerStatus();
+        }
+
+        async function testScheduleOff() {
+            addDebugLog('🧪 Test: Enviando comando OFF completo', 'info');
+    
+            const offCommand = {
+                "on": false,
+                "bri": 0,
+                "seg": [{
+                    "id": 0,
+                    "on": false,
+                    "bri": 0,
+                    "fx": 0,
+                    "col": [[0,0,0], [0,0,0], [0,0,0]]
+                }],
+                "transition": 0
+            };
+    
+            const success = await sendMQTTCommand(offCommand);
+    
+            if (success) {
+                updateAllLEDsVisual('#000000');
+                showStatus('✅ Comando OFF de prueba enviado');
+            }
         }
         
         // =====================================================
