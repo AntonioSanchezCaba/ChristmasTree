@@ -1554,10 +1554,21 @@
 
                     // WLED responde con su estado en /v (versión/info) o /state
                     if (topic === 'wled/tree/state' || topic === 'wled/tree/v') {
-                        // Validar que el payload sea JSON válido antes de parsear
                         const trimmedPayload = payloadStr.trim();
+
+                        // Detectar si es XML
+                        if (trimmedPayload.startsWith('<?xml') || trimmedPayload.startsWith('<')) {
+                            addDebugLog('📋 Detectado formato XML, parseando...', 'info');
+                            const state = parseWLEDXML(trimmedPayload);
+                            if (state) {
+                                handleWLEDState(state);
+                            }
+                            return;
+                        }
+
+                        // Validar que el payload sea JSON válido antes de parsear
                         if (!trimmedPayload.startsWith('{') && !trimmedPayload.startsWith('[')) {
-                            addDebugLog('⚠️ Respuesta de WLED no es JSON válido (probablemente XML/HTML)', 'error');
+                            addDebugLog('⚠️ Respuesta de WLED no es JSON ni XML válido', 'error');
                             addDebugLog(`📄 Contenido: ${payloadStr.substring(0, 100)}`, 'info');
                             return;
                         }
@@ -1593,6 +1604,51 @@
             setTimeout(() => {
                 initMQTT();
             }, 500);
+        }
+
+        // Función para parsear XML de WLED y convertirlo a formato JSON
+        function parseWLEDXML(xmlString) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+
+                // Verificar si hay errores de parseo
+                const parseError = xmlDoc.querySelector('parsererror');
+                if (parseError) {
+                    throw new Error('Error al parsear XML');
+                }
+
+                const vs = xmlDoc.querySelector('vs');
+                if (!vs) {
+                    throw new Error('No se encontró elemento <vs> en XML');
+                }
+
+                // Extraer brillo (ac = actual brightness)
+                const acElement = vs.querySelector('ac');
+                const brightness = acElement ? parseInt(acElement.textContent) : 128;
+
+                // Extraer colores primarios (cl = color)
+                const clElements = vs.querySelectorAll('cl');
+                const colors = Array.from(clElements).map(el => parseInt(el.textContent));
+
+                // Crear objeto compatible con handleWLEDState
+                const state = {
+                    on: brightness > 0, // Asumimos que está encendido si el brillo > 0
+                    bri: brightness,
+                    seg: [{
+                        col: [colors.length >= 3 ? colors.slice(0, 3) : [255, 255, 255]],
+                        fx: 0 // Sin efecto (color sólido)
+                    }]
+                };
+
+                addDebugLog('✅ XML parseado correctamente', 'success');
+                addDebugLog(`📊 Brillo: ${brightness}, Color: RGB(${colors.slice(0, 3).join(',')})`, 'info');
+
+                return state;
+            } catch (e) {
+                addDebugLog('❌ Error al parsear XML de WLED: ' + e.message, 'error');
+                return null;
+            }
         }
 
         // INICIO: Solución #5 - Nueva función para manejar el estado de WLED
