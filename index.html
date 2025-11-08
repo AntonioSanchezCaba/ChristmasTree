@@ -1830,34 +1830,34 @@
                             applyRainbowDesign(false); // false = no enviar a WLED
                             break;
                         case 12: // Fire
-                            runAnimatedEffect('Fire');
+                            runAnimatedEffect('Fire', false);
                             break;
                         case 28: // Chase
-                            runAnimatedEffect('Chase');
+                            runAnimatedEffect('Chase', false);
                             break;
                         case 17: // Twinkle
-                            runAnimatedEffect('Twinkle');
+                            runAnimatedEffect('Twinkle', false);
                             break;
                         case 20: // Sparkle
-                            runAnimatedEffect('Sparkle');
+                            runAnimatedEffect('Sparkle', false);
                             break;
                         case 79: // Ripple
-                            runAnimatedEffect('Ripple');
+                            runAnimatedEffect('Ripple', false);
                             break;
                         case 1: // Blink
-                            runAnimatedEffect('Blink');
+                            runAnimatedEffect('Blink', false);
                             break;
                         case 10: // Scan
-                            runAnimatedEffect('Scan');
+                            runAnimatedEffect('Scan', false);
                             break;
                         case 67: // Waves
-                            runAnimatedEffect('Waves');
+                            runAnimatedEffect('Waves', false);
                             break;
                         case 49: // Fairy
-                            runAnimatedEffect('Fairy');
+                            runAnimatedEffect('Fairy', false);
                             break;
                         case 110: // Flow
-                            runAnimatedEffect('Flow');
+                            runAnimatedEffect('Flow', false);
                             break;
                         default:
                             // Fallback para efectos no mapeados: mostrar color primario
@@ -2203,59 +2203,38 @@
         }
         
         // EFECTOS ANIMADOS (mantener todas las funciones existentes)
-        function runAnimatedEffect(effectName) {
+        function runAnimatedEffect(effectName, sendToWLED = true) {
             if (effectAnimationInterval) {
                 clearInterval(effectAnimationInterval);
             }
             if (localAnimationInterval) {
                 clearInterval(localAnimationInterval);
             }
-            
+
             currentLocalAnimation = effectName;
             showStatus(`🔄 Animación "${effectName}" iniciada`);
             addDebugLog(`🎬 Iniciando animación: ${effectName}`, 'info');
-            
-            switch(effectName) {
-                case 'Fire':
-                    animateFire();
-                    sendWLEDEffect(12);
-                    break;
-                case 'Chase':
-                    animateChase();
-                    sendWLEDEffect(28);
-                    break;
-                case 'Twinkle':
-                    animateTwinkle();
-                    sendWLEDEffect(17);
-                    break;
-                case 'Sparkle':
-                    animateSparkle();
-                    sendWLEDEffect(20);
-                    break;
-                case 'Ripple':
-                    animateRipple();
-                    sendWLEDEffect(79);
-                    break;
-                case 'Blink':
-                    animateBlink();
-                    sendWLEDEffect(1);
-                    break;
-                case 'Scan':
-                    animateScan();
-                    sendWLEDEffect(10);
-                    break;
-                case 'Waves':
-                    animateWaves();
-                    sendWLEDEffect(67);
-                    break;
-                case 'Fairy':
-                    animateFairy();
-                    sendWLEDEffect(49);
-                    break;
-                case 'Flow':
-                    animateFlow();
-                    sendWLEDEffect(110);
-                    break;
+
+            // Mapeo de efectos a sus números de FX y funciones de animación
+            const effectMap = {
+                'Fire': { fx: 12, animate: animateFire },
+                'Chase': { fx: 28, animate: animateChase },
+                'Twinkle': { fx: 17, animate: animateTwinkle },
+                'Sparkle': { fx: 20, animate: animateSparkle },
+                'Ripple': { fx: 79, animate: animateRipple },
+                'Blink': { fx: 1, animate: animateBlink },
+                'Scan': { fx: 10, animate: animateScan },
+                'Waves': { fx: 67, animate: animateWaves },
+                'Fairy': { fx: 49, animate: animateFairy },
+                'Flow': { fx: 110, animate: animateFlow }
+            };
+
+            const effect = effectMap[effectName];
+            if (effect) {
+                effect.animate();
+                if (sendToWLED) {
+                    sendWLEDEffect(effect.fx);
+                }
             }
         }
 
