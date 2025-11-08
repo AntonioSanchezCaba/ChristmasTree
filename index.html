@@ -1256,13 +1256,15 @@
                 block.title = `${schedule.startTime} - ${schedule.endTime}`;
             }
             
-            block.onclick = () => {
-                if (confirm(`¿Deseas ${schedule.enabled ? 'desactivar' : 'activar'} este horario?`)) {
-                    toggleSchedule(schedule.id);
-                }
+            // Lógica: 1 click = Activar/Desactivar. 2 clicks = Eliminar.
+            block.onclick = (e) => {
+                // Previene que se dispare la acción de un solo click después del doble click
+                e.preventDefault(); 
+                toggleSchedule(schedule.id);
             };
+
             block.ondblclick = () => {
-                if (confirm('¿Eliminar este horario?')) {
+                if (confirm('¿Estás seguro de que deseas ELIMINAR este horario permanentemente?')) {
                     deleteSchedule(schedule.id);
                 }
             };
