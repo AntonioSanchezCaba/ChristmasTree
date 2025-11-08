@@ -142,7 +142,6 @@
             background: rgba(0, 0, 0, 0.8);
             display: none;
             z-index: 1000;
-            animation: fadeIn 0.3s;
         }
         
         .schedule-modal.active {
@@ -1003,12 +1002,20 @@
         
         function openSchedule() {
             const modal = document.getElementById('scheduleModal');
-            modal.classList.remove('closing');
-            modal.classList.add('active');
-            loadSchedules();
-            renderScheduleGrid();
-            updateSchedulerStatus();
+            if (modal) {
+                modal.classList.add('active');
+                loadSchedules();
+                renderScheduleGrid();
+                updateSchedulerStatus();
+            }
         }
+
+function closeSchedule() {
+    const modal = document.getElementById('scheduleModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
         
         function closeSchedule() {
             const modal = document.getElementById('scheduleModal');
@@ -1231,9 +1238,16 @@
         }
         
         function updateSchedulerStatus() {
-            const enabled = document.getElementById('schedulerEnabled').checked;
+            // Verificar que el elemento exista antes de usarlo
+            const schedulerCheckbox = document.getElementById('schedulerEnabled');
             const statusText = document.getElementById('scheduleStatusText');
-            
+    
+            if (!schedulerCheckbox || !statusText) {
+                return;
+            }
+    
+            const enabled = schedulerCheckbox.checked;
+    
             if (enabled) {
                 const activeSchedule = getActiveSchedule();
                 if (activeSchedule) {
@@ -1273,54 +1287,46 @@
         }
         
         async function checkSchedules() {
-            if (!document.getElementById('schedulerEnabled').checked) {
+            // VALIDAR PRIMERO SI HAY CONEXIÓN
+            if (!mqttClient || !mqttClient.connected) {
+                addDebugLog('⚠️ No hay conexión MQTT para verificar horarios', 'error');
                 return;
             }
     
+            // VALIDAR SI EL SCHEDULER ESTÁ HABILITADO
+            if (!document.getElementById('schedulerEnabled') || !document.getElementById('schedulerEnabled').checked) {
+                return;
+            }
+
             const activeSchedule = getActiveSchedule();
             const shouldBeOn = activeSchedule !== null;
-    
+
             if (lastScheduleState !== shouldBeOn) {
                 lastScheduleState = shouldBeOn;
-        
+
                 if (shouldBeOn) {
                     addDebugLog('⏰ Horario activo - Encendiendo LEDs', 'success');
                     showStatus('⏰ Horario: Encendiendo LEDs');
-            
-                    // COMANDO CORRECTO PARA ENCENDER CON WLED
+    
+                    // Comando simple para encender
                     await sendMQTTCommand({
                         "on": true,
-                        "bri": currentBrightness,
-                        "seg": [{
-                            "id": 0,
-                            "on": true,
-                            "bri": currentBrightness
-                        }]
+                        "bri": currentBrightness
                     });
-            
+    
                 } else {
                     addDebugLog('⏰ Fuera de horario - Apagando LEDs', 'info');
                     showStatus('⏰ Horario: Apagando LEDs');
-            
-                    // COMANDO CORRECTO PARA APAGAR CON WLED A TRAVÉS DE MQTT
+    
+                    // Comando simple para apagar
                     await sendMQTTCommand({
-                        "on": false,
-                        "bri": 0,
-                        "seg": [{
-                            "id": 0,
-                            "on": false,
-                            "bri": 0,
-                            "fx": 0,
-                            "col": [[0,0,0], [0,0,0], [0,0,0]]
-                        }],
-                        "transition": 0
+                        "on": false
                     });
             
-                    // Actualizar visual
                     updateAllLEDsVisual('#000000');
                 }
             }
-    
+
             updateSchedulerStatus();
         }
 
@@ -2491,24 +2497,31 @@
         window.onload = function() {
             addDebugLog('🚀 Aplicación iniciada', 'success');
             addDebugLog('📝 Versión completa con Scheduler', 'info');
-            
+    
             initThreeJS();
             generateStars();
             loadDesigns();
             loadSchedules();
-            
-            // Verificar horarios cada 30 segundos
-            setInterval(checkSchedules, 30000);
-            
-            // Iniciar conexión MQTT automáticamente
+    
+            // PRIMERO establecer conexión MQTT
             setTimeout(() => {
                 initMQTT();
             }, 500);
-            
-            // Verificación inicial de horarios
+    
+            // DESPUÉS iniciar verificación de horarios (solo si hay conexión)
             setTimeout(() => {
-                checkSchedules();
-            }, 1000);
+                // Verificar horarios solo cada 60 segundos en lugar de 30
+                setInterval(() => {
+                    if (mqttClient && mqttClient.connected) {
+                        checkSchedules();
+                    }
+                }, 60000);
+        
+                // Primera verificación después de conectar
+                if (mqttClient && mqttClient.connected) {
+                    checkSchedules();
+                }
+            }, 2000);
         };
     </script>
 </body>
