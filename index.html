@@ -1599,6 +1599,22 @@
                 mqttClient.on('message', (topic, message) => {
                     const payloadStr = message.toString();
 
+                    // Procesar mensajes de brillo para sincronización entre dispositivos
+                    if (topic === 'wled/tree/brightness') {
+                        const brightness = parseInt(payloadStr);
+                        if (!isNaN(brightness) && brightness >= 0 && brightness <= 255) {
+                            // Solo actualizar si es diferente del actual (evitar loops)
+                            if (Math.abs(brightness - currentBrightness) > 2) {
+                                currentBrightness = brightness;
+                                document.getElementById('brightness').value = brightness;
+                                updateBrightnessLabel(brightness);
+                                localStorage.setItem('lastBrightness', brightness.toString());
+                                addDebugLog(`💡 Brillo sincronizado desde otro dispositivo: ${brightness}`, 'success');
+                            }
+                        }
+                        return;
+                    }
+
                     // Procesar mensajes de horarios para sincronización entre dispositivos
                     if (topic === 'wled/tree/schedules') {
                         try {
@@ -1771,6 +1787,11 @@
 
                 // Guardar el brillo en localStorage para persistencia
                 localStorage.setItem('lastBrightness', brightness.toString());
+
+                // Publicar brillo en MQTT para sincronizar entre dispositivos
+                if (mqttClient && mqttClient.connected) {
+                    mqttClient.publish('wled/tree/brightness', brightness.toString(), { retain: true });
+                }
             }
 
             // 2. Actualizar Estado (On/Off)
@@ -2425,7 +2446,7 @@
             currentBrightness = parseInt(value);
             updateBrightnessLabel(value);
 
-            // Guardar brillo en localStorage para persistencia
+            // Guardar brillo en localStorage para persistencia local
             localStorage.setItem('lastBrightness', currentBrightness.toString());
 
             // No es necesario actualizar el visual aquí, WLED lo maneja
@@ -2437,6 +2458,11 @@
             brightnessTimeout = setTimeout(() => {
                 addDebugLog(`💡 Aplicando brillo: ${currentBrightness}`, 'info');
                 sendMQTTCommand({"bri": currentBrightness});
+
+                // Publicar brillo en MQTT para sincronizar entre dispositivos
+                if (mqttClient && mqttClient.connected) {
+                    mqttClient.publish('wled/tree/brightness', currentBrightness.toString(), { retain: true });
+                }
             }, 300); // 300ms debounce
         }
         
