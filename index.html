@@ -1256,36 +1256,41 @@
                 block.title = `${schedule.startTime} - ${schedule.endTime}`;
             }
         
-            // **NUEVA LÓGICA DEFINITIVA CON TIMER**
-            // Un solo 'onclick' maneja los dos casos para evitar conflictos.
+            // **LÓGICA DEFINITIVA CON TIMER:**
+            // Usamos un contador de clics y un timer para distinguir entre 1 y 2 clics.
+            let clickCount = 0;
             let clickTimer = null;
-            const DOUBLE_CLICK_TIME = 300; // 300ms para diferenciar single de double click
+            const DOUBLE_CLICK_TIME = 300; // Tiempo en ms para considerarse doble clic
 
             block.onclick = (e) => {
-                e.preventDefault(); // Prevenir cualquier acción por defecto (como selección de texto)
+                e.preventDefault(); 
+                clickCount++;
 
-                if (clickTimer) {
-                    // CASO 2: Hay un timer corriendo (es el segundo click) -> Doble Click
+                if (clickCount === 1) {
+                    // Primer click: Inicia el timer.
+                    clickTimer = setTimeout(() => {
+                        // Si el timer expira, es un Single Click.
+                        clickCount = 0;
+                        clickTimer = null;
+                    
+                        // ACCIÓN SINGLE CLICK: TOGGLE (Activar/Desactivar)
+                        toggleSchedule(schedule.id);
+                    
+                    }, DOUBLE_CLICK_TIME);
+                } else if (clickCount === 2) {
+                    // Segundo click (dentro del tiempo límite): Doble Click.
                     clearTimeout(clickTimer);
+                    clickCount = 0;
                     clickTimer = null;
                 
                     // ACCIÓN DOBLE CLICK: PREGUNTAR POR ELIMINACIÓN
                     if (confirm('¿Estás seguro de que deseas ELIMINAR este horario permanentemente?')) {
                         deleteSchedule(schedule.id);
                     }
-                } else {
-                    // CASO 1: No hay timer (es el primer click) -> Iniciar timer
-                    clickTimer = setTimeout(() => {
-                        clickTimer = null;
-                    
-                        // ACCIÓN SINGLE CLICK: TOGGLE (Activar/Desactivar - gris/color)
-                        toggleSchedule(schedule.id);
-                    
-                    }, DOUBLE_CLICK_TIME);
                 }
             };
 
-            // NOTA: ELIMINA cualquier línea "block.ondblclick" anterior.
+            // NOTA: Asegúrate de que **NO EXISTA** una línea `block.ondblclick = ...` en esta función.
         
             return block;
         }
