@@ -973,49 +973,73 @@
                         <span class="brightness-value" id="brightVal">50%</span>
                     </div>
                 </div>
-                 
+
+                <!-- Control Básico -->
                 <div class="section">
-                    <div class="section-title">🎨 Static Color Designs</div>
+                    <div class="section-title">⚡ Control</div>
                     <div class="effects-grid">
-                         <button class="effect-btn" onclick="setStaticDesign('OFF')">OFF</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Solid')">Solid</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Rainbow')">Rainbow</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Warm')">Warm</button>
-                         <button class="effect-btn" onclick="setStaticDesign('Cold')">Cold</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Purple Rain')">Purple Rain</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Dominican')">Dominican</button>
+                        <button class="effect-btn" onclick="setStaticDesign('OFF')" style="background: #dc3545;">🔴 OFF</button>
+                        <button class="effect-btn" onclick="setStaticDesign('Solid')">🎨 Color Personalizado</button>
                     </div>
-                 </div>
-                
+                </div>
+
+                <!-- Efectos Cálidos -->
                 <div class="section">
-                    <div class="section-title">📁 My Designs</div>
+                    <div class="section-title">🔥 Efectos Cálidos</div>
+                    <div class="effects-grid">
+                        <button class="effect-btn" onclick="setStaticDesign('Warm')">☀️ Warm (Estático)</button>
+                        <button class="effect-btn" onclick="runAnimatedEffect('Fire')">🔥 Fire (Animado)</button>
+                    </div>
+                </div>
+
+                <!-- Efectos Fríos -->
+                <div class="section">
+                    <div class="section-title">❄️ Efectos Fríos</div>
+                    <div class="effects-grid">
+                        <button class="effect-btn" onclick="setStaticDesign('Cold')">❄️ Cold (Estático)</button>
+                        <button class="effect-btn" onclick="runAnimatedEffect('Scan')">📡 Scan (Animado)</button>
+                        <button class="effect-btn" onclick="runAnimatedEffect('Waves')">🌀 Waves (Animado)</button>
+                    </div>
+                </div>
+
+                <!-- Efectos Brillantes -->
+                <div class="section">
+                    <div class="section-title">✨ Efectos Brillantes</div>
+                    <div class="effects-grid">
+                        <button class="effect-btn" onclick="runAnimatedEffect('Twinkle')">✨ Twinkle</button>
+                        <button class="effect-btn" onclick="runAnimatedEffect('Sparkle')">💫 Sparkle</button>
+                        <button class="effect-btn" onclick="runAnimatedEffect('Fairy')">🧚 Fairy</button>
+                        <button class="effect-btn" onclick="runAnimatedEffect('Blink')">⚡ Blink</button>
+                    </div>
+                </div>
+
+                <!-- Efectos Multicolor -->
+                <div class="section">
+                    <div class="section-title">🌈 Efectos Multicolor</div>
+                    <div class="effects-grid">
+                        <button class="effect-btn" onclick="setStaticDesign('Rainbow')">🌈 Rainbow</button>
+                        <button class="effect-btn" onclick="setStaticDesign('Purple Rain')">💜 Purple Rain</button>
+                        <button class="effect-btn" onclick="setStaticDesign('Dominican')">🇩🇴 Dominican</button>
+                    </div>
+                </div>
+
+                <!-- Efectos Dinámicos -->
+                <div class="section">
+                    <div class="section-title">🌊 Efectos Dinámicos</div>
+                    <div class="effects-grid">
+                        <button class="effect-btn" onclick="runAnimatedEffect('Chase')">🏃 Chase</button>
+                        <button class="effect-btn" onclick="runAnimatedEffect('Ripple')">🌊 Ripple</button>
+                        <button class="effect-btn" onclick="runAnimatedEffect('Flow')">🌈 Flow</button>
+                        <button class="effect-btn danger" onclick="stopAllAnimations()">⏹ Stop Animation</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">📁 Mis Diseños Guardados</div>
                      <input type="text" id="designName" placeholder="Nombre del diseño">
-                    <button onclick="saveDesign()">Guardar Diseño Actual</button>
+                    <button onclick="saveDesign()">💾 Guardar Diseño Actual</button>
                     <div id="designsList"></div>
                 </div>
-                
- 
-                <div class="section">
-                    <div class="section-title">🌊 Animated Effects (Movement)</div>
-                    <p style="font-size: 12px; margin-bottom: 10px; color: #666;">
-                        Estos efectos añaden movimiento a los diseños de color
-                    </p>
-                    <div class="animated-effects-grid">
-                        
-                         <button onclick="runAnimatedEffect('Fire')">🔥 Fire</button>
-                        <button onclick="runAnimatedEffect('Chase')">🏃 Chase</button>
-                        <button onclick="runAnimatedEffect('Twinkle')">✨ Twinkle</button>
-                        <button onclick="runAnimatedEffect('Sparkle')">💫 Sparkle</button>
-                         <button onclick="runAnimatedEffect('Ripple')">🌊 Ripple</button>
-                        <button onclick="runAnimatedEffect('Blink')">⚡ Blink</button>
-                        <button onclick="runAnimatedEffect('Scan')">📡 Scan</button>
-                        <button onclick="runAnimatedEffect('Waves')">🌀 Waves</button>
-                         <button onclick="runAnimatedEffect('Fairy')">🧚 Fairy</button>
-                        <button onclick="runAnimatedEffect('Flow')">🌈 Flow</button>
-                        <button class="danger" onclick="stopAllAnimations()">⏹ Stop Animation</button>
-                    </div>
-                
-                 </div>
             </div>
         </div>
     </div>
