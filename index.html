@@ -1255,45 +1255,23 @@
                 // Si es muy pequeño, al menos poner un tooltip
                 block.title = `${schedule.startTime} - ${schedule.endTime}`;
             }
-        
-            // **LÓGICA DEFINITIVA CON TIMER:**
-            // Usamos un contador de clics y un timer para distinguir entre 1 y 2 clics.
-            let clickCount = 0;
-            let clickTimer = null;
-            const DOUBLE_CLICK_TIME = 300; // Tiempo en ms para considerarse doble clic
-
+            
+            // Lógica: 1 click = Activar/Desactivar. 2 clicks = Eliminar.
             block.onclick = (e) => {
+                // Previene que se dispare la acción de un solo click después del doble click
                 e.preventDefault(); 
-                clickCount++;
-
-                if (clickCount === 1) {
-                    // Primer click: Inicia el timer.
-                    clickTimer = setTimeout(() => {
-                        // Si el timer expira, es un Single Click.
-                        clickCount = 0;
-                        clickTimer = null;
-                    
-                        // ACCIÓN SINGLE CLICK: TOGGLE (Activar/Desactivar)
-                        toggleSchedule(schedule.id);
-                    
-                    }, DOUBLE_CLICK_TIME);
-                } else if (clickCount === 2) {
-                    // Segundo click (dentro del tiempo límite): Doble Click.
-                    clearTimeout(clickTimer);
-                    clickCount = 0;
-                    clickTimer = null;
-                
-                    // ACCIÓN DOBLE CLICK: PREGUNTAR POR ELIMINACIÓN
-                    if (confirm('¿Estás seguro de que deseas ELIMINAR este horario permanentemente?')) {
-                        deleteSchedule(schedule.id);
-                    }
-                }
+                toggleSchedule(schedule.id);
             };
 
-            // NOTA: Asegúrate de que **NO EXISTA** una línea `block.ondblclick = ...` en esta función.
-        
+            block.ondblclick = () => {
+                if (confirm('¿Estás seguro de que deseas ELIMINAR este horario permanentemente?')) {
+                    deleteSchedule(schedule.id);
+                }
+            };
+            
             return block;
         }
+        // FIN: Solución #2 y #3
         
         // Funciones de horarios rápidos
         function setWeekdaySchedule() {
@@ -1570,15 +1548,15 @@
                     // WLED responde con su estado en /v (versión/info) o /state
                     if (topic === 'wled/tree/state' || topic === 'wled/tree/v') {
                         try {
-                            // Intenta parsear la cadena
                             const data = JSON.parse(payloadStr);
                             
-                            // Lógica más robusta: 1. Busca 'state'. 2. Busca 'info'. 3. Usa el objeto raíz.
+                            // **NUEVA LÓGICA MÁS ROBUSTA:** // 1. Prioriza 'state' si existe.
+                            // 2. Si no, usa el objeto raíz (data).
+                            // 3. Si se sincroniza el diseño (como en 'v'), el objeto 'info' puede estar anidado.
                             const state = data.state || data.info || data; 
                             
                             handleWLEDState(state);
                         } catch (e) {
-                            // Captura el error si la cadena no es JSON válido
                             addDebugLog('❌ Error al parsear estado JSON de WLED: ' + e.message, 'error');
                         }
                     }
