@@ -1432,6 +1432,13 @@
             const activeSchedule = getActiveSchedule();
             const shouldBeOn = activeSchedule !== null;
 
+            // Al inicio, sincronizar lastScheduleState sin enviar comandos
+            if (lastScheduleState === null) {
+                lastScheduleState = shouldBeOn;
+                addDebugLog(`🔄 Estado inicial del scheduler: ${shouldBeOn ? 'Horario activo' : 'Fuera de horario'} (sin enviar comandos)`, 'info');
+                return; // No enviar comandos al cargar la página
+            }
+
             if (lastScheduleState !== shouldBeOn) {
                 lastScheduleState = shouldBeOn;
                 if (shouldBeOn) {
