@@ -1576,9 +1576,16 @@
 
                     // Procesar mensajes de estado de WLED (v, state, o api con JSON de estado)
                     if (topic === 'wled/tree/v' || topic === 'wled/tree/state' || topic === 'wled/tree/api') {
-                        addDebugLog(`📨 Mensaje desde ${topic}`, 'success');
-
                         const trimmedPayload = payloadStr.trim();
+
+                        // Mostrar preview del contenido (incluso si está vacío)
+                        if (trimmedPayload.length === 0) {
+                            addDebugLog(`📨 ${topic}: (vacío)`, 'info');
+                            return;
+                        }
+
+                        const preview = trimmedPayload.substring(0, 80);
+                        addDebugLog(`📨 ${topic}: ${preview}${trimmedPayload.length > 80 ? '...' : ''}`, 'success');
 
                         // Detectar si es XML
                         if (trimmedPayload.startsWith('<?xml') || trimmedPayload.startsWith('<')) {
@@ -1591,7 +1598,7 @@
 
                         // Validar que el payload sea JSON válido antes de parsear
                         if (!trimmedPayload.startsWith('{') && !trimmedPayload.startsWith('[')) {
-                            // Ignorar mensajes que no son JSON ni XML (como comandos simples)
+                            addDebugLog(`⚠️ ${topic}: Formato desconocido`, 'error');
                             return;
                         }
 
