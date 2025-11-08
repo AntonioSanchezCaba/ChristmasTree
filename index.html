@@ -1526,6 +1526,12 @@
                      mqttClient.subscribe('wled/tree/#', (err) => {
                         if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
+
+                            // Solicitar estado actual de WLED al conectarse
+                            setTimeout(() => {
+                                addDebugLog('🔍 Solicitando estado actual de WLED...', 'info');
+                                mqttClient.publish('wled/tree/api', '');
+                            }, 500);
                         } else {
                             addDebugLog('⚠️ Error al suscribirse: ' + err.message, 'error');
                         }
