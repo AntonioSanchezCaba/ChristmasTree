@@ -7,63 +7,61 @@
     <style>
         * {
             margin: 0;
-padding: 0;
+            padding: 0;
             box-sizing: border-box;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
             overflow: hidden;
             height: 100vh;
             color: #333;
-}
+        }
         
         .stars {
             position: fixed;
-top: 0;
+            top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-}
+        }
         
         .star {
             position: absolute;
-width: 2px;
+            width: 2px;
             height: 2px;
             background: white;
             border-radius: 50%;
             animation: twinkle 3s infinite;
-}
+        }
         
         @keyframes twinkle {
-            0%, 100% { opacity: 0.3;
-}
-            50% { opacity: 1;
-}
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
         
         .main-container {
             display: flex;
-height: 100vh;
+            height: 100vh;
             position: relative;
             z-index: 1;
         }
         
         .tree-view {
             flex: 1;
-display: flex;
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 20px;
             position: relative;
-}
+        }
         
         .tree-container {
             position: relative;
-width: 90%;
+            width: 90%;
             height: 90%;
             max-width: 800px;
             max-height: 900px;
@@ -71,21 +69,21 @@ width: 90%;
         
         #treeCanvas {
             position: absolute;
-top: 0;
+            top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             cursor: grab;
-}
+        }
         #treeCanvas:active {
             cursor: grabbing;
-}
+        }
         
         /* BOTÓN SCHEDULE FLOTANTE */
         /* BOTÓN SCHEDULE MINIMALISTA */
         .schedule-button {
             position: fixed;
-top: 15px;
+            top: 15px;
             right: 470px;
             background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
             color: white;
@@ -93,30 +91,30 @@ top: 15px;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-cursor: pointer;
+            cursor: pointer;
             font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 10px rgba(71, 118, 230, 0.4);
-transition: all 0.3s;
+            transition: all 0.3s;
             z-index: 100;
         }
 
         .schedule-button span {
             display: none;
-/* Oculta el texto */
+            /* Oculta el texto */
         }
 
         .schedule-button:hover {
             transform: scale(1.1);
-box-shadow: 0 4px 15px rgba(71, 118, 230, 0.6);
+            box-shadow: 0 4px 15px rgba(71, 118, 230, 0.6);
         }
 
         /* Tooltip al pasar el mouse */
         .schedule-button::after {
             content: 'Schedule';
-position: absolute;
+            position: absolute;
             bottom: -30px;
             left: 50%;
             transform: translateX(-50%);
@@ -124,45 +122,43 @@ position: absolute;
             color: white;
             padding: 4px 8px;
             border-radius: 4px;
-font-size: 12px;
+            font-size: 12px;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
-}
+        }
 
         .schedule-button:hover::after {
             opacity: 1;
-}
+        }
         
         /* MODAL DE SCHEDULE */
         .schedule-modal {
             position: fixed;
-top: 0;
+            top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.8);
             display: none;
             z-index: 1000;
-}
+        }
         
         .schedule-modal.active {
             display: flex;
-justify-content: center;
+            justify-content: center;
             align-items: center;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0;
-}
-            to { opacity: 1;
-}
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .schedule-container {
             background: white;
-width: 90%;
+            width: 90%;
             max-width: 1200px;
             height: 85vh;
             border-radius: 20px;
@@ -170,38 +166,38 @@ width: 90%;
             display: flex;
             flex-direction: column;
             animation: slideUp 0.3s;
-}
+        }
         
         @keyframes slideUp {
             from {
                 transform: translateY(50px);
-opacity: 0;
+                opacity: 0;
             }
             to {
                 transform: translateY(0);
-opacity: 1;
+                opacity: 1;
             }
         }
         
         .schedule-header {
             background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
-color: white;
+            color: white;
             padding: 20px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-}
+        }
         
         .schedule-header h2 {
             font-size: 24px;
-display: flex;
+            display: flex;
             align-items: center;
             gap: 10px;
         }
         
         .close-schedule {
             background: rgba(255, 255, 255, 0.2);
-border: none;
+            border: none;
             color: white;
             width: 40px;
             height: 40px;
@@ -210,7 +206,7 @@ border: none;
             font-size: 24px;
             font-weight: bold;
             transition: all 0.3s ease;
-display: flex;
+            display: flex;
             align-items: center;
             justify-content: center;
             line-height: 1;
@@ -218,73 +214,73 @@ display: flex;
 
         .close-schedule:hover {
             background: rgba(255, 255, 255, 0.3);
-transform: rotate(90deg) scale(1.1);
+            transform: rotate(90deg) scale(1.1);
         }
 
         .close-schedule:active {
             transform: rotate(90deg) scale(0.95);
-}
+        }
         
         .schedule-body {
             flex: 1;
-overflow-y: auto;
+            overflow-y: auto;
             padding: 30px;
             background: #f8f9fa;
         }
         
         .schedule-grid {
             display: grid;
-grid-template-columns: 100px 1fr;
+            grid-template-columns: 100px 1fr;
             gap: 20px;
             background: white;
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+        }
         
         .time-column {
             display: flex;
-flex-direction: column;
+            flex-direction: column;
             gap: 40px;
             padding-top: 40px;
         }
         
         .time-label {
             height: 60px;
-display: flex;
+            display: flex;
             align-items: center;
             justify-content: flex-end;
             padding-right: 10px;
             font-size: 12px;
             color: #666;
             border-top: 1px solid #e0e0e0;
-}
+        }
         
         .days-grid {
             display: grid;
-grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 10px;
         }
         
         .day-column {
             background: #fff;
-border: 1px solid #e0e0e0;
+            border: 1px solid #e0e0e0;
             border-radius: 10px;
             overflow: hidden;
         }
         
         .day-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-color: white;
+            color: white;
             padding: 10px;
             text-align: center;
             font-weight: 600;
             font-size: 14px;
-}
+        }
         
         .day-schedule {
             position: relative;
-height: 1440px;
+            height: 1440px;
             background: repeating-linear-gradient(
                 to bottom,
                 #fff 0px,
@@ -292,13 +288,12 @@ height: 1440px;
                 #f5f5f5 59px,
                 #f5f5f5 60px
             
-
             );
-}
+        }
         
         .schedule-block {
             position: absolute;
-left: 5px;
+            left: 5px;
             right: 5px;
             background: #4CAF50;
             color: white;
@@ -307,114 +302,114 @@ left: 5px;
             font-size: 11px;
             cursor: pointer;
             transition: all 0.3s;
-display: flex;
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-/* INICIO: Solución #2 - Ocultar texto si es muy pequeño */
-            overflow: hidden;
-/* FIN: Solución #2 */
+            /* INICIO: Solución #2 - Ocultar texto si es muy pequeño */
+            overflow: hidden; 
+            /* FIN: Solución #2 */
         }
         
         .schedule-block:hover {
             transform: scale(1.02);
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         
         .schedule-block.inactive {
             background: #9e9e9e;
-opacity: 0.7;
+            opacity: 0.7;
         }
         
         .add-schedule-panel {
             background: white;
-border-radius: 15px;
+            border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+        }
         
         .quick-actions {
             display: flex;
-gap: 10px;
+            gap: 10px;
             margin-bottom: 20px;
         }
         
         .quick-action-btn {
             flex: 1;
-padding: 10px;
+            padding: 10px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-transition: all 0.3s;
+            transition: all 0.3s;
         }
         
         .quick-action-btn:hover {
             transform: translateY(-2px);
-box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
         }
         
         .control-panel {
             width: 450px;
-background: rgba(255, 255, 255, 0.98);
+            background: rgba(255, 255, 255, 0.98);
             overflow-y: auto;
             box-shadow: -5px 0 30px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-}
+        }
         
         .panel-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-color: white;
+            color: white;
             padding: 15px 20px; /* Reducido de 20px */
             text-align: center;
-position: sticky;
+            position: sticky;
             top: 0;
             z-index: 10;
         }
 
         .panel-header h1 {
             font-size: 1.5em;
-/* Reducido de 1.8em */
+            /* Reducido de 1.8em */
             margin-bottom: 3px;
-}
+        }
 
         .panel-header p {
             font-size: 0.9em;
-/* Más pequeño */
+            /* Más pequeño */
             opacity: 0.9;
-}
+        }
         
         .panel-content {
             padding: 20px;
-flex-grow: 1;
+            flex-grow: 1;
         }
         
         .section {
             background: white;
-border-radius: 12px;
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
+        }
         
         .section-title {
             font-size: 1.1em;
-font-weight: 600;
+            font-weight: 600;
             color: #333;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 8px;
-}
+        }
         
         .connection-status {
             padding: 10px;
-border-radius: 8px;
+            border-radius: 8px;
             text-align: center;
             font-weight: 600;
             margin-bottom: 15px;
@@ -422,31 +417,31 @@ border-radius: 8px;
         
         .connection-status.connected {
             background: #d4edda;
-color: #155724;
+            color: #155724;
         }
         
         .connection-status.disconnected {
             background: #f8d7da;
-color: #721c24;
+            color: #721c24;
         }
         
         .connection-status.connecting {
             background: #fff3cd;
-color: #856404;
+            color: #856404;
         }
         
         .info-box {
             background: #e7f3ff;
-border-left: 4px solid #2196F3;
+            border-left: 4px solid #2196F3;
             padding: 12px;
             margin-bottom: 15px;
             border-radius: 4px;
             font-size: 13px;
-}
+        }
         
         .debug-log {
             background: #f5f5f5;
-border: 1px solid #ddd;
+            border: 1px solid #ddd;
             border-radius: 6px;
             padding: 10px;
             max-height: 200px;
@@ -454,28 +449,28 @@ border: 1px solid #ddd;
             font-family: 'Courier New', monospace;
             font-size: 12px;
             margin-top: 10px;
-}
+        }
         
         .debug-log div {
             margin: 2px 0;
-padding: 2px;
+            padding: 2px;
         }
         
         .debug-log .success {
             color: #28a745;
-}
+        }
         
         .debug-log .error {
             color: #dc3545;
-}
+        }
         
         .debug-log .info {
             color: #007bff;
-}
+        }
         
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-color: white;
+            color: white;
             border: none;
             padding: 12px 20px;
             border-radius: 8px;
@@ -484,41 +479,41 @@ color: white;
             font-weight: 600;
             transition: all 0.3s;
             width: 100%;
-margin-bottom: 10px;
+            margin-bottom: 10px;
         }
         
         button:hover {
             transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
         button:active {
             transform: translateY(0);
-box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
         }
         
         button.active {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-box-shadow: 0 0 20px rgba(79, 172, 254, 0.6);
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.6);
         }
         
         button.danger {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
+        }
         button.danger:hover {
             box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
-}
+        }
         
         .color-selector {
             display: flex;
-gap: 10px;
+            gap: 10px;
             align-items: center;
             margin-bottom: 15px;
         }
         
         input[type="color"] {
             -webkit-appearance: none;
--moz-appearance: none;
+            -moz-appearance: none;
             appearance: none;
             width: 60px;
             height: 60px;
@@ -527,50 +522,50 @@ gap: 10px;
             cursor: pointer;
             padding: 0;
             background-color: transparent;
-}
+        }
         input[type="color"]::-webkit-color-swatch-wrapper {
             padding: 0;
-border: 3px solid #ddd;
+            border: 3px solid #ddd;
             border-radius: 8px;
         }
         input[type="color"]::-webkit-color-swatch {
             border: none;
-border-radius: 5px;
+            border-radius: 5px;
         }
         input[type="color"]::-moz-color-swatch {
             border: none;
-border-radius: 5px;
+            border-radius: 5px;
         }
         
         .brightness-control {
             display: flex;
-align-items: center;
+            align-items: center;
             gap: 10px;
             margin: 15px 0;
         }
         
         input[type="range"] {
             flex: 1;
-height: 8px;
+            height: 8px;
             border-radius: 5px;
             background: #ddd;
             outline: none;
             -webkit-appearance: none;
-}
+        }
         
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-appearance: none;
+            appearance: none;
             width: 20px;
             height: 20px;
             border-radius: 50%;
             background: #667eea;
             cursor: pointer;
-}
+        }
         
         input[type="range"]::-moz-range-thumb {
             width: 20px;
-height: 20px;
+            height: 20px;
             border-radius: 50%;
             background: #667eea;
             cursor: pointer;
@@ -578,88 +573,88 @@ height: 20px;
         
         .brightness-value {
             min-width: 50px;
-text-align: right;
+            text-align: right;
             font-weight: 600;
             color: #667eea;
         }
         
         input[type="text"], input[type="time"] {
             width: 100%;
-padding: 12px;
+            padding: 12px;
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 14px;
             margin-bottom: 10px;
             transition: border 0.3s;
-}
+        }
         
         input[type="text"]:focus, input[type="time"]:focus {
             outline: none;
-border-color: #667eea;
+            border-color: #667eea;
         }
         
         .effects-grid {
             display: grid;
-grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
         
         .effect-btn {
             margin: 0;
-padding: 10px;
+            padding: 10px;
             font-size: 13px;
         }
         
         .color-palette {
             display: grid;
-grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 8px;
             margin-top: 10px;
         }
         
         .palette-color {
             width: 100%;
-aspect-ratio: 1;
+            aspect-ratio: 1;
             border-radius: 8px;
             cursor: pointer;
             border: 3px solid transparent;
             transition: all 0.3s;
-}
+        }
         
         .palette-color:hover {
             transform: scale(1.1);
-box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
         .palette-color.selected {
             border-color: #667eea;
-transform: scale(1.1);
+            transform: scale(1.1);
         }
         
         .design-item {
             display: flex;
-justify-content: space-between;
+            justify-content: space-between;
             align-items: center;
             padding: 10px;
             background: #f8f9fa;
             border-radius: 8px;
             margin-bottom: 8px;
-}
+        }
         
         .design-item button {
             width: auto;
-margin: 0 5px;
+            margin: 0 5px;
             padding: 8px 15px;
         }
         
         .delete-btn {
             background: #dc3545 !important;
-padding: 8px 12px !important;
+            padding: 8px 12px !important;
         }
         
         .status-message {
             position: fixed;
-top: 20px;
+            top: 20px;
             right: 20px;
             background: #28a745;
             color: white;
@@ -667,53 +662,53 @@ top: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             z-index: 1000;
-animation: slideIn 0.3s;
+            animation: slideIn 0.3s;
         }
         
         @keyframes slideIn {
             from {
                 transform: translateX(400px);
-opacity: 0;
+                opacity: 0;
             }
             to {
                 transform: translateX(0);
-opacity: 1;
+                opacity: 1;
             }
         }
         
         .animated-effects-grid {
             display: grid;
-grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
         
         .animated-effects-grid button {
             margin: 0;
-padding: 10px;
+            padding: 10px;
             font-size: 13px;
         }
         
         .animated-effects-grid button:last-child {
             grid-column: 1 / -1;
-}
+        }
         
         @media (max-width: 1024px) {
             .main-container {
                 flex-direction: column;
-}
+            }
             
             .control-panel {
                 width: 100%;
-max-height: 50vh;
+                max-height: 50vh;
             }
             
             .tree-view {
                 height: 50vh;
-}
+            }
             
             .schedule-button {
                 right: 20px;
-}
+            }
         }
 
         /* INICIO: Solución #4 - Responsividad del Modal Schedule */
@@ -722,84 +717,81 @@ max-height: 50vh;
             /* Hacer el modal full-screen en móvil */
             .schedule-container {
                 width: 100vw;
-height: 100vh;
+                height: 100vh;
                 max-width: 100vw;
                 max-height: 100vh;
                 height: 100%;
                 border-radius: 0;
-}
+            }
 
             .schedule-header h2 {
                 font-size: 18px;
-gap: 5px;
+                gap: 5px;
             }
 
             .close-schedule {
                 width: 35px;
-height: 35px;
+                height: 35px;
                 font-size: 20px;
             }
 
             .schedule-body {
                 padding: 10px;
-}
+            }
 
             /* Apilar acciones rápidas verticalmente */
             .quick-actions {
                 flex-direction: column;
-gap: 8px;
+                gap: 8px;
             }
 
             .add-schedule-panel {
                 padding: 15px;
-}
+            }
 
             /* Forzar que los selectores de día se envuelvan */
             [style*="grid-template-columns: repeat(7, 1fr)"] {
                 grid-template-columns: repeat(4, 1fr) !important;
-gap: 10px !important;
+                gap: 10px !important;
             }
 
             /* Apilar Inicio, Fin y Botón de agregar */
             [style*="grid-template-columns: 1fr 1fr auto"] {
                 grid-template-columns: 1fr !important;
-gap: 15px !important;
+                gap: 15px !important;
             }
             [style*="grid-template-columns: 1fr 1fr auto"] button {
                 width: 100% !important;
-}
+            }
 
 
             /* Hacer que la grilla de días tenga scroll horizontal */
             .schedule-grid {
-                grid-template-columns: 60px 1fr;
-/* Reducir columna de hora */
+                grid-template-columns: 60px 1fr; /* Reducir columna de hora */
                 gap: 10px;
-padding: 10px;
+                padding: 10px;
                 /* Permitir que la grilla se desborde */
                 overflow-x: auto;
-}
+            }
 
             .time-column {
-                gap: 40px;
-/* Mantener alineación */
+                gap: 40px; /* Mantener alineación */
             }
 
             .time-label {
                 font-size: 10px;
-padding-right: 5px;
+                padding-right: 5px;
             }
 
             .days-grid {
                 /* Forzar las 7 columnas, pero permitir scroll */
-                grid-template-columns: repeat(7, 120px);
-/* Ancho fijo para cada día */
+                grid-template-columns: repeat(7, 120px); /* Ancho fijo para cada día */
                 gap: 5px;
-}
+            }
 
             .day-header {
                 font-size: 12px;
-}
+            }
         }
         /* FIN: Solución #4 */
 
@@ -816,119 +808,101 @@ padding-right: 5px;
         <div class="schedule-container">
             <div class="schedule-header">
                 <h2>📅 Programación de Horarios LED</h2>
-<button class="close-schedule" onclick="closeSchedule()" aria-label="Cerrar">✕</button>
+                <button class="close-schedule" onclick="closeSchedule()" aria-label="Cerrar">✕</button>
             </div>
             
             <div class="schedule-body">
                 <div class="add-schedule-panel">
                     <h3 style="margin-bottom: 15px; color: #667eea;">⚡ Acciones Rápidas</h3>
-<div class="quick-actions">
+                    <div class="quick-actions">
                         <button class="quick-action-btn" onclick="setWeekdaySchedule()">
                              💼 Lun-Vie (7:00-21:00)
                         </button>
-<button class="quick-action-btn" onclick="setWeekendSchedule()">
+                        <button class="quick-action-btn" onclick="setWeekendSchedule()">
                             🏖️ Fin de Semana (9:00-23:00)
                         </button>
                         <button class="quick-action-btn" onclick="setEveningSchedule()">
-🌙 Solo Tardes (17:00-23:00)
+                            🌙 Solo Tardes (17:00-23:00)
                         </button>
                         <button class="quick-action-btn" onclick="clearAllSchedules()" style="background: #dc3545;">
                             🗑️ Limpiar Todo
-</button>
+                        </button>
                     </div>
     
                     
-                    <div style="background: #f8f9fa;
-padding: 15px; border-radius: 8px; margin-top: 15px;">
-                        <h4 style="margin-top: 0;
-color: #667eea;">➕ Agregar Horario Personalizado</h4>
-
-                        <div style="display: grid;
-grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 15px;">
-                            <label style="display: flex;
-align-items: center; font-size: 13px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                        <h4 style="margin-top: 0; color: #667eea;">➕ Agregar Horario Personalizado</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; font-size: 13px;">
                                 <input type="checkbox" id="day-0" style="margin-right: 3px;"> Dom
                             </label>
-                            <label style="display: flex;
-align-items: center; font-size: 13px;">
+                            <label style="display: flex; align-items: center; font-size: 13px;">
                                 <input type="checkbox" id="day-1" style="margin-right: 3px;"> Lun
                             </label>
-                            <label style="display: flex;
-align-items: center; font-size: 13px;">
+                            <label style="display: flex; align-items: center; font-size: 13px;">
                                 <input type="checkbox" id="day-2" style="margin-right: 3px;"> Mar
                             </label>
-                            <label style="display: flex;
-align-items: center; font-size: 13px;">
+                            <label style="display: flex; align-items: center; font-size: 13px;">
                                 <input type="checkbox" id="day-3" style="margin-right: 3px;"> Mié
                             </label>
-                            <label style="display: flex;
-align-items: center; font-size: 13px;">
+                            <label style="display: flex; align-items: center; font-size: 13px;">
                                 <input type="checkbox" id="day-4" style="margin-right: 3px;"> Jue
                             </label>
-                            <label style="display: flex;
-align-items: center; font-size: 13px;">
+                            <label style="display: flex; align-items: center; font-size: 13px;">
                                 <input type="checkbox" id="day-5" style="margin-right: 3px;"> Vie
                             </label>
-                            <label style="display: flex;
-align-items: center; font-size: 13px;">
+                            <label style="display: flex; align-items: center; font-size: 13px;">
                                 <input type="checkbox" id="day-6" style="margin-right: 3px;"> Sáb
                             </label>
                         </div>
-
+        
                         
-                        <div style="display: grid;
-grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
                             <div>
-                                <label style="font-size: 12px;
-color: #666;">Hora Inicio:</label>
+                                <label style="font-size: 12px; color: #666;">Hora Inicio:</label>
                                 <input type="time" id="scheduleStartTime" value="07:00" style="margin: 0;">
                             </div>
                             <div>
-                                 <label style="font-size: 12px;
-color: #666;">Hora Fin:</label>
-<input type="time" id="scheduleEndTime" value="21:00" style="margin: 0;">
+                                 <label style="font-size: 12px; color: #666;">Hora Fin:</label>
+                                <input type="time" id="scheduleEndTime" value="21:00" style="margin: 0;">
                             </div>
-                            <button onclick="addSchedule()" style="background: #28a745;
-margin: 0; width: auto; padding: 10px 20px;">
+                            <button onclick="addSchedule()" style="background: #28a745; margin: 0; width: auto; padding: 10px 20px;">
                                 ➕ Agregar
                             </button>
                         </div>
                     </div>
-
-                    <div style="margin-top: 20px;
-padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #2196F3;">
-                        <label style="display: flex;
-align-items: center; gap: 10px; font-weight: 600;">
-                            <input type="checkbox" id="schedulerEnabled" onchange="updateScheduler()" style="width: 20px;
-height: 20px;">
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #2196F3;">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 600;">
+                            <input type="checkbox" id="schedulerEnabled" onchange="updateScheduler()" style="width: 20px; height: 20px;">
                             <span>🔌 Activar Programación Automática</span>
                         </label>
-                        <p style="margin-top: 10px;
-margin-bottom: 0; font-size: 13px; color: #666;">
+                        <p style="margin-top: 10px; margin-bottom: 0; font-size: 13px; color: #666;">
                             Estado: <span id="scheduleStatusText" style="font-weight: 600;">Desactivado</span>
                         </p>
                     </div>
                 </div>
-
+   
                  
                 <div class="schedule-grid">
                     <div class="time-column">
                         <div class="time-label">00:00</div>
                          <div class="time-label">02:00</div>
-<div class="time-label">04:00</div>
+                        <div class="time-label">04:00</div>
                         <div class="time-label">06:00</div>
                         <div class="time-label">08:00</div>
                          <div class="time-label">10:00</div>
-<div class="time-label">12:00</div>
+                        <div class="time-label">12:00</div>
                         <div class="time-label">14:00</div>
                         <div class="time-label">16:00</div>
                          <div class="time-label">18:00</div>
-<div class="time-label">20:00</div>
+                        <div class="time-label">20:00</div>
                         <div class="time-label">22:00</div>
                     </div>
                        
                     <div class="days-grid" id="scheduleGrid">
-</div>
+                        </div>
                 </div>
             </div>
         </div>
@@ -936,7 +910,7 @@ margin-bottom: 0; font-size: 13px; color: #666;">
     
     <div class="main-container">
         <div class="tree-view">
-<div class="tree-container">
+            <div class="tree-container">
                 <canvas id="treeCanvas"></canvas>
             </div>
         </div>
@@ -945,103 +919,102 @@ margin-bottom: 0; font-size: 13px; color: #666;">
          <div class="control-panel">
             <div class="panel-header">
                 <h1>🎄 Christmas LED Tree</h1>
-<p>3D WLED Edition - Mosquitto</p>
+                <p>3D WLED Edition - Mosquitto</p>
             </div>
             
             <div class="panel-content">
      
                 <div class="section">
                     <div class="section-title">🔌 Conexión MQTT</div>
-
+                    
                     <div class="connection-status connecting" id="connectionStatus">
                          🔄 Conectando...
                     </div>
                     
                     <div class="info-box">
-<strong>📡 Servidor:</strong> mqtt.vittence.com<br>
+                         <strong>📡 Servidor:</strong> mqtt.vittence.com<br>
                         <strong>🔒 Protocolo:</strong> WebSocket Secure (WSS) - Puerto 8084<br>
                         <strong>🎯 Topic:</strong> wled/tree/api<br>
-<strong>✅ SSL:</strong> Certificado Let's Encrypt válido<br>
+                        <strong>✅ SSL:</strong> Certificado Let's Encrypt válido<br>
                          <strong>🌐 Compatible:</strong> Funciona desde HTTPS
                     </div>
-
+                    
                     <button onclick="reconnectMQTT()">🔄 Reconectar MQTT</button>
                      <button onclick="sendTestMessage()">📤 Enviar Mensaje de Prueba</button>
                     <button onclick="resetWLED()" class="danger">🔴 Apagar LEDs</button>
                     
                     <div class="debug-log" id="debugLog"></div>
-</div>
+                </div>
                
                 <div class="section">
                     <div class="section-title">🎨 LED Color</div>
-<div class="color-selector">
+                    <div class="color-selector">
                          <input type="color" id="ledColor" value="#ff0000" onchange="updateSelectedColor()">
                         <button onclick="activatePaintMode()" id="paintBtn">Activar Paint Mode</button>
                     </div>
-
+                    
                      <div id="colorPalette" class="color-palette" style="display: none;">
                         <div class="palette-color selected" style="background: #ff0000" onclick="selectPaletteColor('#ff0000')"></div>
                         <div class="palette-color" style="background: #ffa500" onclick="selectPaletteColor('#ffa500')"></div>
-<div class="palette-color" style="background: #ffff00" onclick="selectPaletteColor('#ffff00')"></div>
+                        <div class="palette-color" style="background: #ffff00" onclick="selectPaletteColor('#ffff00')"></div>
                          <div class="palette-color" style="background: #ffffff" onclick="selectPaletteColor('#ffffff')"></div>
                         <div class="palette-color" style="background: #00ff00" onclick="selectPaletteColor('#00ff00')"></div>
                         <div class="palette-color" style="background: #0000ff" onclick="selectPaletteColor('#0000ff')"></div>
-<div class="palette-color" style="background: #4b0082" onclick="selectPaletteColor('#4b0082')"></div>
+                         <div class="palette-color" style="background: #4b0082" onclick="selectPaletteColor('#4b0082')"></div>
                         <div class="palette-color" style="background: #ee82ee" onclick="selectPaletteColor('#ee82ee')"></div>
                         <div class="palette-color" style="background: #333333" onclick="selectPaletteColor('#333333')"></div>
-</div>
+                    </div>
                 </div>
  
                 <div class="section">
                     <div class="section-title">💡 Brightness</div>
                     <div class="brightness-control">
-<input type="range" id="brightness" min="0" max="255" value="128" oninput="setBrightness(this.value)">
+                         <input type="range" id="brightness" min="0" max="255" value="128" oninput="setBrightness(this.value)">
                         <span class="brightness-value" id="brightVal">50%</span>
                     </div>
                 </div>
-
+                 
                 <div class="section">
                     <div class="section-title">🎨 Static Color Designs</div>
                     <div class="effects-grid">
                          <button class="effect-btn" onclick="setStaticDesign('OFF')">OFF</button>
-<button class="effect-btn" onclick="setStaticDesign('Solid')">Solid</button>
+                        <button class="effect-btn" onclick="setStaticDesign('Solid')">Solid</button>
                         <button class="effect-btn" onclick="setStaticDesign('Rainbow')">Rainbow</button>
                         <button class="effect-btn" onclick="setStaticDesign('Warm')">Warm</button>
                          <button class="effect-btn" onclick="setStaticDesign('Cold')">Cold</button>
-<button class="effect-btn" onclick="setStaticDesign('Purple Rain')">Purple Rain</button>
+                        <button class="effect-btn" onclick="setStaticDesign('Purple Rain')">Purple Rain</button>
                         <button class="effect-btn" onclick="setStaticDesign('Dominican')">Dominican</button>
                     </div>
                  </div>
                 
                 <div class="section">
-<div class="section-title">📁 My Designs</div>
+                    <div class="section-title">📁 My Designs</div>
                      <input type="text" id="designName" placeholder="Nombre del diseño">
-<button onclick="saveDesign()">Guardar Diseño Actual</button>
+                    <button onclick="saveDesign()">Guardar Diseño Actual</button>
                     <div id="designsList"></div>
                 </div>
                 
  
                 <div class="section">
                     <div class="section-title">🌊 Animated Effects (Movement)</div>
-<p style="font-size: 12px;
-margin-bottom: 10px; color: #666;">
+                    <p style="font-size: 12px; margin-bottom: 10px; color: #666;">
                         Estos efectos añaden movimiento a los diseños de color
                     </p>
                     <div class="animated-effects-grid">
                         
-<button onclick="runAnimatedEffect('Fire')">🔥 Fire</button>
+                         <button onclick="runAnimatedEffect('Fire')">🔥 Fire</button>
                         <button onclick="runAnimatedEffect('Chase')">🏃 Chase</button>
                         <button onclick="runAnimatedEffect('Twinkle')">✨ Twinkle</button>
                         <button onclick="runAnimatedEffect('Sparkle')">💫 Sparkle</button>
-<button onclick="runAnimatedEffect('Ripple')">🌊 Ripple</button>
+                         <button onclick="runAnimatedEffect('Ripple')">🌊 Ripple</button>
                         <button onclick="runAnimatedEffect('Blink')">⚡ Blink</button>
                         <button onclick="runAnimatedEffect('Scan')">📡 Scan</button>
                         <button onclick="runAnimatedEffect('Waves')">🌀 Waves</button>
-<button onclick="runAnimatedEffect('Fairy')">🧚 Fairy</button>
+                         <button onclick="runAnimatedEffect('Fairy')">🧚 Fairy</button>
                         <button onclick="runAnimatedEffect('Flow')">🌈 Flow</button>
                         <button class="danger" onclick="stopAllAnimations()">⏹ Stop Animation</button>
                     </div>
-
+                
                  </div>
             </div>
         </div>
@@ -1053,72 +1026,72 @@ margin-bottom: 10px; color: #666;">
     <script>
         // =====================================================
         // VARIABLES GLOBALES
-// =====================================================
+        // =====================================================
         
         let scene, camera, renderer;
         let ledGroup;
-let ledMeshes = [];
+        let ledMeshes = [];
         let ledColors = {};
         let ledPositions = [];
         
         const totalLeds = 179;
         let paintMode = false;
-let selectedColor = '#ff0000';
+        let selectedColor = '#ff0000';
         let currentBrightness = 128;
         
         let effectAnimationInterval = null;
         let localAnimationInterval = null;
         let currentEffect = null;
-let currentLocalAnimation = null;
+        let currentLocalAnimation = null;
         
         // CONFIGURACIÓN MQTT MOSQUITTO
         let mqttClient = null;
         const MQTT_CONFIG = {
-broker: 'wss://mqtt.vittence.com:8084/mqtt',
+            broker: 'wss://mqtt.vittence.com:8084/mqtt',
             topic: 'wled/tree/api',
             username: '',
             password: ''
         };
         let COLOR_ORDER = 'RGB';
-
+        
         // VARIABLES DE PROGRAMACIÓN
         let schedules = [];
         let schedulerInterval = null;
-let lastScheduleState = null;
+        let lastScheduleState = null;
         
         // Días de la semana
         const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
         const DAYS_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-// =====================================================
-// FUNCIONES DE SCHEDULE MODAL
+        // =====================================================
+        // FUNCIONES DE SCHEDULE MODAL
         // =====================================================
         
         function openSchedule() {
             const modal = document.getElementById('scheduleModal');
             if (modal) {
-modal.classList.add('active');
+                modal.classList.add('active');
                 loadSchedules();
                 renderScheduleGrid();
-updateSchedulerStatus();
+                updateSchedulerStatus();
             }
         }
 
         function closeSchedule() {
             const modal = document.getElementById('scheduleModal');
             if (modal) {
-modal.classList.remove('active');
+                modal.classList.remove('active');
             }
-}
+        }
         
         function closeSchedule() {
             const modal = document.getElementById('scheduleModal');
             modal.classList.add('closing');
-
+    
             setTimeout(() => {
                 modal.classList.remove('active');
                 modal.classList.remove('closing');
             }, 300);
-}
+        }
         
         // =====================================================
         // SISTEMA DE PROGRAMACIÓN AVANZADO
@@ -1127,38 +1100,38 @@ modal.classList.remove('active');
         function loadSchedules() {
             const savedSchedules = localStorage.getItem('wledSchedules');
             if (savedSchedules) {
-schedules = JSON.parse(savedSchedules);
+                schedules = JSON.parse(savedSchedules);
             }
-
+            
             const enabled = localStorage.getItem('schedulerEnabled') === 'true';
             document.getElementById('schedulerEnabled').checked = enabled;
-}
+        }
         
         function saveSchedules() {
             localStorage.setItem('wledSchedules', JSON.stringify(schedules));
             renderScheduleGrid();
-}
+        }
         
         function addSchedule() {
             const selectedDays = [];
             for (let i = 0; i < 7; i++) {
-if (document.getElementById(`day-${i}`).checked) {
+                if (document.getElementById(`day-${i}`).checked) {
                     selectedDays.push(i);
                 }
-}
+            }
             
             if (selectedDays.length === 0) {
                 showStatus('❌ Selecciona al menos un día', true);
                 return;
-}
+            }
             
             const startTime = document.getElementById('scheduleStartTime').value;
             const endTime = document.getElementById('scheduleEndTime').value;
-
+            
             if (!startTime || !endTime) {
                 showStatus('❌ Define las horas de inicio y fin', true);
                 return;
-}
+            }
             
             const schedule = {
                 id: Date.now(),
@@ -1166,34 +1139,34 @@ if (document.getElementById(`day-${i}`).checked) {
                 startTime: startTime,
                 endTime: endTime,
     
-enabled: true
+                enabled: true
             };
             schedules.push(schedule);
-saveSchedules();
+            saveSchedules();
             
             // Limpiar formulario
             for (let i = 0; i < 7; i++) {
                 document.getElementById(`day-${i}`).checked = false;
             }
-document.getElementById('scheduleStartTime').value = '07:00';
+            document.getElementById('scheduleStartTime').value = '07:00';
             document.getElementById('scheduleEndTime').value = '21:00';
             showStatus('✅ Horario agregado correctamente');
-addDebugLog('📅 Nuevo horario agregado', 'success');
+            addDebugLog('📅 Nuevo horario agregado', 'success');
         }
         
         function deleteSchedule(id) {
             schedules = schedules.filter(s => s.id !== id);
             saveSchedules();
-showStatus('✅ Horario eliminado');
+            showStatus('✅ Horario eliminado');
             addDebugLog('🗑️ Horario eliminado', 'info');
         }
         
         function toggleSchedule(id) {
             const schedule = schedules.find(s => s.id === id);
             if (schedule) {
-schedule.enabled = !schedule.enabled;
+                schedule.enabled = !schedule.enabled;
                 saveSchedules();
-addDebugLog(`📅 Horario ${schedule.enabled ? 'activado' : 'desactivado'}`, 'info');
+                addDebugLog(`📅 Horario ${schedule.enabled ? 'activado' : 'desactivado'}`, 'info');
             }
         }
         
@@ -1201,12 +1174,12 @@ addDebugLog(`📅 Horario ${schedule.enabled ? 'activado' : 'desactivado'}`, 'in
         function renderScheduleGrid() {
             const grid = document.getElementById('scheduleGrid');
             grid.innerHTML = '';
-
+            
             // Crear columnas para cada día
             for (let day = 0; day < 7; day++) {
                 const dayColumn = document.createElement('div');
                 dayColumn.className = 'day-column';
-
+                
                 const dayHeader = document.createElement('div');
                 dayHeader.className = 'day-header';
                 dayHeader.textContent = DAYS_SHORT[day];
@@ -1215,46 +1188,43 @@ addDebugLog(`📅 Horario ${schedule.enabled ? 'activado' : 'desactivado'}`, 'in
                 daySchedule.className = 'day-schedule';
                 
                 // Agregar bloques de horario para este día
-schedules.forEach(schedule => {
+                schedules.forEach(schedule => {
                     if (!schedule.enabled) return; // No renderizar deshabilitados
 
                     const [startH, startM] = schedule.startTime.split(':').map(Number);
                     const [endH, endM] = schedule.endTime.split(':').map(Number);
                     
-const startMinutes = startH * 60 + startM;
+                    const startMinutes = startH * 60 + startM;
                     const endMinutes = endH * 60 + endM;
 
                     const isOvernight = endMinutes < startMinutes;
 
                     if (!isOvernight) {
-// --- Horario Normal (mismo día) ---
+                        // --- Horario Normal (mismo día) ---
                         if (schedule.days.includes(day)) {
                             const block = createScheduleBlock(schedule, startMinutes, endMinutes);
-daySchedule.appendChild(block);
+                            daySchedule.appendChild(block);
                         }
                     } else {
                         // --- Horario Overnight (pasa la medianoche) ---
-
+                        
                         // 1. Parte que *empieza* hoy y termina mañana
                         if (schedule.days.includes(day)) {
-                            const block = createScheduleBlock(schedule, startMinutes, 1440);
-// 1440 = 24:00
-daySchedule.appendChild(block);
+                            const block = createScheduleBlock(schedule, startMinutes, 1440); // 1440 = 24:00
+                            daySchedule.appendChild(block);
                         }
 
                         // 2. Parte que *termina* hoy (empezó ayer)
-                        const prevDay = (day === 0) ?
-6 : day - 1; // 6 = Sábado
+                        const prevDay = (day === 0) ? 6 : day - 1; // 6 = Sábado
                         if (schedule.days.includes(prevDay)) {
-                            const block = createScheduleBlock(schedule, 0, endMinutes);
-// 0 = 00:00
+                            const block = createScheduleBlock(schedule, 0, endMinutes); // 0 = 00:00
                             daySchedule.appendChild(block);
                         }
-}
+                    }
                 });
 
                 dayColumn.appendChild(dayHeader);
-dayColumn.appendChild(daySchedule);
+                dayColumn.appendChild(daySchedule);
                 grid.appendChild(dayColumn);
             }
         }
@@ -1266,14 +1236,13 @@ dayColumn.appendChild(daySchedule);
             
             const block = document.createElement('div');
             block.className = `schedule-block ${schedule.enabled ? '' : 'inactive'}`;
-
+            
             // Calcular posición y altura
-            const top = startMinutes;
-// 1 pixel por minuto
+            const top = startMinutes; // 1 pixel por minuto
             const height = endMinutes - startMinutes;
             
             block.style.top = `${top}px`;
-block.style.height = `${height}px`;
+            block.style.height = `${height}px`;
             
             // Solución #2: Solo mostrar texto si el bloque es lo suficientemente alto
             if (height >= 40) { // 40 minutos o más
@@ -1281,25 +1250,25 @@ block.style.height = `${height}px`;
                     <strong>${schedule.startTime}</strong>
                     <span>a</span>
                     <strong>${schedule.endTime}</strong>
-`;
+                `;
             } else {
-// Si es muy pequeño, al menos poner un tooltip
+                // Si es muy pequeño, al menos poner un tooltip
                 block.title = `${schedule.startTime} - ${schedule.endTime}`;
             }
-
+            
             block.onclick = () => {
                 if (confirm(`¿Deseas ${schedule.enabled ? 'desactivar' : 'activar'} este horario?`)) {
                     toggleSchedule(schedule.id);
                 }
-};
+            };
             block.ondblclick = () => {
-if (confirm('¿Eliminar este horario?')) {
+                if (confirm('¿Eliminar este horario?')) {
                     deleteSchedule(schedule.id);
                 }
-};
+            };
             
             return block;
-}
+        }
         // FIN: Solución #2 y #3
         
         // Funciones de horarios rápidos
@@ -1308,11 +1277,11 @@ if (confirm('¿Eliminar este horario?')) {
                 id: Date.now(),
                 days: [1, 2, 3, 4, 5],
                 startTime: '07:00',
-endTime: '21:00',
+                endTime: '21:00',
                 enabled: true
             };
             schedules.push(schedule);
-saveSchedules();
+            saveSchedules();
             showStatus('✅ Horario Lun-Vie agregado');
         }
         
@@ -1322,10 +1291,10 @@ saveSchedules();
                 days: [0, 6],
                 startTime: '09:00',
                  endTime: '23:00',
-enabled: true
+                enabled: true
             };
             schedules.push(schedule);
-saveSchedules();
+            saveSchedules();
             showStatus('✅ Horario Fin de Semana agregado');
         }
         
@@ -1335,10 +1304,10 @@ saveSchedules();
                 days: [0, 1, 2, 3, 4, 5, 6],
                 startTime: '17:00',
                 endTime: '23:00',
-enabled: true
+                enabled: true
             };
             schedules.push(schedule);
-saveSchedules();
+            saveSchedules();
             showStatus('✅ Horario de Tardes agregado');
         }
         
@@ -1346,98 +1315,95 @@ saveSchedules();
             if (confirm('¿Eliminar TODOS los horarios programados?')) {
                 schedules = [];
                 saveSchedules();
-showStatus('✅ Todos los horarios eliminados');
+                showStatus('✅ Todos los horarios eliminados');
             }
         }
         
         function updateScheduler() {
             const enabled = document.getElementById('schedulerEnabled').checked;
             localStorage.setItem('schedulerEnabled', enabled.toString());
-
+            
             updateSchedulerStatus();
             
             if (enabled) {
                 showStatus('✅ Programación automática activada');
                 addDebugLog('⏰ Programación automática activada', 'success');
-checkSchedules();
+                checkSchedules();
             } else {
                 showStatus('⏸️ Programación automática desactivada');
                 addDebugLog('⏰ Programación automática desactivada', 'info');
-}
+            }
         }
         
         function updateSchedulerStatus() {
             // Verificar que el elemento exista antes de usarlo
             const schedulerCheckbox = document.getElementById('schedulerEnabled');
             const statusText = document.getElementById('scheduleStatusText');
-
+    
             if (!schedulerCheckbox || !statusText) {
                 return;
             }
-
+    
             const enabled = schedulerCheckbox.checked;
             if (enabled) {
-const activeSchedule = getActiveSchedule();
+                const activeSchedule = getActiveSchedule();
                 if (activeSchedule) {
-statusText.textContent = `✅ ENCENDIDO (hasta ${activeSchedule.endTime})`;
+                    statusText.textContent = `✅ ENCENDIDO (hasta ${activeSchedule.endTime})`;
                     statusText.style.color = '#28a745';
-} else {
+                } else {
                     statusText.textContent = `⏸️ APAGADO (esperando horario)`;
                     statusText.style.color = '#dc3545';
-}
+                }
             } else {
                 statusText.textContent = 'Desactivado';
                 statusText.style.color = '#6c757d';
-}
+            }
         }
         
         function getActiveSchedule() {
             const now = new Date();
             const currentDay = now.getDay();
-const currentTime = now.getHours() * 60 + now.getMinutes();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
 
             for (const schedule of schedules) {
-if (!schedule.enabled) continue;
+                if (!schedule.enabled) continue;
                 
                 const [startH, startM] = schedule.startTime.split(':').map(Number);
-const [endH, endM] = schedule.endTime.split(':').map(Number);
+                const [endH, endM] = schedule.endTime.split(':').map(Number);
                 const startMinutes = startH * 60 + startM;
                 const endMinutes = endH * 60 + endM;
 
                 const isOvernight = endMinutes < startMinutes;
 
                 if (!isOvernight) {
-// --- Horario Normal ---
+                    // --- Horario Normal ---
                     if (schedule.days.includes(currentDay) && currentTime >= startMinutes && currentTime <= endMinutes) {
                         return schedule;
                     }
-} else {
+                } else {
                     // --- Horario Overnight ---
-                    const prevDay = (currentDay === 0) ?
-6 : currentDay - 1;
+                    const prevDay = (currentDay === 0) ? 6 : currentDay - 1;
 
-                    // 1. ¿Está activo *después* de medianoche?
-(p.ej. 02:00)
+                    // 1. ¿Está activo *después* de medianoche? (p.ej. 02:00)
                     if (schedule.days.includes(prevDay) && currentTime >= 0 && currentTime <= endMinutes) {
                         return schedule;
                     }
-// 2. ¿Está activo *antes* de medianoche?
-(p.ej. 22:00)
+                    // 2. ¿Está activo *antes* de medianoche? (p.ej. 22:00)
                     if (schedule.days.includes(currentDay) && currentTime >= startMinutes && currentTime <= 1440) {
                         return schedule;
                     }
-}
+                }
             }
             
             return null;
-}
+        }
         
         async function checkSchedules() {
             // VALIDAR PRIMERO SI HAY CONEXIÓN
             if (!mqttClient || !mqttClient.connected) {
                 addDebugLog('⚠️ No hay conexión MQTT para verificar horarios', 'error');
                 return;
-}
+            }
     
             // VALIDAR SI EL SCHEDULER ESTÁ HABILITADO
             if (!document.getElementById('schedulerEnabled') || !document.getElementById('schedulerEnabled').checked) {
@@ -1450,49 +1416,49 @@ const [endH, endM] = schedule.endTime.split(':').map(Number);
             if (lastScheduleState !== shouldBeOn) {
                 lastScheduleState = shouldBeOn;
                 if (shouldBeOn) {
-addDebugLog('⏰ Horario activo - Encendiendo LEDs', 'success');
+                    addDebugLog('⏰ Horario activo - Encendiendo LEDs', 'success');
                     showStatus('⏰ Horario: Encendiendo LEDs');
-
+    
                     // Comando simple para encender
                     await sendMQTTCommand({
                         "on": true,
                         "bri": currentBrightness
                     });
                 } else {
-addDebugLog('⏰ Fuera de horario - Apagando LEDs', 'info');
+                    addDebugLog('⏰ Fuera de horario - Apagando LEDs', 'info');
                     showStatus('⏰ Horario: Apagando LEDs');
-
+    
                     // Comando simple para apagar
                     await sendMQTTCommand({
                         "on": false
                     });
                     updateAllLEDsVisual('#000000');
-}
+                }
             }
 
             updateSchedulerStatus();
-}
+        }
 
         async function testScheduleOff() {
             addDebugLog('🧪 Test: Enviando comando OFF completo', 'info');
             const offCommand = {
-"on": false,
+                "on": false,
                 "bri": 0,
                 "seg": [{
                     "id": 0,
                     "on": false,
                     "bri": 0,
-"fx": 0,
+                    "fx": 0,
                     "col": [[0,0,0], [0,0,0], [0,0,0]]
                 }],
                 "transition": 0
              };
-
+    
             const success = await sendMQTTCommand(offCommand);
             if (success) {
-updateAllLEDsVisual('#000000');
+                updateAllLEDsVisual('#000000');
                 showStatus('✅ Comando OFF de prueba enviado');
-}
+            }
         }
         
         // =====================================================
@@ -1502,15 +1468,15 @@ updateAllLEDsVisual('#000000');
         function addDebugLog(message, type = 'info') {
             const logDiv = document.getElementById('debugLog');
             const entry = document.createElement('div');
-entry.className = type;
+            entry.className = type;
             const timestamp = new Date().toLocaleTimeString();
             entry.textContent = `[${timestamp}] ${message}`;
             logDiv.appendChild(entry);
             logDiv.scrollTop = logDiv.scrollHeight;
             while (logDiv.children.length > 50) {
-logDiv.removeChild(logDiv.firstChild);
+                logDiv.removeChild(logDiv.firstChild);
             }
-}
+        }
         
         // =====================================================
         // CONEXIÓN MQTT (mantener las funciones existentes)
@@ -1519,7 +1485,7 @@ logDiv.removeChild(logDiv.firstChild);
         function initMQTT() {
             addDebugLog('🔌 Iniciando conexión a Mosquitto...', 'info');
             addDebugLog(`📡 Broker: ${MQTT_CONFIG.broker}`, 'info');
-
+            
             const options = {
                 clientId: 'web-tree-' + Math.random().toString(16).substr(2, 8),
                 clean: true,
@@ -1527,101 +1493,101 @@ logDiv.removeChild(logDiv.firstChild);
                 connectTimeout: 30000,
                 protocol: 'wss',
                  protocolVersion: 4,
-rejectUnauthorized: true,
+                rejectUnauthorized: true,
                 keepalive: 60
             };
             if (MQTT_CONFIG.username) {
-options.username = MQTT_CONFIG.username;
+                options.username = MQTT_CONFIG.username;
                 options.password = MQTT_CONFIG.password;
-}
+            }
             
             try {
                 mqttClient = mqtt.connect(MQTT_CONFIG.broker, options);
                 mqttClient.on('connect', () => {
-addDebugLog('✅ Conectado exitosamente a Mosquitto!', 'success');
+                    addDebugLog('✅ Conectado exitosamente a Mosquitto!', 'success');
                     document.getElementById('connectionStatus').className = 'connection-status connected';
                     document.getElementById('connectionStatus').textContent = '✅ Conectado';
                     
                      mqttClient.subscribe('wled/tree/#', (err) => {
-if (!err) {
+                        if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
                             
                             // INICIO: Solución #5 - Solicitar estado actual al conectar
-addDebugLog('🔔 Solicitando estado actual de WLED...', 'info');
+                            addDebugLog('🔔 Solicitando estado actual de WLED...', 'info');
                             mqttClient.publish(MQTT_CONFIG.topic, '{"v":true}', { qos: 0 });
-// FIN: Solución #5
+                            // FIN: Solución #5
 
                         } else {
                             addDebugLog('⚠️ Error al suscribirse: ' + err.message, 'error');
-}
+                        }
                     });
                 });
-mqttClient.on('error', (err) => {
+                mqttClient.on('error', (err) => {
                     addDebugLog('❌ Error MQTT: ' + err.message, 'error');
                     document.getElementById('connectionStatus').className = 'connection-status disconnected';
                     document.getElementById('connectionStatus').textContent = '❌ Error de conexión';
                 });
                 mqttClient.on('reconnect', () => {
-addDebugLog('🔄 Intentando reconectar...', 'info');
+                    addDebugLog('🔄 Intentando reconectar...', 'info');
                     document.getElementById('connectionStatus').className = 'connection-status connecting';
                     document.getElementById('connectionStatus').textContent = '🔄 Reconectando...';
                 });
                 mqttClient.on('offline', () => {
-addDebugLog('⚠️ Cliente MQTT offline', 'error');
+                    addDebugLog('⚠️ Cliente MQTT offline', 'error');
                     document.getElementById('connectionStatus').className = 'connection-status disconnected';
                     document.getElementById('connectionStatus').textContent = '⚠️ Desconectado';
                 });
 
                 // INICIO: Solución #5 - Procesar mensajes de estado de WLED
-mqttClient.on('message', (topic, message) => {
+                mqttClient.on('message', (topic, message) => {
                     const payloadStr = message.toString();
                     addDebugLog(`📨 Mensaje: ${topic} = ${payloadStr.substring(0, 50)}...`, 'success');
 
                     // WLED responde con su estado en /v (versión/info) o /state
-if (topic === 'wled/tree/state' || topic === 'wled/tree/v') {
+                    if (topic === 'wled/tree/state' || topic === 'wled/tree/v') {
                         try {
                             const data = JSON.parse(payloadStr);
                             
                             // Si el payload tiene 'state', usamos eso. Si no, usamos el payload raíz.
                             const state = data.state || data; 
-handleWLEDState(state);
+                            handleWLEDState(state);
                         } catch (e) {
-addDebugLog('❌ Error al parsear estado JSON de WLED: ' + e.message, 'error');
+                            addDebugLog('❌ Error al parsear estado JSON de WLED: ' + e.message, 'error');
                         }
                     }
-});
+                });
                 // FIN: Solución #5
 
             } catch (error) {
                 addDebugLog('❌ Error crítico al inicializar: ' + error.message, 'error');
             }
-}
+        }
         
         function reconnectMQTT() {
             if (mqttClient) {
                 addDebugLog('🔄 Desconectando cliente anterior...', 'info');
                 mqttClient.end(true);
-mqttClient = null;
+                mqttClient = null;
             }
             setTimeout(() => {
                 initMQTT();
             }, 500);
-}
+        }
 
         // INICIO: Solución #5 - Nueva función para manejar el estado de WLED
         function handleWLEDState(state) {
             if (!state) {
                 addDebugLog('⚠️ Estado WLED recibido pero vacío', 'error');
                 return;
-}
+            }
 
             addDebugLog('🔄 Estado WLED recibido, actualizando UI...', 'info');
             
             // 1. Actualizar Brillo
-if (typeof state.bri !== 'undefined') {
+            if (typeof state.bri !== 'undefined') {
                 const brightness = state.bri;
                 document.getElementById('brightness').value = brightness;
-updateBrightnessLabel(brightness);
+                updateBrightnessLabel(brightness);
                 currentBrightness = brightness;
             }
 
@@ -1629,73 +1595,72 @@ updateBrightnessLabel(brightness);
             if (typeof state.on === 'undefined' || !state.on) {
                 updateAllLEDsVisual('#000000');
                 return; // Si está apagado, no procesar colores
-}
+            }
 
             // 3. Actualizar Colores y Efectos (basado en el primer segmento)
             if (state.seg && state.seg[0]) {
                 const segment = state.seg[0];
                 const fx = segment.fx;
-const pal = segment.pal;
-                const col = segment.col[0] || [255, 0, 0];
-// Color primario, con fallback
+                const pal = segment.pal;
+                const col = segment.col[0] || [255, 0, 0]; // Color primario, con fallback
                 
                 const hexColor = rgbToHex(col[0], col[1], col[2]);
                 
                 // Actualizar el picker de color de la UI
-selectedColor = hexColor;
+                selectedColor = hexColor;
                 document.getElementById('ledColor').value = hexColor;
 
                 // Detener cualquier animación local
                 stopAllAnimations();
 
                 if (fx === 0) {
-// --- Efecto Sólido ---
+                    // --- Efecto Sólido ---
                     addDebugLog(`🔄 Sincronizando: Color Sólido ${hexColor}`, 'info');
                     updateAllLEDsVisual(hexColor);
-} else {
+                } else {
                     // --- Efecto Animado ---
                     addDebugLog(`🔄 Sincronizando: Efecto ${fx}, Paleta ${pal}`, 'info');
                     // Mapear efectos de WLED a animaciones locales
-// (Esto es una simulación, nunca será 100% exacto)
+                    // (Esto es una simulación, nunca será 100% exacto)
                     switch(fx) {
                         case 9: // Rainbow
                             applyRainbowDesign();
-break;
-                        case 12: // Fire
-runAnimatedEffect('Fire');
                             break;
-case 28: // Chase
+                        case 12: // Fire
+                            runAnimatedEffect('Fire');
+                            break;
+                        case 28: // Chase
                             runAnimatedEffect('Chase');
                             break;
-case 17: // Twinkle
+                        case 17: // Twinkle
                             runAnimatedEffect('Twinkle');
                             break;
-case 20: // Sparkle
+                        case 20: // Sparkle
                             runAnimatedEffect('Sparkle');
                             break;
-case 79: // Ripple
+                        case 79: // Ripple
                             runAnimatedEffect('Ripple');
                             break;
-case 1: // Blink
+                        case 1: // Blink
                             runAnimatedEffect('Blink');
                             break;
-case 10: // Scan
+                        case 10: // Scan
                             runAnimatedEffect('Scan');
                             break;
-case 67: // Waves
+                        case 67: // Waves
                             runAnimatedEffect('Waves');
                             break;
-case 49: // Fairy
+                        case 49: // Fairy
                             runAnimatedEffect('Fairy');
                             break;
-case 110: // Flow
+                        case 110: // Flow
                             runAnimatedEffect('Flow');
                             break;
-default:
+                        default:
                             // Fallback para efectos no mapeados: mostrar color primario
                             addDebugLog(`FX ${fx} no mapeado, mostrando color primario`, 'info');
                             updateAllLEDsVisual(hexColor);
-}
+                    }
                 }
             }
         }
@@ -1706,28 +1671,28 @@ default:
         // =====================================================
         
         async function sendMQTTCommand(payload) {
-if (!mqttClient || !mqttClient.connected) {
+            if (!mqttClient || !mqttClient.connected) {
                 addDebugLog('❌ No hay conexión MQTT', 'error');
                 showStatus('❌ No conectado a MQTT', true);
-return false;
+                return false;
             }
             
             const payloadStr = JSON.stringify(payload);
             addDebugLog(`📤 Enviando comando: ${payloadStr.substring(0, 80)}...`, 'info');
-
+            
             try {
                 mqttClient.publish(MQTT_CONFIG.topic, payloadStr, { qos: 1, retain: false }, (err) => {
                     if (err) {
                         addDebugLog('❌ Error al publicar: ' + err.message, 'error');
                      } else {
-addDebugLog('✅ Comando enviado correctamente', 'success');
+                        addDebugLog('✅ Comando enviado correctamente', 'success');
                     }
                 });
                 return true;
-} catch (error) {
+            } catch (error) {
                 addDebugLog('❌ Excepción al publicar: ' + error.message, 'error');
                 return false;
-}
+            }
         }
         
         async function sendTestMessage() {
@@ -1736,14 +1701,14 @@ addDebugLog('✅ Comando enviado correctamente', 'success');
                 "timestamp": new Date().toISOString(),
                 "message": "Test desde interfaz web"
              };
-
+            
             addDebugLog('🧪 Enviando mensaje de prueba...', 'info');
             const success = await sendMQTTCommand(testPayload);
-
+            
             if (success) {
                 showStatus('✅ Mensaje de prueba enviado');
             }
-}
+        }
         
         // =====================================================
         // FUNCIONES DE CONTROL (mantener todas las existentes)
@@ -1752,19 +1717,19 @@ addDebugLog('✅ Comando enviado correctamente', 'success');
         async function resetWLED() {
             stopAllAnimations();
             addDebugLog('🔴 Apagando LEDs...', 'info');
-
+            
             await sendMQTTCommand({
                 "on": false,
                 "seg": [{
                     "fx": 0,
                     "sx": 0,
                     "ix": 0,
-"pal": 0,
+                    "pal": 0,
                     "col": [[0,0,0]]
                 }]
             });
             updateAllLEDsVisual('#000000');
-showStatus('✓ LEDs apagados');
+            showStatus('✓ LEDs apagados');
         }
         
         function applyColorOrder(r, g, b) {
@@ -1772,148 +1737,148 @@ showStatus('✓ LEDs apagados');
                 case 'RGB':
                     return [r, g, b];
                 case 'GRB':
-return [g, r, b];
+                    return [g, r, b];
                 case 'BGR':
-return [b, g, r];
+                    return [b, g, r];
                 case 'RBG':
-return [r, b, g];
+                    return [r, b, g];
                 case 'GBR':
-return [g, b, r];
+                    return [g, b, r];
                 case 'BRG':
-return [b, r, g];
+                    return [b, r, g];
                 default:
-return [r, g, b];
+                    return [r, g, b];
             }
-}
+        }
         
         // INICIO: Funciones de Diagnóstico Eliminadas
         // testColorDirect, cycleColorTest, y testIndividualLEDs han sido eliminadas.
-// FIN: Funciones de Diagnóstico Eliminadas
+        // FIN: Funciones de Diagnóstico Eliminadas
         
         // CONTROL DE LEDS
         function activatePaintMode() {
-paintMode = !paintMode;
+            paintMode = !paintMode;
             const btn = document.getElementById('paintBtn');
-const palette = document.getElementById('colorPalette');
+            const palette = document.getElementById('colorPalette');
             
             if (paintMode) {
                 btn.classList.add('active');
                 btn.textContent = 'Paint Mode: ON';
-palette.style.display = 'grid';
+                palette.style.display = 'grid';
                 showStatus('🎨 Paint Mode activado');
                 addDebugLog('🎨 Paint Mode activado', 'info');
             } else {
-btn.classList.remove('active');
+                btn.classList.remove('active');
                 btn.textContent = 'Activar Paint Mode';
-palette.style.display = 'none';
+                palette.style.display = 'none';
                 showStatus('Paint Mode desactivado');
                 addDebugLog('Paint Mode desactivado', 'info');
             }
-}
+        }
         
         function updateSelectedColor() {
             selectedColor = document.getElementById('ledColor').value;
             addDebugLog(`🎨 Color seleccionado: ${selectedColor}`, 'info');
-}
+        }
         
         function selectPaletteColor(color) {
             selectedColor = color;
             document.getElementById('ledColor').value = color;
-
+            
             document.querySelectorAll('.palette-color').forEach(el => {
                 el.classList.remove('selected');
             });
             event.target.classList.add('selected');
-}
+        }
         
         async function updateLEDColor(index, color) {
             if (index < 0 || index >= totalLeds) return;
             ledColors[index] = color;
-updateLEDVisual(index, color, true);
+            updateLEDVisual(index, color, true);
             
             const rgb = hexToRgb(color);
             if (!rgb) return;
             
             const orderedRgb = applyColorOrder(rgb.r, rgb.g, rgb.b);
             await sendMQTTCommand({
-"on": true,
+                "on": true,
                 "seg": [{
                     "fx": 0,
                     "i": [index, orderedRgb]
                 }]
              });
-}
+        }
         
         function updateLEDVisual(index, color, needsUpdate = true) {
             if (index < 0 || index >= totalLeds || !ledMeshes[index]) return;
             const mesh = ledMeshes[index];
-mesh.material.color.set(color);
+            mesh.material.color.set(color);
             
             if (needsUpdate) {
                 mesh.material.needsUpdate = true;
             }
-}
+        }
         
         function updateAllLEDsVisual(color) {
             for (let i = 0; i < totalLeds; i++) {
                 ledColors[i] = color;
                 updateLEDVisual(i, color, false);
-}
+            }
             
             ledMeshes.forEach(mesh => {
                 mesh.material.needsUpdate = true;
             });
-}
+        }
         
         // DISEÑOS ESTÁTICOS (mantener todas las funciones existentes)
         function setStaticDesign(designName) {
             stopAllAnimations();
             currentEffect = designName;
-
+            
             addDebugLog(`🎨 Aplicando diseño estático: ${designName}`, 'info');
             
             document.querySelectorAll('.effect-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             if (event && event.target) {
-event.target.classList.add('active');
+                event.target.classList.add('active');
             }
-
+            
             switch(designName) {
                 case 'OFF':
                     applyOFFDesign();
                     break;
-case 'Solid':
+                case 'Solid':
                     applySolidDesign();
                     break;
-case 'Rainbow':
+                case 'Rainbow':
                     applyRainbowDesign();
                     break;
-case 'Warm':
+                case 'Warm':
                     applyWarmDesign();
                     break;
-case 'Cold':
+                case 'Cold':
                     applyColdDesign();
                     break;
-case 'Purple Rain':
+                case 'Purple Rain':
                     applyPurpleRainDesign();
                     break;
-case 'Dominican':
+                case 'Dominican':
                     applyDominicanDesign();
                     break;
-}
+            }
         }
 
         async function applyOFFDesign() {
             updateAllLEDsVisual('#000000');
             await sendMQTTCommand({ "on": false });
-showStatus('✓ LEDs apagados');
+            showStatus('✓ LEDs apagados');
         }
 
         async function applySolidDesign() {
             updateAllLEDsVisual(selectedColor);
             const rgb = hexToRgb(selectedColor);
-
+            
             await sendMQTTCommand({
                 "on": true,
                 "bri": currentBrightness,
@@ -1921,36 +1886,36 @@ showStatus('✓ LEDs apagados');
                     "id": 0,
                     "fx": 0,
                     "col": [applyColorOrder(rgb.r, rgb.g, rgb.b)]
-}]
+                }]
             });
             showStatus(`✓ Solid ${selectedColor}`);
-}
+        }
 
         async function applyRainbowDesign() {
             addDebugLog('🌈 Aplicando Rainbow', 'info');
             for (let i = 0; i < totalLeds; i++) {
-const hue = (i * 360 / totalLeds) % 360;
+                const hue = (i * 360 / totalLeds) % 360;
                 const color = hslToRgb(hue, 100, 50);
-const hexColor = rgbToHex(color.r, color.g, color.b);
+                const hexColor = rgbToHex(color.r, color.g, color.b);
                 updateLEDVisual(i, hexColor, false);
             }
-ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
+            ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
             await sendMQTTCommand({
-"on": true,
+                "on": true,
                 "bri": currentBrightness,
                 "seg": [{
                     "id": 0,
                     "fx": 9,
                     "pal": 11
-}]
+                }]
             });
             showStatus('✓ Rainbow aplicado');
-}
+        }
 
         async function applyWarmDesign() {
             const warmColor = '#ffe4b5';
             updateAllLEDsVisual(warmColor);
-
+            
             const rgb = hexToRgb(warmColor);
             
             await sendMQTTCommand({
@@ -1960,35 +1925,35 @@ ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
                     "id": 0,
                     "fx": 0,
                      "col": [applyColorOrder(rgb.r, rgb.g, rgb.b)]
-}]
+                }]
             });
             showStatus('✓ Warm aplicado');
-}
+        }
 
         async function applyColdDesign() {
             addDebugLog('❄️ Aplicando Cold', 'info');
             const coldColors = ['#0066ff', '#00ccff', '#6600ff', '#00ffff', '#3366ff'];
-for (let i = 0; i < totalLeds; i++) {
+            for (let i = 0; i < totalLeds; i++) {
                 const colorHex = coldColors[i % coldColors.length];
                 updateLEDVisual(i, colorHex, false);
-}
+            }
             ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
             await sendMQTTCommand({
-"on": true,
+                "on": true,
                 "bri": currentBrightness,
                 "seg": [{
                     "id": 0,
                     "fx": 67,
                     "pal": 9
-}]
+                }]
             });
             showStatus('✓ Cold aplicado');
-}
+        }
 
         async function applyPurpleRainDesign() {
             const purpleColor = '#8b00ff';
             updateAllLEDsVisual(purpleColor);
-
+            
             const rgb = hexToRgb(purpleColor);
             
             await sendMQTTCommand({
@@ -1998,100 +1963,100 @@ for (let i = 0; i < totalLeds; i++) {
                     "id": 0,
                     "fx": 0,
                      "col": [applyColorOrder(rgb.r, rgb.g, rgb.b)]
-}]
+                }]
             });
             showStatus('✓ Purple Rain aplicado');
-}
+        }
 
         async function applyDominicanDesign() {
             addDebugLog('🇩🇴 Aplicando Dominican', 'info');
             const third = Math.floor(totalLeds / 3);
-
+            
             for (let i = 0; i < totalLeds; i++) {
                 let colorHex;
                 if (i < third) {
-colorHex = '#0000ff';
+                    colorHex = '#0000ff';
                 } else if (i < third * 2) {
-colorHex = '#ffffff';
+                    colorHex = '#ffffff';
                 } else {
-colorHex = '#ff0000';
+                    colorHex = '#ff0000';
                 }
-updateLEDVisual(i, colorHex, false);
+                updateLEDVisual(i, colorHex, false);
             }
-ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
+            ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
             await sendMQTTCommand({
-"on": true,
+                "on": true,
                 "bri": currentBrightness,
                 "seg": [{
                     "id": 0,
                     "fx": 2,
                     "pal": 255
-}]
+                }]
             });
             showStatus('✓ Dominican aplicado 🇩🇴');
-}
+        }
         
         // EFECTOS ANIMADOS (mantener todas las funciones existentes)
         function runAnimatedEffect(effectName) {
             if (effectAnimationInterval) {
                 clearInterval(effectAnimationInterval);
             }
-if (localAnimationInterval) {
+            if (localAnimationInterval) {
                 clearInterval(localAnimationInterval);
             }
-
+            
             currentLocalAnimation = effectName;
             showStatus(`🔄 Animación "${effectName}" iniciada`);
-addDebugLog(`🎬 Iniciando animación: ${effectName}`, 'info');
+            addDebugLog(`🎬 Iniciando animación: ${effectName}`, 'info');
             
             switch(effectName) {
                 case 'Fire':
                     animateFire();
                     sendWLEDEffect(12);
-break;
+                    break;
                 case 'Chase':
                     animateChase();
                     sendWLEDEffect(28);
-break;
+                    break;
                 case 'Twinkle':
                     animateTwinkle();
                     sendWLEDEffect(17);
-break;
+                    break;
                 case 'Sparkle':
                     animateSparkle();
                     sendWLEDEffect(20);
-break;
+                    break;
                 case 'Ripple':
                     animateRipple();
                     sendWLEDEffect(79);
-break;
+                    break;
                 case 'Blink':
                     animateBlink();
                     sendWLEDEffect(1);
-break;
+                    break;
                 case 'Scan':
                     animateScan();
                     sendWLEDEffect(10);
-break;
+                    break;
                 case 'Waves':
                     animateWaves();
                     sendWLEDEffect(67);
-break;
+                    break;
                 case 'Fairy':
                     animateFairy();
                     sendWLEDEffect(49);
-break;
+                    break;
                 case 'Flow':
                     animateFlow();
                     sendWLEDEffect(110);
-break;
+                    break;
             }
         }
 
         async function sendWLEDEffect(fxNumber) {
             const rgb = hexToRgb(selectedColor);
             const colorArray = applyColorOrder(rgb.r, rgb.g, rgb.b);
-
+            
             await sendMQTTCommand({
                 "on": true,
                 "bri": currentBrightness,
@@ -2099,10 +2064,10 @@ break;
                 "seg": [{
                     "id": 0,
                     "fx": fxNumber,
-"col": [colorArray, [0, 0, 0], [0, 0, 0]]
+                    "col": [colorArray, [0, 0, 0], [0, 0, 0]]
                 }]
             });
-}
+        }
 
         function animateFire() {
             effectAnimationInterval = setInterval(() => {
@@ -2110,41 +2075,41 @@ break;
                     const intensity = Math.random();
                     const r = 255;
                      const g = Math.floor(intensity * 150);
-const b = 0;
+                    const b = 0;
                     const hexColor = rgbToHex(r, g, b);
                     updateLEDVisual(i, hexColor, false);
                  }
-ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
+                ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
             }, 100);
-}
+        }
 
         function animateChase() {
             let pos = 0;
             effectAnimationInterval = setInterval(() => {
-for (let i = 0; i < totalLeds; i++) {
+                for (let i = 0; i < totalLeds; i++) {
                     if (i % 10 === pos) {
                         updateLEDVisual(i, selectedColor, false);
                      } else {
-updateLEDVisual(i, '#000000', false);
+                        updateLEDVisual(i, '#000000', false);
                     }
                 }
                 ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
                  pos = (pos + 1) % 10;
-}, 100);
-}
+            }, 100);
+        }
 
         function animateTwinkle() {
             effectAnimationInterval = setInterval(() => {
                 for (let i = 0; i < totalLeds; i++) {
                     if (Math.random() > 0.95) {
                         updateLEDVisual(i, '#ffffff', false);
-} else {
+                    } else {
                         updateLEDVisual(i, selectedColor, false);
                     }
                 }
                  ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
-}, 200);
-}
+            }, 200);
+        }
 
         function animateSparkle() {
             effectAnimationInterval = setInterval(() => {
@@ -2152,298 +2117,298 @@ updateLEDVisual(i, '#000000', false);
                     updateLEDVisual(i, selectedColor, false);
                 }
                  const sparkleIndex = Math.floor(Math.random() * totalLeds);
-updateLEDVisual(sparkleIndex, '#ffffff', false);
+                updateLEDVisual(sparkleIndex, '#ffffff', false);
                 ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
             }, 100);
-}
+        }
 
         function animateRipple() {
             let offset = 0;
             effectAnimationInterval = setInterval(() => {
-for (let i = 0; i < totalLeds; i++) {
+                for (let i = 0; i < totalLeds; i++) {
                     const distance = Math.abs(i - totalLeds/2);
                     const wave = Math.sin((distance + offset) * 0.3) * 0.5 + 0.5;
                      const rgb = hexToRgb(selectedColor);
-const hexColor = rgbToHex(
+                    const hexColor = rgbToHex(
                         Math.floor(rgb.r * wave),
                         Math.floor(rgb.g * wave),
                          Math.floor(rgb.b * wave)
-);
+                    );
                     updateLEDVisual(i, hexColor, false);
                 }
                 ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
                  offset += 1;
-}, 80);
-}
+            }, 80);
+        }
 
         function animateBlink() {
             let on = true;
             localAnimationInterval = setInterval(() => {
-if (on) {
+                if (on) {
                     updateAllLEDsVisual(selectedColor);
                     sendMQTTCommand({ "on": true, "bri": currentBrightness });
                 } else {
                      updateAllLEDsVisual('#000000');
-sendMQTTCommand({ "on": true, "bri": 0 });
+                    sendMQTTCommand({ "on": true, "bri": 0 });
                 }
                 on = !on;
             }, 500);
-}
+        }
         
         function animateScan() {
             let currentLed = 0;
             localAnimationInterval = setInterval(() => {
-for (let i = 0; i < totalLeds; i++) {
+                for (let i = 0; i < totalLeds; i++) {
                     if (i === currentLed) {
                         updateLEDVisual(i, selectedColor, false);
                     } else {
-updateLEDVisual(i, '#000000', false);
+                        updateLEDVisual(i, '#000000', false);
                     }
                 }
                 ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
                 
                  currentLed = (currentLed + 1) % totalLeds;
-}, 50);
-}
+            }, 50);
+        }
         
         function animateWaves() {
             let offset = 0;
             localAnimationInterval = setInterval(() => {
-const rgb = hexToRgb(selectedColor);
+                const rgb = hexToRgb(selectedColor);
                 
                 for (let i = 0; i < totalLeds; i++) {
                     const wave = Math.sin((i + offset) * 0.2) * 0.5 + 0.5;
                      const waveColor = rgbToHex(
-Math.floor(rgb.r * wave),
+                        Math.floor(rgb.r * wave),
                         Math.floor(rgb.g * wave),
                         Math.floor(rgb.b * wave)
                      );
-updateLEDVisual(i, waveColor, false);
+                    updateLEDVisual(i, waveColor, false);
                 }
                 ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
                 
                  offset += 1;
-}, 100);
-}
+            }, 100);
+        }
         
         function animateFairy() {
             localAnimationInterval = setInterval(() => {
                 for (let i = 0; i < totalLeds; i++) {
                     if (Math.random() > 0.7) {
                          updateLEDVisual(i, selectedColor, false);
-} else {
+                    } else {
                         updateLEDVisual(i, '#000000', false);
                     }
                 }
                  ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
-}, 200);
-}
+            }, 200);
+        }
         
         function animateFlow() {
             let hue = 0;
             localAnimationInterval = setInterval(() => {
-for (let i = 0; i < totalLeds; i++) {
+                for (let i = 0; i < totalLeds; i++) {
                     const ledHue = (hue + (i * 360 / totalLeds)) % 360;
                     const color = hslToRgb(ledHue, 100, 50);
                      const hexColor = rgbToHex(color.r, color.g, color.b);
-updateLEDVisual(i, hexColor, false);
+                    updateLEDVisual(i, hexColor, false);
                 }
                 ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
                 
                 
-hue = (hue + 5) % 360;
+                hue = (hue + 5) % 360;
             }, 100);
-}
+        }
 
         function stopAllAnimations() {
             if (effectAnimationInterval) {
                 clearInterval(effectAnimationInterval);
                 effectAnimationInterval = null;
-}
+            }
             if (localAnimationInterval) {
                 clearInterval(localAnimationInterval);
                 localAnimationInterval = null;
-}
+            }
             currentLocalAnimation = null;
             addDebugLog('⏹ Animación detenida', 'info');
-// No mostrar status aquí, es muy ruidoso
+            // No mostrar status aquí, es muy ruidoso
         }
         
         // BRILLO
         let brightnessTimeout = null;
         function setBrightness(value) {
-currentBrightness = parseInt(value);
+            currentBrightness = parseInt(value);
             updateBrightnessLabel(value);
             // No es necesario actualizar el visual aquí, WLED lo maneja
-
+            
             if (brightnessTimeout) {
                 clearTimeout(brightnessTimeout);
             }
-
+            
             brightnessTimeout = setTimeout(() => {
                 addDebugLog(`💡 Aplicando brillo: ${currentBrightness}`, 'info');
                 sendMQTTCommand({"bri": currentBrightness});
             }, 300); // 300ms debounce
-}
+        }
         
         function updateBrightnessLabel(value) {
             const percent = Math.round(value / 2.55);
             document.getElementById('brightVal').textContent = `${percent}%`;
-}
+        }
 
         // DISEÑOS GUARDADOS (mantener todas las funciones existentes)
         function saveDesign() {
             const name = document.getElementById('designName').value.trim();
             if (!name) {
-showStatus('❌ Escribe un nombre para el diseño.', true);
+                showStatus('❌ Escribe un nombre para el diseño.', true);
                 return;
-}
+            }
             
             const designToSave = {};
             for(const [index, color] of Object.entries(ledColors)) {
-if (color !== '#333333' && color !== '#000000') {
+                if (color !== '#333333' && color !== '#000000') {
                     designToSave[index] = color;
                 }
-}
+            }
 
             if (Object.keys(designToSave).length === 0) {
                  showStatus('❌ No hay LEDs encendidos para guardar.', true);
                  return;
-}
+            }
 
             let designs = JSON.parse(localStorage.getItem('wledDesigns')) || {};
             designs[name] = designToSave;
-localStorage.setItem('wledDesigns', JSON.stringify(designs));
+            localStorage.setItem('wledDesigns', JSON.stringify(designs));
             
             showStatus(`✓ Diseño "${name}" guardado.`);
             addDebugLog(`💾 Diseño guardado: ${name}`, 'success');
             document.getElementById('designName').value = '';
             loadDesigns();
-}
+        }
 
         function loadDesigns() {
             const designs = JSON.parse(localStorage.getItem('wledDesigns')) ||
             {};
-const listDiv = document.getElementById('designsList');
+            const listDiv = document.getElementById('designsList');
             listDiv.innerHTML = '';
             
             if (Object.keys(designs).length === 0) {
                 listDiv.innerHTML = '<p style="color: #666; font-size: 14px;">No hay diseños guardados.</p>';
                 return;
-}
+            }
             
             Object.keys(designs).forEach(name => {
                 const item = document.createElement('div');
                 item.className = 'design-item';
                 item.innerHTML = `
                      <span>${escapeHTML(name)}</span>
-<div>
+                    <div>
                         <button onclick="applyDesign('${escapeHTML(name)}')">Cargar</button>
                         <button class="delete-btn" onclick="deleteDesign('${escapeHTML(name)}')">X</button>
                     </div>
                  `;
-listDiv.appendChild(item);
+                listDiv.appendChild(item);
             });
-}
+        }
 
         async function applyDesign(name) {
             const designs = JSON.parse(localStorage.getItem('wledDesigns')) ||
             {};
-const design = designs[name];
+            const design = designs[name];
             
             if (!design) {
                 showStatus('❌ No se encontró el diseño.', true);
                 return;
-}
+            }
 
             stopAllAnimations();
             
             const payload_i = [];
             for (let i = 0; i < totalLeds; i++) {
-ledColors[i] = '#333333';
+                ledColors[i] = '#333333';
                 updateLEDVisual(i, '#333333', false);
-}
+            }
             
             for(const [index, color] of Object.entries(design)) {
                 const rgb = hexToRgb(color);
                 const idx = parseInt(index);
-payload_i.push(idx, [rgb.r, rgb.g, rgb.b]);
+                payload_i.push(idx, [rgb.r, rgb.g, rgb.b]);
                 
                 ledColors[idx] = color;
                 updateLEDVisual(idx, color, false);
             }
-
+            
             ledMeshes.forEach(mesh => {
                 mesh.material.needsUpdate = true;
             });
             await sendMQTTCommand({
-"on": true,
+                "on": true,
                 "seg": [{ "fx": 0, "i": payload_i }]
             });
             showStatus(`✓ Diseño "${name}" cargado.`);
-addDebugLog(`📂 Diseño cargado: ${name}`, 'success');
+            addDebugLog(`📂 Diseño cargado: ${name}`, 'success');
         }
 
         function deleteDesign(name) {
             if (!confirm(`¿Seguro que quieres borrar el diseño "${name}"?`)) {
                 return;
             }
-let designs = JSON.parse(localStorage.getItem('wledDesigns')) || {};
+            let designs = JSON.parse(localStorage.getItem('wledDesigns')) || {};
             delete designs[name];
             localStorage.setItem('wledDesigns', JSON.stringify(designs));
-showStatus(`✓ Diseño "${name}" borrado.`);
+            showStatus(`✓ Diseño "${name}" borrado.`);
             addDebugLog(`🗑️ Diseño eliminado: ${name}`, 'info');
             loadDesigns();
-}
+        }
         
         // THREE.JS (mantener todas las funciones existentes)
         function initThreeJS() {
             const canvas = document.getElementById('treeCanvas');
             scene = new THREE.Scene();
-scene.background = null;
+            scene.background = null;
             
             camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
             camera.position.set(0, 8, 25);
             camera.lookAt(0, 8, 0);
-
+            
             renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
             renderer.setSize(canvas.clientWidth, canvas.clientHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-scene.add(ambientLight);
+            scene.add(ambientLight);
             
             const pointLight = new THREE.PointLight(0xffffff, 0.8);
             pointLight.position.set(0, 25, 20);
             scene.add(pointLight);
             
             createChristmasTree();
-let isDragging = false;
+            let isDragging = false;
             let previousMousePosition = { x: 0, y: 0 };
             canvas.addEventListener('mousedown', () => {
-isDragging = true;
+                isDragging = true;
             });
             canvas.addEventListener('mousemove', (e) => {
-if (isDragging) {
+                if (isDragging) {
                     const deltaMove = {
                         x: e.offsetX - previousMousePosition.x,
                         y: e.offsetY - previousMousePosition.y
                      };
-
+                    
                     ledGroup.rotation.y += deltaMove.x * 0.01;
                     ledGroup.rotation.x += deltaMove.y * 0.01;
                  }
-
+                
                 previousMousePosition = {
                     x: e.offsetX,
                     y: e.offsetY
                 };
              });
-
+            
             canvas.addEventListener('mouseup', () => {
-isDragging = false;
+                isDragging = false;
             });
             canvas.addEventListener('click', onCanvasClick);
-
+            
             window.addEventListener('resize', onWindowResize);
             
             animate();
@@ -2452,71 +2417,71 @@ isDragging = false;
         function createChristmasTree() {
             ledGroup = new THREE.Group();
             const treeHeight = 17;
-const treeRadius = 7;
+            const treeRadius = 7;
             const treeGeometry = new THREE.ConeGeometry(treeRadius, treeHeight, 32);
             const treeMaterial = new THREE.MeshPhongMaterial({ 
-color: 0x0a4d0a, 
+                color: 0x0a4d0a, 
                 transparent: true, 
                 opacity: 0.7 
             });
             const treeMesh = new THREE.Mesh(treeGeometry, treeMaterial);
-treeMesh.position.y = treeHeight / 2;
+            treeMesh.position.y = treeHeight / 2;
             ledGroup.add(treeMesh);
             
             const starGeometry = new THREE.SphereGeometry(0.8, 16, 16);
             const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-const starMesh = new THREE.Mesh(starGeometry, starMaterial);
+            const starMesh = new THREE.Mesh(starGeometry, starMaterial);
             starMesh.position.y = treeHeight + 0.5;
             ledGroup.add(starMesh);
             const ledsPerLayer = 9;
-const layers = Math.ceil(totalLeds / ledsPerLayer);
+            const layers = Math.ceil(totalLeds / ledsPerLayer);
             
             let ledIndex = 0;
             for (let layer = 0; layer < layers && ledIndex < totalLeds; layer++) {
-const ledsInThisLayer = Math.min(ledsPerLayer, totalLeds - ledIndex);
+                const ledsInThisLayer = Math.min(ledsPerLayer, totalLeds - ledIndex);
                 for (let i = 0; i < ledsInThisLayer; i++) {
-const angleOffset = (i / ledsInThisLayer) * (Math.PI * 2);
+                    const angleOffset = (i / ledsInThisLayer) * (Math.PI * 2);
                     const y = (layer / layers) * treeHeight;
-const radiusAtHeight = treeRadius * (1 - (y / treeHeight));
+                    const radiusAtHeight = treeRadius * (1 - (y / treeHeight));
                     const spiralOffset = layer * 0.4;
-const x = Math.cos(angleOffset + spiralOffset) * radiusAtHeight;
+                    const x = Math.cos(angleOffset + spiralOffset) * radiusAtHeight;
                     const z = Math.sin(angleOffset + spiralOffset) * radiusAtHeight;
-
+                    
                     const ledGeometry = new THREE.SphereGeometry(0.2, 8, 8);
                     const ledMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
-const ledMesh = new THREE.Mesh(ledGeometry, ledMaterial);
+                    const ledMesh = new THREE.Mesh(ledGeometry, ledMaterial);
                     
                     ledMesh.position.set(x, y, z);
                     ledMesh.userData.ledIndex = ledIndex;
                     ledGroup.add(ledMesh);
-ledMeshes.push(ledMesh);
+                    ledMeshes.push(ledMesh);
                     ledColors[ledIndex] = '#333333';
                     ledPositions[ledIndex] = { x, y, z };
                     
                     ledIndex++;
                 }
-}
+            }
             
             scene.add(ledGroup);
-}
+        }
         
         function onCanvasClick(event) {
             if (!paintMode) return;
             const canvas = document.getElementById('treeCanvas');
-const rect = canvas.getBoundingClientRect();
+            const rect = canvas.getBoundingClientRect();
             
             const mouse = new THREE.Vector2(
                 ((event.clientX - rect.left) / rect.width) * 2 - 1,
                 -((event.clientY - rect.top) / rect.height) * 2 + 1
             );
             const raycaster = new THREE.Raycaster();
-raycaster.setFromCamera(mouse, camera);
+            raycaster.setFromCamera(mouse, camera);
             
             const intersects = raycaster.intersectObjects(ledMeshes);
             if (intersects.length > 0) {
-const clickedLED = intersects[0].object;
+                const clickedLED = intersects[0].object;
                 const ledIndex = clickedLED.userData.ledIndex;
-
+                
                 updateLEDColor(ledIndex, selectedColor);
             }
         }
@@ -2524,13 +2489,13 @@ const clickedLED = intersects[0].object;
         function animate() {
             requestAnimationFrame(animate);
             ledGroup.rotation.y += 0.001;
-renderer.render(scene, camera);
+            renderer.render(scene, camera);
         }
         
         function onWindowResize() {
             const canvas = document.getElementById('treeCanvas');
             camera.aspect = canvas.clientWidth / canvas.clientHeight;
-camera.updateProjectionMatrix();
+            camera.updateProjectionMatrix();
             renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         }
         
@@ -2538,56 +2503,56 @@ camera.updateProjectionMatrix();
         function generateStars() {
             const starsContainer = document.getElementById('stars');
             for(let i = 0; i < 100; i++) {
-const star = document.createElement('div');
+                const star = document.createElement('div');
                 star.className = 'star';
-star.style.left = Math.random() * 100 + '%';
+                star.style.left = Math.random() * 100 + '%';
                 star.style.top = Math.random() * 100 + '%';
                 star.style.animationDelay = Math.random() * 3 + 's';
-starsContainer.appendChild(star);
+                starsContainer.appendChild(star);
             }
         }
 
         function showStatus(message, isError = false) {
             const oldMessage = document.querySelector('.status-message');
             if (oldMessage) oldMessage.remove();
-
+            
             const status = document.createElement('div');
             status.className = 'status-message';
             status.textContent = message;
             if (isError) {
-status.style.background = '#dc3545';
+                status.style.background = '#dc3545';
             }
-document.body.appendChild(status);
+            document.body.appendChild(status);
             setTimeout(() => {
-status.remove();
+                status.remove();
             }, 3000);
-}
+        }
 
         function hexToRgb(hex) {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {
-r: parseInt(result[1], 16),
+                r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
                 b: parseInt(result[3], 16)
             } : null;
-}
+        }
 
         function rgbToHex(r, g, b) {
             return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
+        }
 
         function hslToRgb(h, s, l) {
             s /= 100;
             l /= 100;
-const k = n => (n + h / 30) % 12;
+            const k = n => (n + h / 30) % 12;
             const a = s * Math.min(l, 1 - l);
-const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+            const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
             return {
-r: Math.round(255 * f(0)),
+                r: Math.round(255 * f(0)),
                 g: Math.round(255 * f(8)),
                 b: Math.round(255 * f(4))
             };
-}
+        }
         
         function escapeHTML(str) {
             return str.replace(/[&<>"']/g, function(m) {
@@ -2595,11 +2560,11 @@ r: Math.round(255 * f(0)),
                     '&': '&amp;',
                     '<': '&lt;',
                     '>': '&gt;',
-'"': '&quot;',
+                    '"': '&quot;',
                     "'": '&#39;'
                 }[m];
             });
-}
+        }
         
         // =====================================================
         // INICIALIZACIÓN
@@ -2608,31 +2573,30 @@ r: Math.round(255 * f(0)),
         window.onload = function() {
             addDebugLog('🚀 Aplicación iniciada', 'success');
             addDebugLog('📝 Versión completa con Scheduler', 'info');
-
+    
             initThreeJS();
             generateStars();
             loadDesigns();
             loadSchedules();
             // PRIMERO establecer conexión MQTT
-setTimeout(() => {
+            setTimeout(() => {
                 initMQTT();
             }, 500);
             // DESPUÉS iniciar verificación de horarios (solo si hay conexión)
-setTimeout(() => {
+            setTimeout(() => {
                 // Verificar horarios solo cada 60 segundos en lugar de 30
                 setInterval(() => {
                     if (mqttClient && mqttClient.connected) {
                          checkSchedules();
-}
+                    }
                 }, 60000);
         
                 // Primera verificación después de conectar
-                if (mqttClient 
-&& mqttClient.connected) {
+                if (mqttClient && mqttClient.connected) {
                     checkSchedules();
                 }
             }, 2000);
         };
-</script>
+    </script>
 </body>
 </html>
