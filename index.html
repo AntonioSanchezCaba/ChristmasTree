@@ -979,7 +979,7 @@
                     <div class="section-title">⚡ Control</div>
                     <div class="effects-grid">
                         <button class="effect-btn" onclick="setStaticDesign('OFF')" style="background: #dc3545;">🔴 OFF</button>
-                        <button class="effect-btn" onclick="setPalette(0)">🎨 Solid (Custom Color)</button>
+                        <button class="effect-btn" onclick="runEffect(0)">⚪ Solid (Static)</button>
                     </div>
                 </div>
 
@@ -1006,7 +1006,6 @@
                 <div class="section">
                     <div class="section-title">⚡ Effect Modes</div>
                     <div class="effects-grid">
-                        <button class="effect-btn" onclick="runEffect(0)">⚪ Solid (Static)</button>
                         <button class="effect-btn" onclick="runEffect(1)">💫 Blink</button>
                         <button class="effect-btn" onclick="runEffect(2)">🌬️ Breathe</button>
                         <button class="effect-btn" onclick="runEffect(9)">🌈 Rainbow</button>
@@ -1016,7 +1015,7 @@
                         <button class="effect-btn" onclick="runEffect(28)">🏃 Chase</button>
                         <button class="effect-btn" onclick="runEffect(38)">🌌 Aurora</button>
                         <button class="effect-btn" onclick="runEffect(42)">🎆 Fireworks</button>
-                        <button class="effect-btn" onclick="runEffect(45, 35)">🔥 Fire Flicker</button>
+                        <button class="effect-btn" onclick="runEffect(45)">🌋 Lava</button>
                         <button class="effect-btn" onclick="runEffect(67)">🌀 Colorwaves</button>
                         <button class="effect-btn" onclick="runEffect(76)">☄️ Meteor</button>
                         <button class="effect-btn" onclick="runEffect(79)">🌊 Ripple</button>
@@ -1030,9 +1029,8 @@
                 <div class="section">
                     <div class="section-title">🎨 Custom Designs</div>
                     <div class="effects-grid">
-                        <button class="effect-btn" onclick="setStaticDesign('Rainbow')">🌈 Rainbow Static</button>
                         <button class="effect-btn" onclick="setStaticDesign('Purple Rain')">💜 Purple Rain</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Dominican')">🇩🇴 Dominican Flag</button>
+                        <button class="effect-btn" onclick="setStaticDesign('Dominican')">🇩🇴 Dominican</button>
                     </div>
                 </div>
 
@@ -1069,6 +1067,8 @@
         let localAnimationInterval = null;
         let currentEffect = null;
         let currentLocalAnimation = null;
+        let currentEffectId = 0; // Efecto actual de WLED (fx)
+        let currentPaletteId = 0; // Paleta actual de WLED (pal)
 
         // Variable para guardar el último estado de WLED
         let pendingWLEDState = null;
@@ -1833,9 +1833,13 @@
                 const fx = segment.fx;
                 const pal = segment.pal;
                 const col = segment.col[0] || [255, 0, 0]; // Color primario, con fallback
-                
+
+                // Sincronizar efecto y paleta actuales
+                currentEffectId = fx;
+                currentPaletteId = pal || 0;
+
                 const hexColor = rgbToHex(col[0], col[1], col[2]);
-                
+
                 // Actualizar el picker de color de la UI
                 selectedColor = hexColor;
                 document.getElementById('ledColor').value = hexColor;
@@ -2288,36 +2292,38 @@
             });
         }
 
-        // Apply a color palette (uses with Palette effect mode 65, or current effect)
+        // Apply a color palette - mantiene el efecto actual y solo cambia la paleta
         async function setPalette(paletteId) {
-            addDebugLog(`🎨 Aplicando palette: ${paletteId}`, 'info');
+            addDebugLog(`🎨 Cambiando palette a: ${paletteId} (manteniendo efecto ${currentEffectId})`, 'info');
 
-            // Stop any local animations
-            if (effectAnimationInterval) clearInterval(effectAnimationInterval);
-            if (localAnimationInterval) clearInterval(localAnimationInterval);
+            // Guardar la paleta actual
+            currentPaletteId = paletteId;
 
             const rgb = hexToRgb(selectedColor);
             const colorArray = applyColorOrder(rgb.r, rgb.g, rgb.b);
 
-            // Use Palette effect mode (65) to display the palette
+            // Aplicar la paleta con el efecto actual
             await sendMQTTCommand({
                 "on": true,
                 "bri": currentBrightness,
                 "mainseg": 0,
                 "seg": [{
                     "id": 0,
-                    "fx": 65, // Palette effect mode
+                    "fx": currentEffectId,
                     "pal": paletteId,
                     "col": [colorArray, [0, 0, 0], [0, 0, 0]]
                 }]
             });
 
-            showStatus(`✓ Palette ${paletteId} aplicada`);
+            showStatus(`✓ Palette ${paletteId} aplicada con efecto ${currentEffectId}`);
         }
 
-        // Run an effect mode with optional palette
-        async function runEffect(fxId, paletteId = null) {
-            addDebugLog(`⚡ Aplicando efecto: fx=${fxId}, pal=${paletteId || 'default'}`, 'info');
+        // Run an effect mode - usa la paleta actual
+        async function runEffect(fxId) {
+            addDebugLog(`⚡ Aplicando efecto: fx=${fxId} con palette=${currentPaletteId}`, 'info');
+
+            // Guardar el efecto actual
+            currentEffectId = fxId;
 
             // Stop any local animations
             if (effectAnimationInterval) clearInterval(effectAnimationInterval);
@@ -2326,22 +2332,17 @@
             const rgb = hexToRgb(selectedColor);
             const colorArray = applyColorOrder(rgb.r, rgb.g, rgb.b);
 
-            const segmentConfig = {
-                "id": 0,
-                "fx": fxId,
-                "col": [colorArray, [0, 0, 0], [0, 0, 0]]
-            };
-
-            // Add palette if specified
-            if (paletteId !== null) {
-                segmentConfig.pal = paletteId;
-            }
-
+            // Aplicar el efecto con la paleta actual
             await sendMQTTCommand({
                 "on": true,
                 "bri": currentBrightness,
                 "mainseg": 0,
-                "seg": [segmentConfig]
+                "seg": [{
+                    "id": 0,
+                    "fx": fxId,
+                    "pal": currentPaletteId,
+                    "col": [colorArray, [0, 0, 0], [0, 0, 0]]
+                }]
             });
 
             // Run local animation for visual feedback
@@ -2352,7 +2353,7 @@
                 if (animFunc) animFunc();
             }
 
-            showStatus(`✓ Effect ${fxId} aplicado`);
+            showStatus(`✓ Effect ${fxId} aplicado con palette ${currentPaletteId}`);
         }
 
         // Helper to get effect name from ID
