@@ -1631,18 +1631,27 @@
                 const clElements = vs.querySelectorAll('cl');
                 const colors = Array.from(clElements).map(el => parseInt(el.textContent));
 
+                // Extraer efecto (fx)
+                const fxElement = vs.querySelector('fx');
+                const fx = fxElement ? parseInt(fxElement.textContent) : 0;
+
+                // Extraer paleta (fp)
+                const fpElement = vs.querySelector('fp');
+                const pal = fpElement ? parseInt(fpElement.textContent) : 0;
+
                 // Crear objeto compatible con handleWLEDState
                 const state = {
                     on: brightness > 0, // Asumimos que está encendido si el brillo > 0
                     bri: brightness,
                     seg: [{
                         col: [colors.length >= 3 ? colors.slice(0, 3) : [255, 255, 255]],
-                        fx: 0 // Sin efecto (color sólido)
+                        fx: fx,
+                        pal: pal
                     }]
                 };
 
                 addDebugLog('✅ XML parseado correctamente', 'success');
-                addDebugLog(`📊 Brillo: ${brightness}, Color: RGB(${colors.slice(0, 3).join(',')})`, 'info');
+                addDebugLog(`📊 Brillo: ${brightness}, Color: RGB(${colors.slice(0, 3).join(',')}), FX: ${fx}, Paleta: ${pal}`, 'info');
 
                 return state;
             } catch (e) {
