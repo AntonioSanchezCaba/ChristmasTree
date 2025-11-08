@@ -1114,6 +1114,17 @@
         function saveSchedules() {
             localStorage.setItem('wledSchedules', JSON.stringify(schedules));
             renderScheduleGrid();
+
+            // Publicar horarios en MQTT para sincronizar entre dispositivos
+            if (mqttClient && mqttClient.connected) {
+                const schedulesData = {
+                    schedules: schedules,
+                    enabled: document.getElementById('schedulerEnabled').checked,
+                    timestamp: Date.now()
+                };
+                mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: true });
+                addDebugLog('📤 Horarios publicados para sincronización', 'success');
+            }
         }
         
         function addSchedule() {
@@ -1341,9 +1352,9 @@
         function updateScheduler() {
             const enabled = document.getElementById('schedulerEnabled').checked;
             localStorage.setItem('schedulerEnabled', enabled.toString());
-            
+
             updateSchedulerStatus();
-            
+
             if (enabled) {
                 showStatus('✅ Programación automática activada');
                 addDebugLog('⏰ Programación automática activada', 'success');
@@ -1351,6 +1362,17 @@
             } else {
                 showStatus('⏸️ Programación automática desactivada');
                 addDebugLog('⏰ Programación automática desactivada', 'info');
+            }
+
+            // Publicar cambio en MQTT para sincronizar entre dispositivos
+            if (mqttClient && mqttClient.connected) {
+                const schedulesData = {
+                    schedules: schedules,
+                    enabled: enabled,
+                    timestamp: Date.now()
+                };
+                mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: true });
+                addDebugLog('📤 Estado del scheduler publicado', 'success');
             }
         }
         
@@ -1538,8 +1560,20 @@
                         if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
                             addDebugLog('⏳ Esperando estado de WLED...', 'info');
-                            // No enviar comandos - esperar a que WLED publique su estado naturalmente
-                            // La sincronización ocurrirá cuando WLED envíe su próximo mensaje de estado
+
+                            // Publicar horarios locales después de suscribirse
+                            // Si hay horarios retenidos en MQTT, llegarán primero y sobrescribirán estos
+                            setTimeout(() => {
+                                if (schedules.length > 0 || document.getElementById('schedulerEnabled').checked) {
+                                    const schedulesData = {
+                                        schedules: schedules,
+                                        enabled: document.getElementById('schedulerEnabled').checked,
+                                        timestamp: Date.now()
+                                    };
+                                    mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: true });
+                                    addDebugLog('📤 Horarios locales publicados al conectar', 'info');
+                                }
+                            }, 500);
                         } else {
                             addDebugLog('⚠️ Error al suscribirse: ' + err.message, 'error');
                         }
@@ -1564,6 +1598,32 @@
                 // INICIO: Solución #5 - Procesar mensajes de estado de WLED
                 mqttClient.on('message', (topic, message) => {
                     const payloadStr = message.toString();
+
+                    // Procesar mensajes de horarios para sincronización entre dispositivos
+                    if (topic === 'wled/tree/schedules') {
+                        try {
+                            const data = JSON.parse(payloadStr);
+                            if (data.schedules && Array.isArray(data.schedules)) {
+                                // Evitar loop si es nuestro propio mensaje (comparar timestamp reciente)
+                                const timeDiff = Date.now() - (data.timestamp || 0);
+                                if (timeDiff > 1000) { // Solo aplicar si tiene más de 1 segundo
+                                    schedules = data.schedules;
+                                    localStorage.setItem('wledSchedules', JSON.stringify(schedules));
+
+                                    if (typeof data.enabled !== 'undefined') {
+                                        document.getElementById('schedulerEnabled').checked = data.enabled;
+                                        localStorage.setItem('schedulerEnabled', data.enabled.toString());
+                                    }
+
+                                    renderScheduleGrid();
+                                    addDebugLog('📥 Horarios sincronizados desde otro dispositivo', 'success');
+                                }
+                            }
+                        } catch (e) {
+                            addDebugLog('❌ Error al procesar horarios: ' + e.message, 'error');
+                        }
+                        return;
+                    }
 
                     // Procesar mensajes de estado de WLED (v, state, o api con JSON de estado)
                     if (topic === 'wled/tree/v' || topic === 'wled/tree/state' || topic === 'wled/tree/api') {
