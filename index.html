@@ -1531,12 +1531,24 @@
                         if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
 
-                            // Solicitar estado actual de WLED al conectarse (con delay mayor)
+                            // Solicitar estado actual de WLED - método mejorado
                             setTimeout(() => {
-                                addDebugLog('🔍 Solicitando estado inicial de WLED...', 'info');
-                                // Publicar comando vacío en api para que WLED envíe su estado
+                                addDebugLog('🔍 Solicitando estado inicial de WLED (método 1: polling v)...', 'info');
+                                // Método 1: Publicar en el topic v para forzar actualización
+                                mqttClient.publish('wled/tree/v', '');
+                            }, 800);
+
+                            setTimeout(() => {
+                                addDebugLog('🔍 Solicitando estado inicial de WLED (método 2: api)...', 'info');
+                                // Método 2: Solicitar a través de api
                                 mqttClient.publish('wled/tree/api', '{"v":true}');
-                            }, 1000);
+                            }, 1500);
+
+                            setTimeout(() => {
+                                addDebugLog('🔍 Solicitando estado inicial de WLED (método 3: state)...', 'info');
+                                // Método 3: Publicar en state vacío para trigger respuesta
+                                mqttClient.publish('wled/tree/state', '');
+                            }, 2200);
                         } else {
                             addDebugLog('⚠️ Error al suscribirse: ' + err.message, 'error');
                         }
@@ -1562,9 +1574,12 @@
                 mqttClient.on('message', (topic, message) => {
                     const payloadStr = message.toString();
 
+                    // Log de TODOS los mensajes para debug
+                    addDebugLog(`📬 Mensaje recibido - Topic: ${topic}, Tamaño: ${payloadStr.length} bytes`, 'info');
+
                     // Procesar mensajes de estado de WLED (v, state, o api con JSON de estado)
                     if (topic === 'wled/tree/v' || topic === 'wled/tree/state' || topic === 'wled/tree/api') {
-                        addDebugLog(`📨 Mensaje WLED desde ${topic}`, 'success');
+                        addDebugLog(`📨 Mensaje WLED desde ${topic}, contenido: ${payloadStr.substring(0, 100)}...`, 'success');
 
                         const trimmedPayload = payloadStr.trim();
 
