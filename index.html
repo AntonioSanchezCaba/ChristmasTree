@@ -1257,18 +1257,32 @@
             }
             
             // Lógica: 1 click = Activar/Desactivar. 2 clicks = Eliminar.
-            block.onclick = (e) => {
-                // Previene que se dispare la acción de un solo click después del doble click
-                e.preventDefault(); 
-                toggleSchedule(schedule.id);
-            };
+            // Usamos un sistema de detección de doble click para evitar conflictos
+            let clickTimer = null;
+            let clickCount = 0;
 
-            block.ondblclick = () => {
-                if (confirm('¿Estás seguro de que deseas ELIMINAR este horario permanentemente?')) {
-                    deleteSchedule(schedule.id);
+            block.addEventListener('click', (e) => {
+                e.preventDefault();
+                clickCount++;
+
+                if (clickCount === 1) {
+                    // Primer click: esperar para ver si hay un segundo click
+                    clickTimer = setTimeout(() => {
+                        // Solo hubo un click → toggle activar/desactivar
+                        toggleSchedule(schedule.id);
+                        clickCount = 0;
+                    }, 250); // 250ms de espera para detectar doble click
+                } else if (clickCount === 2) {
+                    // Segundo click → eliminar
+                    clearTimeout(clickTimer);
+                    clickCount = 0;
+
+                    if (confirm('¿Estás seguro de que deseas ELIMINAR este horario permanentemente?')) {
+                        deleteSchedule(schedule.id);
+                    }
                 }
-            };
-            
+            });
+
             return block;
         }
         // FIN: Solución #2 y #3
@@ -1547,17 +1561,26 @@
 
                     // WLED responde con su estado en /v (versión/info) o /state
                     if (topic === 'wled/tree/state' || topic === 'wled/tree/v') {
+                        // Validar que el payload sea JSON válido antes de parsear
+                        const trimmedPayload = payloadStr.trim();
+                        if (!trimmedPayload.startsWith('{') && !trimmedPayload.startsWith('[')) {
+                            addDebugLog('⚠️ Respuesta de WLED no es JSON válido (probablemente XML/HTML)', 'error');
+                            addDebugLog(`📄 Contenido: ${payloadStr.substring(0, 100)}`, 'info');
+                            return;
+                        }
+
                         try {
                             const data = JSON.parse(payloadStr);
-                            
+
                             // **NUEVA LÓGICA MÁS ROBUSTA:** // 1. Prioriza 'state' si existe.
                             // 2. Si no, usa el objeto raíz (data).
                             // 3. Si se sincroniza el diseño (como en 'v'), el objeto 'info' puede estar anidado.
-                            const state = data.state || data.info || data; 
-                            
+                            const state = data.state || data.info || data;
+
                             handleWLEDState(state);
                         } catch (e) {
                             addDebugLog('❌ Error al parsear estado JSON de WLED: ' + e.message, 'error');
+                            addDebugLog(`📄 Payload problemático: ${payloadStr.substring(0, 200)}`, 'info');
                         }
                     }
                 });
