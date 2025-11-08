@@ -1255,23 +1255,21 @@
                 // Si es muy pequeño, al menos poner un tooltip
                 block.title = `${schedule.startTime} - ${schedule.endTime}`;
             }
-            
-            // Lógica: 1 click = Activar/Desactivar. 2 clicks = Eliminar.
-            block.onclick = (e) => {
-                // Previene que se dispare la acción de un solo click después del doble click
-                e.preventDefault(); 
+        
+            // **NUEVA LÓGICA:** // 1 CLICK: Activa/Desactiva el horario (pone el cuadro en gris/color). NO PREGUNTA.
+            block.onclick = () => {
                 toggleSchedule(schedule.id);
             };
 
+            // DOBLE CLICK: Pregunta si se desea ELIMINAR el horario.
             block.ondblclick = () => {
                 if (confirm('¿Estás seguro de que deseas ELIMINAR este horario permanentemente?')) {
                     deleteSchedule(schedule.id);
                 }
             };
-            
+        
             return block;
         }
-        // FIN: Solución #2 y #3
         
         // Funciones de horarios rápidos
         function setWeekdaySchedule() {
@@ -1549,8 +1547,10 @@
                     if (topic === 'wled/tree/state' || topic === 'wled/tree/v') {
                         try {
                             const data = JSON.parse(payloadStr);
+
+                            // Lógica más robusta:
                             const state = data.state || data.info || data; 
-                            
+        
                             handleWLEDState(state);
                         } catch (e) {
                             addDebugLog('❌ Error al parsear estado JSON de WLED: ' + e.message, 'error');
