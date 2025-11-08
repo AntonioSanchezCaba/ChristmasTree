@@ -1548,8 +1548,11 @@
                         try {
                             const data = JSON.parse(payloadStr);
                             
-                            // Si el payload tiene 'state', usamos eso. Si no, usamos el payload raíz.
-                            const state = data.state || data; 
+                            // **NUEVA LÓGICA MÁS ROBUSTA:** // 1. Prioriza 'state' si existe.
+                            // 2. Si no, usa el objeto raíz (data).
+                            // 3. Si se sincroniza el diseño (como en 'v'), el objeto 'info' puede estar anidado.
+                            const state = data.state || data.info || data; 
+                            
                             handleWLEDState(state);
                         } catch (e) {
                             addDebugLog('❌ Error al parsear estado JSON de WLED: ' + e.message, 'error');
