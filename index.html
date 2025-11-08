@@ -1527,11 +1527,12 @@
                         if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
 
-                            // Solicitar estado actual de WLED al conectarse
+                            // Solicitar estado actual de WLED al conectarse (con delay mayor)
                             setTimeout(() => {
-                                addDebugLog('🔍 Solicitando estado actual de WLED...', 'info');
-                                mqttClient.publish('wled/tree/api', '');
-                            }, 500);
+                                addDebugLog('🔍 Solicitando estado inicial de WLED...', 'info');
+                                // Publicar comando vacío en api para que WLED envíe su estado
+                                mqttClient.publish('wled/tree/api', '{"v":true}');
+                            }, 1000);
                         } else {
                             addDebugLog('⚠️ Error al suscribirse: ' + err.message, 'error');
                         }
@@ -1555,10 +1556,11 @@
 
                 // INICIO: Solución #5 - Procesar mensajes de estado de WLED
                 mqttClient.on('message', (topic, message) => {
-                    // Solo procesar mensajes de estado relevantes (ignorar api, g, c, status, etc.)
-                    if (topic === 'wled/tree/v' || topic === 'wled/tree/state') {
-                        const payloadStr = message.toString();
-                        addDebugLog(`📨 Estado WLED recibido desde ${topic}`, 'success');
+                    const payloadStr = message.toString();
+
+                    // Procesar mensajes de estado de WLED (v, state, o api con JSON de estado)
+                    if (topic === 'wled/tree/v' || topic === 'wled/tree/state' || topic === 'wled/tree/api') {
+                        addDebugLog(`📨 Mensaje WLED desde ${topic}`, 'success');
 
                         const trimmedPayload = payloadStr.trim();
 
@@ -1573,19 +1575,24 @@
 
                         // Validar que el payload sea JSON válido antes de parsear
                         if (!trimmedPayload.startsWith('{') && !trimmedPayload.startsWith('[')) {
-                            addDebugLog('⚠️ Formato desconocido', 'error');
+                            // Ignorar mensajes que no son JSON ni XML (como comandos simples)
                             return;
                         }
 
                         try {
                             const data = JSON.parse(payloadStr);
-                            const state = data.state || data.info || data;
-                            handleWLEDState(state);
+
+                            // Solo procesar si parece ser un estado (tiene propiedades de estado)
+                            if (data.state || data.seg || data.on !== undefined || data.bri !== undefined) {
+                                addDebugLog(`📊 JSON de estado detectado en ${topic}`, 'info');
+                                const state = data.state || data;
+                                handleWLEDState(state);
+                            }
                         } catch (e) {
-                            addDebugLog('❌ Error al parsear JSON: ' + e.message, 'error');
+                            // Ignorar errores de JSON parse silenciosamente
                         }
                     }
-                    // Ignorar silenciosamente otros topics (api, g, c, status, etc.)
+                    // Ignorar silenciosamente otros topics (g, c, status, etc.)
                 });
                 // FIN: Solución #5
 
