@@ -1537,19 +1537,9 @@
                      mqttClient.subscribe('wled/tree/#', (err) => {
                         if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
-
-                            // Estrategia: hacer un pequeño "nudge" para que WLED publique su estado
-                            setTimeout(() => {
-                                addDebugLog('🔍 Solicitando estado de WLED con nudge...', 'info');
-
-                                // Publicar un comando que cambie el brillo temporalmente +1
-                                mqttClient.publish('wled/tree/api', JSON.stringify({"bri": "+1"}));
-
-                                // Después de 200ms, devolverlo -1 para restaurar
-                                setTimeout(() => {
-                                    mqttClient.publish('wled/tree/api', JSON.stringify({"bri": "-1"}));
-                                }, 200);
-                            }, 1000);
+                            addDebugLog('⏳ Esperando estado de WLED...', 'info');
+                            // No enviar comandos - esperar a que WLED publique su estado naturalmente
+                            // La sincronización ocurrirá cuando WLED envíe su próximo mensaje de estado
                         } else {
                             addDebugLog('⚠️ Error al suscribirse: ' + err.message, 'error');
                         }
