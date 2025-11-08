@@ -1256,17 +1256,36 @@
                 block.title = `${schedule.startTime} - ${schedule.endTime}`;
             }
         
-            // **NUEVA LÓGICA:** // 1 CLICK: Activa/Desactiva el horario (pone el cuadro en gris/color). NO PREGUNTA.
-            block.onclick = () => {
-                toggleSchedule(schedule.id);
-            };
+            // **NUEVA LÓGICA DEFINITIVA CON TIMER**
+            // Un solo 'onclick' maneja los dos casos para evitar conflictos.
+            let clickTimer = null;
+            const DOUBLE_CLICK_TIME = 300; // 300ms para diferenciar single de double click
 
-            // DOBLE CLICK: Pregunta si se desea ELIMINAR el horario.
-            block.ondblclick = () => {
-                if (confirm('¿Estás seguro de que deseas ELIMINAR este horario permanentemente?')) {
-                    deleteSchedule(schedule.id);
+            block.onclick = (e) => {
+                e.preventDefault(); // Prevenir cualquier acción por defecto (como selección de texto)
+
+                if (clickTimer) {
+                    // CASO 2: Hay un timer corriendo (es el segundo click) -> Doble Click
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                
+                    // ACCIÓN DOBLE CLICK: PREGUNTAR POR ELIMINACIÓN
+                    if (confirm('¿Estás seguro de que deseas ELIMINAR este horario permanentemente?')) {
+                        deleteSchedule(schedule.id);
+                    }
+                } else {
+                    // CASO 1: No hay timer (es el primer click) -> Iniciar timer
+                    clickTimer = setTimeout(() => {
+                        clickTimer = null;
+                    
+                        // ACCIÓN SINGLE CLICK: TOGGLE (Activar/Desactivar - gris/color)
+                        toggleSchedule(schedule.id);
+                    
+                    }, DOUBLE_CLICK_TIME);
                 }
             };
+
+            // NOTA: ELIMINA cualquier línea "block.ondblclick" anterior.
         
             return block;
         }
