@@ -2310,7 +2310,28 @@
             // Guardar la paleta actual
             currentPaletteId = paletteId;
 
-            const rgb = hexToRgb(selectedColor);
+            // Definir colores base para paletas especiales
+            const paletteBaseColors = {
+                2: '#9B30FF',      // Purple Rain - morado vibrante
+                255: '#0038A8',    // Dominican - azul de la bandera
+                35: '#FF4500',     // Fire - naranja/rojo fuego
+                8: '#FF4500',      // Lava - naranja lava
+                9: '#006994',      // Ocean - azul océano
+                11: '#FF0000',     // Rainbow - rojo inicial
+                10: '#228B22',     // Forest - verde bosque
+                13: '#FF6347'      // Sunset - naranja/rojo atardecer
+            };
+
+            // Si la paleta tiene un color base definido, usarlo
+            let colorToUse = selectedColor;
+            if (paletteBaseColors[paletteId]) {
+                colorToUse = paletteBaseColors[paletteId];
+                selectedColor = colorToUse;
+                document.getElementById('ledColor').value = colorToUse;
+                addDebugLog(`🎨 Color base establecido a ${colorToUse} para palette ${paletteId}`, 'info');
+            }
+
+            const rgb = hexToRgb(colorToUse);
             const colorArray = applyColorOrder(rgb.r, rgb.g, rgb.b);
 
             // Aplicar la paleta con el efecto actual
@@ -2325,6 +2346,11 @@
                     "col": [colorArray, [0, 0, 0], [0, 0, 0]]
                 }]
             });
+
+            // Si está en modo Solid (fx: 0), actualizar visualización inmediatamente
+            if (currentEffectId === 0) {
+                updateAllLEDsVisual(colorToUse);
+            }
 
             showStatus(`✓ Palette ${paletteId} aplicada con efecto ${currentEffectId}`);
         }
