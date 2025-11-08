@@ -1699,11 +1699,10 @@
                 } else {
                     // --- Efecto Animado ---
                     addDebugLog(`🔄 Sincronizando: Efecto ${fx}, Paleta ${pal}`, 'info');
-                    // Mapear efectos de WLED a animaciones locales
-                    // (Esto es una simulación, nunca será 100% exacto)
+                    // Mapear efectos de WLED a animaciones locales (solo visual, sin enviar a WLED)
                     switch(fx) {
                         case 9: // Rainbow
-                            applyRainbowDesign();
+                            applyRainbowDesign(false); // false = no enviar a WLED
                             break;
                         case 12: // Fire
                             runAnimatedEffect('Fire');
@@ -1970,7 +1969,7 @@
             showStatus(`✓ Solid ${selectedColor}`);
         }
 
-        async function applyRainbowDesign() {
+        async function applyRainbowDesign(sendToWLED = true) {
             addDebugLog('🌈 Aplicando Rainbow', 'info');
             for (let i = 0; i < totalLeds; i++) {
                 const hue = (i * 360 / totalLeds) % 360;
@@ -1979,15 +1978,18 @@
                 updateLEDVisual(i, hexColor, false);
             }
             ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
-            await sendMQTTCommand({
-                "on": true,
-                "bri": currentBrightness,
-                "seg": [{
-                    "id": 0,
-                    "fx": 9,
-                    "pal": 11
-                }]
-            });
+
+            if (sendToWLED) {
+                await sendMQTTCommand({
+                    "on": true,
+                    "bri": currentBrightness,
+                    "seg": [{
+                        "id": 0,
+                        "fx": 9,
+                        "pal": 11
+                    }]
+                });
+            }
             showStatus('✓ Rainbow aplicado');
         }
 
