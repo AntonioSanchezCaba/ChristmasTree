@@ -1768,6 +1768,9 @@
                 document.getElementById('brightness').value = brightness;
                 updateBrightnessLabel(brightness);
                 currentBrightness = brightness;
+
+                // Guardar el brillo en localStorage para persistencia
+                localStorage.setItem('lastBrightness', brightness.toString());
             }
 
             // 2. Actualizar Estado (On/Off)
@@ -2421,12 +2424,16 @@
         function setBrightness(value) {
             currentBrightness = parseInt(value);
             updateBrightnessLabel(value);
+
+            // Guardar brillo en localStorage para persistencia
+            localStorage.setItem('lastBrightness', currentBrightness.toString());
+
             // No es necesario actualizar el visual aquí, WLED lo maneja
-            
+
             if (brightnessTimeout) {
                 clearTimeout(brightnessTimeout);
             }
-            
+
             brightnessTimeout = setTimeout(() => {
                 addDebugLog(`💡 Aplicando brillo: ${currentBrightness}`, 'info');
                 sendMQTTCommand({"bri": currentBrightness});
@@ -2766,7 +2773,17 @@
         window.onload = function() {
             addDebugLog('🚀 Aplicación iniciada', 'success');
             addDebugLog('📝 Versión completa con Scheduler', 'info');
-    
+
+            // Cargar último brillo conocido desde localStorage
+            const savedBrightness = localStorage.getItem('lastBrightness');
+            if (savedBrightness) {
+                const brightness = parseInt(savedBrightness);
+                currentBrightness = brightness;
+                document.getElementById('brightness').value = brightness;
+                updateBrightnessLabel(brightness);
+                addDebugLog(`💡 Brillo restaurado: ${brightness}`, 'info');
+            }
+
             initThreeJS();
             generateStars();
             loadDesigns();
