@@ -1549,16 +1549,15 @@
 
                 // INICIO: Solución #5 - Procesar mensajes de estado de WLED
                 mqttClient.on('message', (topic, message) => {
-                    const payloadStr = message.toString();
-                    addDebugLog(`📨 Mensaje: ${topic} = ${payloadStr.substring(0, 50)}...`, 'success');
+                    // Solo procesar mensajes de estado relevantes (ignorar api, g, c, status, etc.)
+                    if (topic === 'wled/tree/v' || topic === 'wled/tree/state') {
+                        const payloadStr = message.toString();
+                        addDebugLog(`📨 Estado WLED recibido desde ${topic}`, 'success');
 
-                    // WLED responde con su estado en /v (versión/info) o /state
-                    if (topic === 'wled/tree/state' || topic === 'wled/tree/v') {
                         const trimmedPayload = payloadStr.trim();
 
                         // Detectar si es XML
                         if (trimmedPayload.startsWith('<?xml') || trimmedPayload.startsWith('<')) {
-                            addDebugLog('📋 Detectado formato XML, parseando...', 'info');
                             const state = parseWLEDXML(trimmedPayload);
                             if (state) {
                                 handleWLEDState(state);
@@ -1568,25 +1567,19 @@
 
                         // Validar que el payload sea JSON válido antes de parsear
                         if (!trimmedPayload.startsWith('{') && !trimmedPayload.startsWith('[')) {
-                            addDebugLog('⚠️ Respuesta de WLED no es JSON ni XML válido', 'error');
-                            addDebugLog(`📄 Contenido: ${payloadStr.substring(0, 100)}`, 'info');
+                            addDebugLog('⚠️ Formato desconocido', 'error');
                             return;
                         }
 
                         try {
                             const data = JSON.parse(payloadStr);
-
-                            // **NUEVA LÓGICA MÁS ROBUSTA:** // 1. Prioriza 'state' si existe.
-                            // 2. Si no, usa el objeto raíz (data).
-                            // 3. Si se sincroniza el diseño (como en 'v'), el objeto 'info' puede estar anidado.
                             const state = data.state || data.info || data;
-
                             handleWLEDState(state);
                         } catch (e) {
-                            addDebugLog('❌ Error al parsear estado JSON de WLED: ' + e.message, 'error');
-                            addDebugLog(`📄 Payload problemático: ${payloadStr.substring(0, 200)}`, 'info');
+                            addDebugLog('❌ Error al parsear JSON: ' + e.message, 'error');
                         }
                     }
+                    // Ignorar silenciosamente otros topics (api, g, c, status, etc.)
                 });
                 // FIN: Solución #5
 
