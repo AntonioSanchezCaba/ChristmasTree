@@ -79,6 +79,267 @@
             cursor: grabbing;
         }
         
+        /* BOTÓN SCHEDULE FLOTANTE */
+        /* BOTÓN SCHEDULE MINIMALISTA */
+        .schedule-button {
+            position: fixed;
+            top: 15px;
+            right: 470px;
+            background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(71, 118, 230, 0.4);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .schedule-button span {
+            display: none; /* Oculta el texto */
+        }
+
+        .schedule-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(71, 118, 230, 0.6);
+        }
+
+        /* Tooltip al pasar el mouse */
+        .schedule-button::after {
+            content: 'Schedule';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .schedule-button:hover::after {
+            opacity: 1;
+        }
+        
+        /* MODAL DE SCHEDULE */
+        .schedule-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+        
+        .schedule-modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .schedule-container {
+            background: white;
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .schedule-header {
+            background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .schedule-header h2 {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .close-schedule {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+        
+        .close-schedule:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .schedule-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .time-column {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            padding-top: 40px;
+        }
+        
+        .time-label {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        
+        .day-column {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .day-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .day-schedule {
+            position: relative;
+            height: 1440px;
+            background: repeating-linear-gradient(
+                to bottom,
+                #fff 0px,
+                #fff 59px,
+                #f5f5f5 59px,
+                #f5f5f5 60px
+            );
+        }
+        
+        .schedule-block {
+            position: absolute;
+            left: 5px;
+            right: 5px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            padding: 5px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .schedule-block:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .schedule-block.inactive {
+            background: #9e9e9e;
+            opacity: 0.7;
+        }
+        
+        .add-schedule-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .quick-action-btn {
+            flex: 1;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+        }
+        
         .control-panel {
             width: 450px;
             background: rgba(255, 255, 255, 0.98);
@@ -91,16 +352,21 @@
         .panel-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 15px 20px; /* Reducido de 20px */
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 10;
         }
-        
+
         .panel-header h1 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
+            font-size: 1.5em; /* Reducido de 1.8em */
+            margin-bottom: 3px;
+        }
+
+        .panel-header p {
+            font-size: 0.9em; /* Más pequeño */
+            opacity: 0.9;
         }
         
         .panel-content {
@@ -371,32 +637,6 @@
             padding: 8px 12px !important;
         }
         
-        .timer-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-        
-        .timer-controls label {
-            min-width: 80px;
-            font-weight: 600;
-        }
-        
-        .timer-controls input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-        
-        #currentTime {
-            font-size: 2em;
-            font-weight: bold;
-            text-align: center;
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-        
         .status-message {
             position: fixed;
             top: 20px;
@@ -450,11 +690,127 @@
             .tree-view {
                 height: 50vh;
             }
+            
+            .schedule-button {
+                right: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div id="stars" class="stars"></div>
+    
+    <!-- BOTÓN SCHEDULE -->
+    <button class="schedule-button" onclick="openSchedule()">
+        📅 <span style="font-size: 12px;">Schedule</span>
+    </button>
+    
+    <!-- MODAL DE SCHEDULE -->
+    <div id="scheduleModal" class="schedule-modal">
+        <div class="schedule-container">
+            <div class="schedule-header">
+                <h2>📅 Programación de Horarios LED</h2>
+                <button class="close-schedule" onclick="closeSchedule()">✕</button>
+            </div>
+            
+            <div class="schedule-body">
+                <!-- Panel de Acciones Rápidas -->
+                <div class="add-schedule-panel">
+                    <h3 style="margin-bottom: 15px; color: #667eea;">⚡ Acciones Rápidas</h3>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" onclick="setWeekdaySchedule()">
+                            💼 Lun-Vie (7:00-21:00)
+                        </button>
+                        <button class="quick-action-btn" onclick="setWeekendSchedule()">
+                            🏖️ Fin de Semana (9:00-23:00)
+                        </button>
+                        <button class="quick-action-btn" onclick="setEveningSchedule()">
+                            🌙 Solo Tardes (17:00-23:00)
+                        </button>
+                        <button class="quick-action-btn" onclick="clearAllSchedules()" style="background: #dc3545;">
+                            🗑️ Limpiar Todo
+                        </button>
+                    </div>
+                    
+                    <!-- Agregar Horario Personalizado -->
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                        <h4 style="margin-top: 0; color: #667eea;">➕ Agregar Horario Personalizado</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-0" style="margin-right: 3px;"> Dom
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-1" style="margin-right: 3px;"> Lun
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-2" style="margin-right: 3px;"> Mar
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-3" style="margin-right: 3px;"> Mié
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-4" style="margin-right: 3px;"> Jue
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-5" style="margin-right: 3px;"> Vie
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-6" style="margin-right: 3px;"> Sáb
+                            </label>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
+                            <div>
+                                <label style="font-size: 12px; color: #666;">Hora Inicio:</label>
+                                <input type="time" id="scheduleStartTime" value="07:00" style="margin: 0;">
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; color: #666;">Hora Fin:</label>
+                                <input type="time" id="scheduleEndTime" value="21:00" style="margin: 0;">
+                            </div>
+                            <button onclick="addSchedule()" style="background: #28a745; margin: 0; width: auto; padding: 10px 20px;">
+                                ➕ Agregar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Control de Activación -->
+                    <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #2196F3;">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 600;">
+                            <input type="checkbox" id="schedulerEnabled" onchange="updateScheduler()" style="width: 20px; height: 20px;">
+                            <span>🔌 Activar Programación Automática</span>
+                        </label>
+                        <p style="margin-top: 10px; margin-bottom: 0; font-size: 13px; color: #666;">
+                            Estado: <span id="scheduleStatusText" style="font-weight: 600;">Desactivado</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Vista de Calendario -->
+                <div class="schedule-grid">
+                    <div class="time-column">
+                        <div class="time-label">00:00</div>
+                        <div class="time-label">02:00</div>
+                        <div class="time-label">04:00</div>
+                        <div class="time-label">06:00</div>
+                        <div class="time-label">08:00</div>
+                        <div class="time-label">10:00</div>
+                        <div class="time-label">12:00</div>
+                        <div class="time-label">14:00</div>
+                        <div class="time-label">16:00</div>
+                        <div class="time-label">18:00</div>
+                        <div class="time-label">20:00</div>
+                        <div class="time-label">22:00</div>
+                    </div>
+                    
+                    <div class="days-grid" id="scheduleGrid">
+                        <!-- Se generará dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div class="main-container">
         <div class="tree-view">
@@ -583,26 +939,6 @@
                         <button class="danger" onclick="stopAllAnimations()">⏹ Stop Animation</button>
                     </div>
                 </div>
-                
-                <!-- TIMER -->
-                <div class="section">
-                    <div class="section-title">⏰ Auto Timer</div>
-                    <div id="currentTime">--:--</div>
-                    <div class="timer-controls">
-                        <label>
-                            <input type="checkbox" id="timerEnabled" onchange="updateTimer()">
-                            Enable Timer
-                        </label>
-                    </div>
-                    <div class="timer-controls">
-                        <label>ON</label>
-                        <input type="time" id="onTime" value="15:00" onchange="updateTimer()">
-                    </div>
-                    <div class="timer-controls">
-                        <label>OFF</label>
-                        <input type="time" id="offTime" value="07:00" onchange="updateTimer()">
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -643,6 +979,316 @@
         
         let COLOR_ORDER = 'RGB';
         
+        // VARIABLES DE PROGRAMACIÓN
+        let schedules = [];
+        let schedulerInterval = null;
+        let lastScheduleState = null;
+        
+        // Días de la semana
+        const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const DAYS_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        
+        // =====================================================
+        // FUNCIONES DE SCHEDULE MODAL
+        // =====================================================
+        
+        function openSchedule() {
+            document.getElementById('scheduleModal').classList.add('active');
+            loadSchedules();
+            renderScheduleGrid();
+            updateSchedulerStatus();
+        }
+        
+        function closeSchedule() {
+            document.getElementById('scheduleModal').classList.remove('active');
+        }
+        
+        // =====================================================
+        // SISTEMA DE PROGRAMACIÓN AVANZADO
+        // =====================================================
+        
+        function loadSchedules() {
+            const savedSchedules = localStorage.getItem('wledSchedules');
+            if (savedSchedules) {
+                schedules = JSON.parse(savedSchedules);
+            }
+            
+            const enabled = localStorage.getItem('schedulerEnabled') === 'true';
+            document.getElementById('schedulerEnabled').checked = enabled;
+        }
+        
+        function saveSchedules() {
+            localStorage.setItem('wledSchedules', JSON.stringify(schedules));
+            renderScheduleGrid();
+        }
+        
+        function addSchedule() {
+            const selectedDays = [];
+            for (let i = 0; i < 7; i++) {
+                if (document.getElementById(`day-${i}`).checked) {
+                    selectedDays.push(i);
+                }
+            }
+            
+            if (selectedDays.length === 0) {
+                showStatus('❌ Selecciona al menos un día', true);
+                return;
+            }
+            
+            const startTime = document.getElementById('scheduleStartTime').value;
+            const endTime = document.getElementById('scheduleEndTime').value;
+            
+            if (!startTime || !endTime) {
+                showStatus('❌ Define las horas de inicio y fin', true);
+                return;
+            }
+            
+            const schedule = {
+                id: Date.now(),
+                days: selectedDays,
+                startTime: startTime,
+                endTime: endTime,
+                enabled: true
+            };
+            
+            schedules.push(schedule);
+            saveSchedules();
+            
+            // Limpiar formulario
+            for (let i = 0; i < 7; i++) {
+                document.getElementById(`day-${i}`).checked = false;
+            }
+            document.getElementById('scheduleStartTime').value = '07:00';
+            document.getElementById('scheduleEndTime').value = '21:00';
+            
+            showStatus('✅ Horario agregado correctamente');
+            addDebugLog('📅 Nuevo horario agregado', 'success');
+        }
+        
+        function deleteSchedule(id) {
+            schedules = schedules.filter(s => s.id !== id);
+            saveSchedules();
+            showStatus('✅ Horario eliminado');
+            addDebugLog('🗑️ Horario eliminado', 'info');
+        }
+        
+        function toggleSchedule(id) {
+            const schedule = schedules.find(s => s.id === id);
+            if (schedule) {
+                schedule.enabled = !schedule.enabled;
+                saveSchedules();
+                addDebugLog(`📅 Horario ${schedule.enabled ? 'activado' : 'desactivado'}`, 'info');
+            }
+        }
+        
+        function renderScheduleGrid() {
+            const grid = document.getElementById('scheduleGrid');
+            grid.innerHTML = '';
+            
+            // Crear columnas para cada día
+            for (let day = 0; day < 7; day++) {
+                const dayColumn = document.createElement('div');
+                dayColumn.className = 'day-column';
+                
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.textContent = DAYS_SHORT[day];
+                
+                const daySchedule = document.createElement('div');
+                daySchedule.className = 'day-schedule';
+                
+                // Agregar bloques de horario para este día
+                schedules.forEach(schedule => {
+                    if (schedule.days.includes(day)) {
+                        const block = createScheduleBlock(schedule);
+                        daySchedule.appendChild(block);
+                    }
+                });
+                
+                dayColumn.appendChild(dayHeader);
+                dayColumn.appendChild(daySchedule);
+                grid.appendChild(dayColumn);
+            }
+        }
+        
+        function createScheduleBlock(schedule) {
+            const [startH, startM] = schedule.startTime.split(':').map(Number);
+            const [endH, endM] = schedule.endTime.split(':').map(Number);
+            
+            const startMinutes = startH * 60 + startM;
+            const endMinutes = endH * 60 + endM;
+            
+            const block = document.createElement('div');
+            block.className = `schedule-block ${schedule.enabled ? '' : 'inactive'}`;
+            
+            // Calcular posición y altura
+            const top = startMinutes; // 1 pixel por minuto
+            const height = endMinutes - startMinutes;
+            
+            block.style.top = `${top}px`;
+            block.style.height = `${height}px`;
+            
+            block.innerHTML = `
+                <strong>${schedule.startTime}</strong>
+                <span>a</span>
+                <strong>${schedule.endTime}</strong>
+            `;
+            
+            block.onclick = () => {
+                if (confirm(`¿Deseas ${schedule.enabled ? 'desactivar' : 'activar'} este horario?`)) {
+                    toggleSchedule(schedule.id);
+                }
+            };
+            
+            block.ondblclick = () => {
+                if (confirm('¿Eliminar este horario?')) {
+                    deleteSchedule(schedule.id);
+                }
+            };
+            
+            return block;
+        }
+        
+        // Funciones de horarios rápidos
+        function setWeekdaySchedule() {
+            const schedule = {
+                id: Date.now(),
+                days: [1, 2, 3, 4, 5],
+                startTime: '07:00',
+                endTime: '21:00',
+                enabled: true
+            };
+            schedules.push(schedule);
+            saveSchedules();
+            showStatus('✅ Horario Lun-Vie agregado');
+        }
+        
+        function setWeekendSchedule() {
+            const schedule = {
+                id: Date.now(),
+                days: [0, 6],
+                startTime: '09:00',
+                endTime: '23:00',
+                enabled: true
+            };
+            schedules.push(schedule);
+            saveSchedules();
+            showStatus('✅ Horario Fin de Semana agregado');
+        }
+        
+        function setEveningSchedule() {
+            const schedule = {
+                id: Date.now(),
+                days: [0, 1, 2, 3, 4, 5, 6],
+                startTime: '17:00',
+                endTime: '23:00',
+                enabled: true
+            };
+            schedules.push(schedule);
+            saveSchedules();
+            showStatus('✅ Horario de Tardes agregado');
+        }
+        
+        function clearAllSchedules() {
+            if (confirm('¿Eliminar TODOS los horarios programados?')) {
+                schedules = [];
+                saveSchedules();
+                showStatus('✅ Todos los horarios eliminados');
+            }
+        }
+        
+        function updateScheduler() {
+            const enabled = document.getElementById('schedulerEnabled').checked;
+            localStorage.setItem('schedulerEnabled', enabled.toString());
+            
+            updateSchedulerStatus();
+            
+            if (enabled) {
+                showStatus('✅ Programación automática activada');
+                addDebugLog('⏰ Programación automática activada', 'success');
+                checkSchedules();
+            } else {
+                showStatus('⏸️ Programación automática desactivada');
+                addDebugLog('⏰ Programación automática desactivada', 'info');
+            }
+        }
+        
+        function updateSchedulerStatus() {
+            const enabled = document.getElementById('schedulerEnabled').checked;
+            const statusText = document.getElementById('scheduleStatusText');
+            
+            if (enabled) {
+                const activeSchedule = getActiveSchedule();
+                if (activeSchedule) {
+                    statusText.textContent = `✅ ENCENDIDO (hasta ${activeSchedule.endTime})`;
+                    statusText.style.color = '#28a745';
+                } else {
+                    statusText.textContent = `⏸️ APAGADO (esperando horario)`;
+                    statusText.style.color = '#dc3545';
+                }
+            } else {
+                statusText.textContent = 'Desactivado';
+                statusText.style.color = '#6c757d';
+            }
+        }
+        
+        function getActiveSchedule() {
+            const now = new Date();
+            const currentDay = now.getDay();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            for (const schedule of schedules) {
+                if (!schedule.enabled) continue;
+                if (!schedule.days.includes(currentDay)) continue;
+                
+                const [startH, startM] = schedule.startTime.split(':').map(Number);
+                const [endH, endM] = schedule.endTime.split(':').map(Number);
+                
+                const startMinutes = startH * 60 + startM;
+                const endMinutes = endH * 60 + endM;
+                
+                if (currentTime >= startMinutes && currentTime <= endMinutes) {
+                    return schedule;
+                }
+            }
+            
+            return null;
+        }
+        
+        async function checkSchedules() {
+            if (!document.getElementById('schedulerEnabled').checked) {
+                return;
+            }
+            
+            const activeSchedule = getActiveSchedule();
+            const shouldBeOn = activeSchedule !== null;
+            
+            if (lastScheduleState !== shouldBeOn) {
+                lastScheduleState = shouldBeOn;
+                
+                if (shouldBeOn) {
+                    addDebugLog('⏰ Horario activo - Encendiendo LEDs', 'success');
+                    showStatus('⏰ Horario: Encendiendo LEDs');
+                    
+                    await sendMQTTCommand({
+                        "on": true,
+                        "bri": currentBrightness
+                    });
+                    
+                } else {
+                    addDebugLog('⏰ Fuera de horario - Apagando LEDs', 'info');
+                    showStatus('⏰ Horario: Apagando LEDs');
+                    
+                    await sendMQTTCommand({
+                        "on": false
+                    });
+                    updateAllLEDsVisual('#000000');
+                }
+            }
+            
+            updateSchedulerStatus();
+        }
+        
         // =====================================================
         // DEBUG LOG
         // =====================================================
@@ -662,7 +1308,7 @@
         }
         
         // =====================================================
-        // CONEXIÓN MQTT (CONFIGURACIÓN DEL PRIMER CÓDIGO)
+        // CONEXIÓN MQTT (mantener las funciones existentes)
         // =====================================================
         
         function initMQTT() {
@@ -680,7 +1326,6 @@
                 keepalive: 60
             };
             
-            // Solo agregar credenciales si existen
             if (MQTT_CONFIG.username) {
                 options.username = MQTT_CONFIG.username;
                 options.password = MQTT_CONFIG.password;
@@ -694,7 +1339,6 @@
                     document.getElementById('connectionStatus').className = 'connection-status connected';
                     document.getElementById('connectionStatus').textContent = '✅ Conectado';
                     
-                    // Suscribirse a topics de respuesta
                     mqttClient.subscribe('wled/tree/#', (err) => {
                         if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
@@ -708,12 +1352,6 @@
                     addDebugLog('❌ Error MQTT: ' + err.message, 'error');
                     document.getElementById('connectionStatus').className = 'connection-status disconnected';
                     document.getElementById('connectionStatus').textContent = '❌ Error de conexión';
-                    
-                    if (err.message.includes('ENOTFOUND') || err.message.includes('getaddrinfo')) {
-                        addDebugLog('💡 Verifica que el DNS apunte correctamente', 'error');
-                    } else if (err.message.includes('ECONNREFUSED') || err.message.includes('timeout')) {
-                        addDebugLog('💡 Verifica que el puerto 8084 esté abierto en el firewall', 'error');
-                    }
                 });
                 
                 mqttClient.on('reconnect', () => {
@@ -730,18 +1368,6 @@
                 
                 mqttClient.on('message', (topic, message) => {
                     addDebugLog(`📨 Mensaje: ${topic} = ${message.toString().substring(0, 50)}...`, 'success');
-                });
-                
-                mqttClient.on('packetsend', (packet) => {
-                    if (packet.cmd !== 'pingreq') {
-                        addDebugLog(`📤 Enviando: ${packet.cmd}`, 'info');
-                    }
-                });
-                
-                mqttClient.on('packetreceive', (packet) => {
-                    if (packet.cmd !== 'pingresp') {
-                        addDebugLog(`📥 Recibido: ${packet.cmd}`, 'info');
-                    }
                 });
                 
             } catch (error) {
@@ -805,7 +1431,7 @@
         }
         
         // =====================================================
-        // FUNCIONES DE CONTROL
+        // FUNCIONES DE CONTROL (mantener todas las existentes)
         // =====================================================
         
         async function resetWLED() {
@@ -847,10 +1473,7 @@
             }
         }
         
-        // =====================================================
         // TEST DE COLORES
-        // =====================================================
-        
         async function testColorDirect(color) {
             stopAllAnimations();
             
@@ -952,10 +1575,7 @@
             showStatus(`✓ Test: Primeros ${Math.min(10, totalLeds)} LEDs en rojo`);
         }
         
-        // =====================================================
         // CONTROL DE LEDS
-        // =====================================================
-        
         function activatePaintMode() {
             paintMode = !paintMode;
             const btn = document.getElementById('paintBtn');
@@ -1033,10 +1653,7 @@
             });
         }
         
-        // =====================================================
-        // DISEÑOS ESTÁTICOS
-        // =====================================================
-        
+        // DISEÑOS ESTÁTICOS (mantener todas las funciones existentes)
         function setStaticDesign(designName) {
             stopAllAnimations();
             currentEffect = designName;
@@ -1214,10 +1831,7 @@
             showStatus('✓ Dominican aplicado 🇩🇴');
         }
         
-        // =====================================================
-        // EFECTOS ANIMADOS
-        // =====================================================
-        
+        // EFECTOS ANIMADOS (mantener todas las funciones existentes)
         function runAnimatedEffect(effectName) {
             if (effectAnimationInterval) {
                 clearInterval(effectAnimationInterval);
@@ -1457,10 +2071,7 @@
             showStatus('⏹ Animación detenida - diseño estático mantenido');
         }
         
-        // =====================================================
         // BRILLO
-        // =====================================================
-        
         let brightnessTimeout = null;
         
         function setBrightness(value) {
@@ -1487,10 +2098,7 @@
             document.getElementById('brightVal').textContent = `${percent}%`;
         }
 
-        // =====================================================
-        // DISEÑOS GUARDADOS
-        // =====================================================
-
+        // DISEÑOS GUARDADOS (mantener todas las funciones existentes)
         function saveDesign() {
             const name = document.getElementById('designName').value.trim();
             if (!name) {
@@ -1595,77 +2203,8 @@
             addDebugLog(`🗑️ Diseño eliminado: ${name}`, 'info');
             loadDesigns();
         }
-
-        // =====================================================
-        // TIMER
-        // =====================================================
-
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('es-ES', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false
-            });
-            document.getElementById('currentTime').textContent = timeString;
-        }
-
-        function loadTimerSettings() {
-            const settings = JSON.parse(localStorage.getItem('wledTimer')) || {};
-            document.getElementById('timerEnabled').checked = settings.enabled || false;
-            document.getElementById('onTime').value = settings.on || '15:00';
-            document.getElementById('offTime').value = settings.off || '07:00';
-        }
-
-        async function updateTimer() {
-            const settings = {
-                enabled: document.getElementById('timerEnabled').checked,
-                on: document.getElementById('onTime').value,
-                off: document.getElementById('offTime').value
-            };
-            localStorage.setItem('wledTimer', JSON.stringify(settings));
-            
-            if (settings.enabled) {
-                showStatus('✓ Timer activado');
-                addDebugLog('⏰ Timer activado', 'success');
-            } else {
-                showStatus('✓ Timer desactivado');
-                addDebugLog('⏰ Timer desactivado', 'info');
-            }
-        }
-
-        function checkTimer() {
-            const settings = JSON.parse(localStorage.getItem('wledTimer')) || {};
-            if (!settings.enabled) return;
-
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentMin = now.getMinutes();
-            const currentTime = currentHour * 60 + currentMin;
-            
-            const [onH, onM] = settings.on.split(':').map(Number);
-            const onTime = onH * 60 + onM;
-            
-            const [offH, offM] = settings.off.split(':').map(Number);
-            const offTime = offH * 60 + offM;
-            
-            if (Math.abs(currentTime - onTime) < 1) {
-                showStatus('⏰ Timer: Encendiendo luces');
-                addDebugLog('⏰ Timer activado: Encendiendo', 'success');
-                updateAllLEDsVisual(selectedColor);
-                sendMQTTCommand({"on": true});
-            } else if (Math.abs(currentTime - offTime) < 1) {
-                showStatus('⏰ Timer: Apagando luces');
-                addDebugLog('⏰ Timer activado: Apagando', 'success');
-                updateAllLEDsVisual('#000000');
-                sendMQTTCommand({"on": false});
-            }
-        }
         
-        // =====================================================
-        // THREE.JS
-        // =====================================================
-        
+        // THREE.JS (mantener todas las funciones existentes)
         function initThreeJS() {
             const canvas = document.getElementById('treeCanvas');
             
@@ -1818,10 +2357,7 @@
             renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         }
         
-        // =====================================================
-        // UTILIDADES
-        // =====================================================
-        
+        // UTILIDADES (mantener todas las funciones existentes)
         function generateStars() {
             const starsContainer = document.getElementById('stars');
             for(let i = 0; i < 100; i++) {
@@ -1895,20 +2431,25 @@
         
         window.onload = function() {
             addDebugLog('🚀 Aplicación iniciada', 'success');
-            addDebugLog('📝 Versión completa con Mosquitto', 'info');
+            addDebugLog('📝 Versión completa con Scheduler', 'info');
             
             initThreeJS();
             generateStars();
             loadDesigns();
-            loadTimerSettings();
-            updateClock();
-            setInterval(updateClock, 1000);
-            setInterval(checkTimer, 60000);
+            loadSchedules();
+            
+            // Verificar horarios cada 30 segundos
+            setInterval(checkSchedules, 30000);
             
             // Iniciar conexión MQTT automáticamente
             setTimeout(() => {
                 initMQTT();
             }, 500);
+            
+            // Verificación inicial de horarios
+            setTimeout(() => {
+                checkSchedules();
+            }, 1000);
         };
     </script>
 </body>
