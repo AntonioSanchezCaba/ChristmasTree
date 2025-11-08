@@ -1074,6 +1074,10 @@
         let pendingWLEDState = null;
         let ledsReady = false;
 
+        // Protección contra loops: rastrear último estado procesado
+        let lastProcessedState = null;
+        let lastProcessedTime = 0;
+
         // CONFIGURACIÓN MQTT MOSQUITTO
         let mqttClient = null;
         const MQTT_CONFIG = {
@@ -1803,6 +1807,20 @@
                 return;
             }
 
+            // Protección contra loops: evitar procesar el mismo estado múltiples veces
+            const now = Date.now();
+            const fx = state.seg?.[0]?.fx;
+            const pal = state.seg?.[0]?.pal;
+            const bri = state.bri;
+            const stateSignature = `${fx}-${pal}-${bri}`;
+
+            // Si es el mismo estado que acabamos de procesar hace menos de 800ms, ignorarlo
+            if (stateSignature === lastProcessedState && (now - lastProcessedTime) < 800) {
+                return; // Ignorar para evitar loop
+            }
+
+            lastProcessedState = stateSignature;
+            lastProcessedTime = now;
 
             // 1. Actualizar Brillo
             if (typeof state.bri !== 'undefined') {
@@ -2451,10 +2469,8 @@
             localAnimationInterval = setInterval(() => {
                 if (on) {
                     updateAllLEDsVisual(selectedColor);
-                    sendMQTTCommand({ "on": true, "bri": currentBrightness });
                 } else {
                      updateAllLEDsVisual('#000000');
-                    sendMQTTCommand({ "on": true, "bri": 0 });
                 }
                 on = !on;
             }, 500);
