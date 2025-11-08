@@ -1189,8 +1189,7 @@
                 
                 // Agregar bloques de horario para este día
                 schedules.forEach(schedule => {
-                    if (!schedule.enabled) return; // No renderizar deshabilitados
-
+                    // Los horarios desactivados se muestran en gris (con clase 'inactive')
                     const [startH, startM] = schedule.startTime.split(':').map(Number);
                     const [endH, endM] = schedule.endTime.split(':').map(Number);
                     
@@ -1527,12 +1526,6 @@
                      mqttClient.subscribe('wled/tree/#', (err) => {
                         if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
-                            
-                            // INICIO: Solución #5 - Solicitar estado actual al conectar
-                            addDebugLog('🔔 Solicitando estado actual de WLED...', 'info');
-                            mqttClient.publish(MQTT_CONFIG.topic, '{"v":true}', { qos: 0 });
-                            // FIN: Solución #5
-
                         } else {
                             addDebugLog('⚠️ Error al suscribirse: ' + err.message, 'error');
                         }
