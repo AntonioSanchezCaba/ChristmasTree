@@ -1549,10 +1549,6 @@
                     if (topic === 'wled/tree/state' || topic === 'wled/tree/v') {
                         try {
                             const data = JSON.parse(payloadStr);
-                            
-                            // **NUEVA LÓGICA MÁS ROBUSTA:** // 1. Prioriza 'state' si existe.
-                            // 2. Si no, usa el objeto raíz (data).
-                            // 3. Si se sincroniza el diseño (como en 'v'), el objeto 'info' puede estar anidado.
                             const state = data.state || data.info || data; 
                             
                             handleWLEDState(state);
