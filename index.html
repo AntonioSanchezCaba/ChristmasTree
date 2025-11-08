@@ -1565,13 +1565,15 @@
                     // WLED responde con su estado en /v (versión/info) o /state
                     if (topic === 'wled/tree/state' || topic === 'wled/tree/v') {
                         try {
+                            // Intenta parsear la cadena
                             const data = JSON.parse(payloadStr);
-
-                            // Lógica más robusta:
+                            
+                            // Lógica más robusta: 1. Busca 'state'. 2. Busca 'info'. 3. Usa el objeto raíz.
                             const state = data.state || data.info || data; 
-        
+                            
                             handleWLEDState(state);
                         } catch (e) {
+                            // Captura el error si la cadena no es JSON válido
                             addDebugLog('❌ Error al parsear estado JSON de WLED: ' + e.message, 'error');
                         }
                     }
