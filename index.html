@@ -1574,12 +1574,9 @@
                 mqttClient.on('message', (topic, message) => {
                     const payloadStr = message.toString();
 
-                    // Log de TODOS los mensajes para debug
-                    addDebugLog(`📬 Mensaje recibido - Topic: ${topic}, Tamaño: ${payloadStr.length} bytes`, 'info');
-
                     // Procesar mensajes de estado de WLED (v, state, o api con JSON de estado)
                     if (topic === 'wled/tree/v' || topic === 'wled/tree/state' || topic === 'wled/tree/api') {
-                        addDebugLog(`📨 Mensaje WLED desde ${topic}, contenido: ${payloadStr.substring(0, 100)}...`, 'success');
+                        addDebugLog(`📨 Mensaje desde ${topic}`, 'success');
 
                         const trimmedPayload = payloadStr.trim();
 
@@ -1601,11 +1598,16 @@
                         try {
                             const data = JSON.parse(payloadStr);
 
-                            // Solo procesar si parece ser un estado (tiene propiedades de estado)
-                            if (data.state || data.seg || data.on !== undefined || data.bri !== undefined) {
-                                addDebugLog(`📊 JSON de estado detectado en ${topic}`, 'info');
+                            // Solo procesar si es un estado COMPLETO (no comandos parciales)
+                            // Un estado completo debe tener al menos 'state' o tanto 'on' como 'seg'
+                            const isCompleteState = data.state || (data.seg && data.on !== undefined);
+
+                            if (isCompleteState) {
+                                addDebugLog(`📊 Estado completo detectado en ${topic}`, 'info');
                                 const state = data.state || data;
                                 handleWLEDState(state);
+                            } else {
+                                addDebugLog(`⏩ Comando parcial ignorado en ${topic} (solo tiene: ${Object.keys(data).join(',')})`, 'info');
                             }
                         } catch (e) {
                             // Ignorar errores de JSON parse silenciosamente
@@ -1634,8 +1636,6 @@
         // Función para parsear XML de WLED y convertirlo a formato JSON (actualizado)
         function parseWLEDXML(xmlString) {
             try {
-                addDebugLog(`📋 XML recibido: ${xmlString.substring(0, 200)}...`, 'info');
-
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlString, "text/xml");
 
@@ -1680,8 +1680,7 @@
                     }]
                 };
 
-                addDebugLog('✅ XML parseado correctamente', 'success');
-                addDebugLog(`📊 Encendido: ${isOn}, Brillo: ${brightness}, Color: RGB(${colors.slice(0, 3).join(',')}), FX: ${fx}, Paleta: ${pal}`, 'info');
+                addDebugLog(`✅ Estado: ${isOn ? 'ON' : 'OFF'}, Brillo: ${brightness}, FX: ${fx}, Pal: ${pal}`, 'success');
 
                 return state;
             } catch (e) {
@@ -1704,8 +1703,6 @@
                 return;
             }
 
-            addDebugLog('🔄 Estado WLED recibido, actualizando UI...', 'info');
-            addDebugLog(`📊 Estado completo: on=${state.on}, bri=${state.bri}, seg=${state.seg ? 'existe' : 'no existe'}`, 'info');
 
             // 1. Actualizar Brillo
             if (typeof state.bri !== 'undefined') {
@@ -1713,17 +1710,14 @@
                 document.getElementById('brightness').value = brightness;
                 updateBrightnessLabel(brightness);
                 currentBrightness = brightness;
-                addDebugLog(`💡 Brillo actualizado a ${brightness}`, 'info');
             }
 
             // 2. Actualizar Estado (On/Off)
             if (typeof state.on === 'undefined' || !state.on) {
-                addDebugLog('⚫ Árbol apagado, mostrando negro', 'info');
+                addDebugLog('⚫ Apagado', 'info');
                 updateAllLEDsVisual('#000000');
                 return; // Si está apagado, no procesar colores
             }
-
-            addDebugLog('✅ Árbol encendido, procesando colores...', 'info');
 
             // 3. Actualizar Colores y Efectos (basado en el primer segmento)
             if (state.seg && state.seg[0]) {
