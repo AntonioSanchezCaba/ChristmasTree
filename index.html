@@ -1043,7 +1043,11 @@
         let localAnimationInterval = null;
         let currentEffect = null;
         let currentLocalAnimation = null;
-        
+
+        // Variable para guardar el último estado de WLED
+        let pendingWLEDState = null;
+        let ledsReady = false;
+
         // CONFIGURACIÓN MQTT MOSQUITTO
         let mqttClient = null;
         const MQTT_CONFIG = {
@@ -1675,6 +1679,13 @@
         function handleWLEDState(state) {
             if (!state) {
                 addDebugLog('⚠️ Estado WLED recibido pero vacío', 'error');
+                return;
+            }
+
+            // Si los LEDs no están listos, guardar el estado para aplicarlo después
+            if (!ledsReady || ledMeshes.length === 0) {
+                addDebugLog('⏳ LEDs no listos, guardando estado para aplicar después...', 'info');
+                pendingWLEDState = state;
                 return;
             }
 
@@ -2565,8 +2576,19 @@
                     ledIndex++;
                 }
             }
-            
+
             scene.add(ledGroup);
+
+            // Marcar que los LEDs están listos
+            ledsReady = true;
+            addDebugLog(`✅ ${totalLeds} LEDs creados y listos`, 'success');
+
+            // Aplicar estado pendiente de WLED si existe
+            if (pendingWLEDState) {
+                addDebugLog('🔄 Aplicando estado pendiente de WLED...', 'info');
+                handleWLEDState(pendingWLEDState);
+                pendingWLEDState = null;
+            }
         }
         
         function onCanvasClick(event) {
