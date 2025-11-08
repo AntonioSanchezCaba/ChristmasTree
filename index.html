@@ -979,65 +979,67 @@
                     <div class="section-title">⚡ Control</div>
                     <div class="effects-grid">
                         <button class="effect-btn" onclick="setStaticDesign('OFF')" style="background: #dc3545;">🔴 OFF</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Solid')">🎨 Color Personalizado</button>
+                        <button class="effect-btn" onclick="setPalette(0)">🎨 Solid (Custom Color)</button>
                     </div>
                 </div>
 
-                <!-- Efectos Cálidos -->
+                <!-- Color Palettes -->
                 <div class="section">
-                    <div class="section-title">🔥 Efectos Cálidos</div>
+                    <div class="section-title">🎨 Color Palettes</div>
                     <div class="effects-grid">
-                        <button class="effect-btn" onclick="setStaticDesign('Warm')">☀️ Warm (Estático)</button>
-                        <button class="effect-btn" onclick="runAnimatedEffect('Fire')">🔥 Fire (Animado)</button>
+                        <button class="effect-btn" onclick="setPalette(35)">🔥 Fire</button>
+                        <button class="effect-btn" onclick="setPalette(9)">🌊 Ocean</button>
+                        <button class="effect-btn" onclick="setPalette(8)">🌋 Lava</button>
+                        <button class="effect-btn" onclick="setPalette(11)">🌈 Rainbow</button>
+                        <button class="effect-btn" onclick="setPalette(10)">🌲 Forest</button>
+                        <button class="effect-btn" onclick="setPalette(13)">🌅 Sunset</button>
+                        <button class="effect-btn" onclick="setPalette(26)">🏖️ Beach</button>
+                        <button class="effect-btn" onclick="setPalette(6)">🎉 Party</button>
+                        <button class="effect-btn" onclick="setPalette(20)">🌸 Pastel</button>
+                        <button class="effect-btn" onclick="setPalette(7)">☁️ Cloud</button>
+                        <button class="effect-btn" onclick="setPalette(50)">✨ Aurora</button>
+                        <button class="effect-btn" onclick="setPalette(48)">🎄 C9 (Christmas)</button>
                     </div>
                 </div>
 
-                <!-- Efectos Fríos -->
+                <!-- Effect Modes -->
                 <div class="section">
-                    <div class="section-title">❄️ Efectos Fríos</div>
+                    <div class="section-title">⚡ Effect Modes</div>
                     <div class="effects-grid">
-                        <button class="effect-btn" onclick="setStaticDesign('Cold')">❄️ Cold (Estático)</button>
-                        <button class="effect-btn" onclick="runAnimatedEffect('Scan')">📡 Scan (Animado)</button>
-                        <button class="effect-btn" onclick="runAnimatedEffect('Waves')">🌀 Waves (Animado)</button>
-                    </div>
-                </div>
-
-                <!-- Efectos Brillantes -->
-                <div class="section">
-                    <div class="section-title">✨ Efectos Brillantes</div>
-                    <div class="effects-grid">
-                        <button class="effect-btn" onclick="runAnimatedEffect('Twinkle')">✨ Twinkle</button>
-                        <button class="effect-btn" onclick="runAnimatedEffect('Sparkle')">💫 Sparkle</button>
-                        <button class="effect-btn" onclick="runAnimatedEffect('Fairy')">🧚 Fairy</button>
-                        <button class="effect-btn" onclick="runAnimatedEffect('Blink')">⚡ Blink</button>
-                    </div>
-                </div>
-
-                <!-- Efectos Multicolor -->
-                <div class="section">
-                    <div class="section-title">🌈 Efectos Multicolor</div>
-                    <div class="effects-grid">
-                        <button class="effect-btn" onclick="setStaticDesign('Rainbow')">🌈 Rainbow</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Purple Rain')">💜 Purple Rain</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Dominican')">🇩🇴 Dominican</button>
-                    </div>
-                </div>
-
-                <!-- Efectos Dinámicos -->
-                <div class="section">
-                    <div class="section-title">🌊 Efectos Dinámicos</div>
-                    <div class="effects-grid">
-                        <button class="effect-btn" onclick="runAnimatedEffect('Chase')">🏃 Chase</button>
-                        <button class="effect-btn" onclick="runAnimatedEffect('Ripple')">🌊 Ripple</button>
-                        <button class="effect-btn" onclick="runAnimatedEffect('Flow')">🌈 Flow</button>
+                        <button class="effect-btn" onclick="runEffect(0)">⚪ Solid (Static)</button>
+                        <button class="effect-btn" onclick="runEffect(1)">💫 Blink</button>
+                        <button class="effect-btn" onclick="runEffect(2)">🌬️ Breathe</button>
+                        <button class="effect-btn" onclick="runEffect(9)">🌈 Rainbow</button>
+                        <button class="effect-btn" onclick="runEffect(10)">📡 Scan</button>
+                        <button class="effect-btn" onclick="runEffect(17)">✨ Twinkle</button>
+                        <button class="effect-btn" onclick="runEffect(20)">⭐ Sparkle</button>
+                        <button class="effect-btn" onclick="runEffect(28)">🏃 Chase</button>
+                        <button class="effect-btn" onclick="runEffect(38)">🌌 Aurora</button>
+                        <button class="effect-btn" onclick="runEffect(42)">🎆 Fireworks</button>
+                        <button class="effect-btn" onclick="runEffect(45, 35)">🔥 Fire Flicker</button>
+                        <button class="effect-btn" onclick="runEffect(67)">🌀 Colorwaves</button>
+                        <button class="effect-btn" onclick="runEffect(76)">☄️ Meteor</button>
+                        <button class="effect-btn" onclick="runEffect(79)">🌊 Ripple</button>
+                        <button class="effect-btn" onclick="runEffect(101)">🌴 Pacifica</button>
+                        <button class="effect-btn" onclick="runEffect(110)">🌊 Flow</button>
                         <button class="effect-btn danger" onclick="stopAllAnimations()">⏹ Stop Animation</button>
                     </div>
                 </div>
 
+                <!-- Custom Designs -->
                 <div class="section">
-                    <div class="section-title">📁 Mis Diseños Guardados</div>
-                     <input type="text" id="designName" placeholder="Nombre del diseño">
-                    <button onclick="saveDesign()">💾 Guardar Diseño Actual</button>
+                    <div class="section-title">🎨 Custom Designs</div>
+                    <div class="effects-grid">
+                        <button class="effect-btn" onclick="setStaticDesign('Rainbow')">🌈 Rainbow Static</button>
+                        <button class="effect-btn" onclick="setStaticDesign('Purple Rain')">💜 Purple Rain</button>
+                        <button class="effect-btn" onclick="setStaticDesign('Dominican')">🇩🇴 Dominican Flag</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">📁 Saved Designs</div>
+                     <input type="text" id="designName" placeholder="Design name">
+                    <button onclick="saveDesign()">💾 Save Current Design</button>
                     <div id="designsList"></div>
                 </div>
             </div>
@@ -1847,17 +1849,17 @@
                     updateAllLEDsVisual(hexColor);
                 } else {
                     // --- Efecto Animado ---
-                    addDebugLog(`🔄 Sincronizando: Efecto ${fx}, Paleta ${pal}`, 'info');
+                    addDebugLog(`🔄 Sincronizando: Efecto ${fx}, Paleta ${pal || 'default'}`, 'info');
                     // Mapear efectos de WLED a animaciones locales (solo visual, sin enviar a WLED)
                     switch(fx) {
+                        case 1: // Blink
+                            runAnimatedEffect('Blink', false);
+                            break;
                         case 9: // Rainbow
                             applyRainbowDesign(false); // false = no enviar a WLED
                             break;
-                        case 12: // Fire
-                            runAnimatedEffect('Fire', false);
-                            break;
-                        case 28: // Chase
-                            runAnimatedEffect('Chase', false);
+                        case 10: // Scan
+                            runAnimatedEffect('Scan', false);
                             break;
                         case 17: // Twinkle
                             runAnimatedEffect('Twinkle', false);
@@ -1865,27 +1867,28 @@
                         case 20: // Sparkle
                             runAnimatedEffect('Sparkle', false);
                             break;
-                        case 79: // Ripple
-                            runAnimatedEffect('Ripple', false);
+                        case 28: // Chase
+                            runAnimatedEffect('Chase', false);
                             break;
-                        case 1: // Blink
-                            runAnimatedEffect('Blink', false);
+                        case 45: // Fire Flicker (con palette 35 = Fire)
+                            runAnimatedEffect('Fire', false);
                             break;
-                        case 10: // Scan
-                            runAnimatedEffect('Scan', false);
+                        case 65: // Palette (muestra la paleta seleccionada)
+                            // Para paletas, mostrar color primario o generar visualización
+                            updateAllLEDsVisual(hexColor);
                             break;
-                        case 67: // Waves
+                        case 67: // Colorwaves
                             runAnimatedEffect('Waves', false);
                             break;
-                        case 49: // Fairy
-                            runAnimatedEffect('Fairy', false);
+                        case 79: // Ripple
+                            runAnimatedEffect('Ripple', false);
                             break;
                         case 110: // Flow
                             runAnimatedEffect('Flow', false);
                             break;
                         default:
                             // Fallback para efectos no mapeados: mostrar color primario
-                            addDebugLog(`FX ${fx} no mapeado, mostrando color primario`, 'info');
+                            addDebugLog(`⚠️ FX ${fx} no mapeado localmente, mostrando color primario`, 'info');
                             updateAllLEDsVisual(hexColor);
                     }
                 }
@@ -2239,9 +2242,9 @@
             showStatus(`🔄 Animación "${effectName}" iniciada`);
             addDebugLog(`🎬 Iniciando animación: ${effectName}`, 'info');
 
-            // Mapeo de efectos a sus números de FX y funciones de animación
+            // Mapeo de efectos a sus números de FX, paletas y funciones de animación
             const effectMap = {
-                'Fire': { fx: 12, animate: animateFire },
+                'Fire': { fx: 45, pal: 35, animate: animateFire }, // Fire Flicker con Fire palette
                 'Chase': { fx: 28, animate: animateChase },
                 'Twinkle': { fx: 17, animate: animateTwinkle },
                 'Sparkle': { fx: 20, animate: animateSparkle },
@@ -2257,25 +2260,117 @@
             if (effect) {
                 effect.animate();
                 if (sendToWLED) {
-                    sendWLEDEffect(effect.fx);
+                    sendWLEDEffect(effect.fx, effect.pal || null);
                 }
             }
         }
 
-        async function sendWLEDEffect(fxNumber) {
+        async function sendWLEDEffect(fxNumber, paletteNumber = null) {
             const rgb = hexToRgb(selectedColor);
             const colorArray = applyColorOrder(rgb.r, rgb.g, rgb.b);
-            
+
+            const segmentConfig = {
+                "id": 0,
+                "fx": fxNumber,
+                "col": [colorArray, [0, 0, 0], [0, 0, 0]]
+            };
+
+            // Add palette if specified
+            if (paletteNumber !== null) {
+                segmentConfig.pal = paletteNumber;
+            }
+
+            await sendMQTTCommand({
+                "on": true,
+                "bri": currentBrightness,
+                "mainseg": 0,
+                "seg": [segmentConfig]
+            });
+        }
+
+        // Apply a color palette (uses with Palette effect mode 65, or current effect)
+        async function setPalette(paletteId) {
+            addDebugLog(`🎨 Aplicando palette: ${paletteId}`, 'info');
+
+            // Stop any local animations
+            if (effectAnimationInterval) clearInterval(effectAnimationInterval);
+            if (localAnimationInterval) clearInterval(localAnimationInterval);
+
+            const rgb = hexToRgb(selectedColor);
+            const colorArray = applyColorOrder(rgb.r, rgb.g, rgb.b);
+
+            // Use Palette effect mode (65) to display the palette
             await sendMQTTCommand({
                 "on": true,
                 "bri": currentBrightness,
                 "mainseg": 0,
                 "seg": [{
                     "id": 0,
-                    "fx": fxNumber,
+                    "fx": 65, // Palette effect mode
+                    "pal": paletteId,
                     "col": [colorArray, [0, 0, 0], [0, 0, 0]]
                 }]
             });
+
+            showStatus(`✓ Palette ${paletteId} aplicada`);
+        }
+
+        // Run an effect mode with optional palette
+        async function runEffect(fxId, paletteId = null) {
+            addDebugLog(`⚡ Aplicando efecto: fx=${fxId}, pal=${paletteId || 'default'}`, 'info');
+
+            // Stop any local animations
+            if (effectAnimationInterval) clearInterval(effectAnimationInterval);
+            if (localAnimationInterval) clearInterval(localAnimationInterval);
+
+            const rgb = hexToRgb(selectedColor);
+            const colorArray = applyColorOrder(rgb.r, rgb.g, rgb.b);
+
+            const segmentConfig = {
+                "id": 0,
+                "fx": fxId,
+                "col": [colorArray, [0, 0, 0], [0, 0, 0]]
+            };
+
+            // Add palette if specified
+            if (paletteId !== null) {
+                segmentConfig.pal = paletteId;
+            }
+
+            await sendMQTTCommand({
+                "on": true,
+                "bri": currentBrightness,
+                "mainseg": 0,
+                "seg": [segmentConfig]
+            });
+
+            // Run local animation for visual feedback
+            const effectName = getEffectName(fxId);
+            if (effectName) {
+                currentLocalAnimation = effectName;
+                const animFunc = getAnimationFunction(fxId);
+                if (animFunc) animFunc();
+            }
+
+            showStatus(`✓ Effect ${fxId} aplicado`);
+        }
+
+        // Helper to get effect name from ID
+        function getEffectName(fxId) {
+            const effectNames = {
+                1: 'Blink', 9: 'Rainbow', 10: 'Scan', 17: 'Twinkle', 20: 'Sparkle',
+                28: 'Chase', 45: 'Fire', 67: 'Waves', 79: 'Ripple', 110: 'Flow'
+            };
+            return effectNames[fxId] || null;
+        }
+
+        // Helper to get animation function from ID
+        function getAnimationFunction(fxId) {
+            const animations = {
+                1: animateBlink, 10: animateScan, 17: animateTwinkle, 20: animateSparkle,
+                28: animateChase, 45: animateFire, 67: animateWaves, 79: animateRipple, 110: animateFlow
+            };
+            return animations[fxId] || null;
         }
 
         function animateFire() {
