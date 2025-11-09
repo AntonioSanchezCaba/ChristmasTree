@@ -1104,6 +1104,7 @@
         let schedulerInterval = null;
         let lastScheduleState = null;
         let wledIsOn = false; // Rastrea si WLED está encendido o apagado
+        let wledStateReceived = false; // Rastrea si hemos recibido al menos un estado de WLED
         let userTimezone = 'America/Santo_Domingo'; // Zona horaria del usuario
 
         // Días de la semana
@@ -1553,12 +1554,21 @@
                 // Nota: No retornamos aquí, continuamos para verificar desincronización
             }
 
+            // Si no hemos recibido estado de WLED todavía, esperar
+            if (!wledStateReceived) {
+                addDebugLog('⏳ Esperando recibir estado de WLED antes de verificar...', 'info');
+                return;
+            }
+
             // Detectar cambios de horario (transición de encendido/apagado)
             const scheduleStateChanged = !isFirstRun && (lastScheduleState !== shouldBeOn);
 
             // Detectar desincronización: el estado real no coincide con el horario
             // SOLO verificar desincronización después de la primera ejecución
             const isOutOfSync = !isFirstRun && (wledIsOn !== shouldBeOn);
+
+            // Log para debug
+            addDebugLog(`🔍 Verificación: shouldBeOn=${shouldBeOn}, wledIsOn=${wledIsOn}, isOutOfSync=${isOutOfSync}`, 'info');
 
             if (scheduleStateChanged) {
                 // El horario cambió (ej: pasó de 22:59 a 23:00)
@@ -1667,6 +1677,15 @@
                         if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
                             addDebugLog('⏳ Esperando estado de WLED...', 'info');
+
+                            // Solicitar estado actual de WLED
+                            setTimeout(() => {
+                                mqttClient.publish('wled/tree/api', '{}', { qos: 1 }, (err) => {
+                                    if (!err) {
+                                        addDebugLog('📤 Solicitando estado actual de WLED...', 'info');
+                                    }
+                                });
+                            }, 500);
 
                             // Publicar horarios locales después de suscribirse
                             // Si hay horarios retenidos en MQTT, llegarán primero y sobrescribirán estos
@@ -1916,7 +1935,14 @@
             }
 
             // 2. Actualizar Estado (On/Off)
+            const previousState = wledIsOn;
             wledIsOn = state.on === true; // Actualizar estado global
+            wledStateReceived = true; // Marcamos que hemos recibido al menos un estado
+
+            // Log cuando cambia el estado
+            if (previousState !== wledIsOn) {
+                addDebugLog(`💡 Estado WLED actualizado: ${wledIsOn ? 'Encendido' : 'Apagado'}`, 'info');
+            }
 
             if (typeof state.on === 'undefined' || !state.on) {
                 addDebugLog('⚫ Apagado', 'info');
