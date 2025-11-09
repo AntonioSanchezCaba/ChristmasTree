@@ -1677,6 +1677,32 @@
             button.disabled = true;
             button.innerHTML = '<span class="auth-loading"></span> Creando cuenta...';
 
+            // VERIFICAR LÍMITE DE USUARIOS (máximo 3)
+            try {
+                const { data: userCount, error: countError } = await supabase.rpc('count_registered_users');
+
+                if (countError) {
+                    console.error('Error al verificar límite de usuarios:', countError);
+                    showAuthError('❌ Error al verificar disponibilidad. Por favor, asegúrate de haber configurado la función SQL en Supabase (ver SUPABASE_SETUP.md)');
+                    button.disabled = false;
+                    button.textContent = 'Crear Cuenta';
+                    return;
+                }
+
+                if (userCount >= 3) {
+                    showAuthError('🚫 Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados.');
+                    button.disabled = false;
+                    button.textContent = 'Crear Cuenta';
+                    return;
+                }
+            } catch (e) {
+                console.error('Error al verificar límite:', e);
+                showAuthError('❌ Error al verificar disponibilidad. Verifica la configuración de Supabase.');
+                button.disabled = false;
+                button.textContent = 'Crear Cuenta';
+                return;
+            }
+
             try {
                 // Usar la URL completa actual (sin hash ni query params)
                 const currentUrl = window.location.origin + window.location.pathname;
@@ -1858,10 +1884,26 @@
         }
 
         // ESCUCHAR CAMBIOS DE AUTENTICACIÓN
-        supabase.auth.onAuthStateChange((event, session) => {
+        supabase.auth.onAuthStateChange(async (event, session) => {
             console.log('Auth event:', event);
 
             if (event === 'SIGNED_IN' && session) {
+                // Verificar límite de usuarios (especialmente para OAuth)
+                try {
+                    const { data: userCount, error: countError } = await supabase.rpc('count_registered_users');
+
+                    if (!countError && userCount > 3) {
+                        // Si se excedió el límite, cerrar sesión inmediatamente
+                        console.error('Límite de usuarios excedido:', userCount);
+                        await supabase.auth.signOut();
+                        showAuthError('🚫 Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados. Si configuraste el Database Trigger en Supabase, este error no debería ocurrir.');
+                        document.getElementById('authOverlay').classList.remove('hidden');
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error verificando límite en auth change:', e);
+                }
+
                 currentUser = session.user;
                 document.getElementById('authOverlay').classList.add('hidden');
                 updateUserInfo(session.user);
@@ -3667,8 +3709,8 @@
         
         function createStarShape() {
             const shape = new THREE.Shape();
-            const outerRadius = 0.5;  // Reducido de 0.8 a 0.5
-            const innerRadius = 0.2;  // Reducido de 0.35 a 0.2
+            const outerRadius = 0.8;
+            const innerRadius = 0.35;
             const points = 5;
 
             for (let i = 0; i < points * 2; i++) {
@@ -3704,34 +3746,25 @@
             // Create 3D star for tree top
             const starShape = createStarShape();
             const extrudeSettings = {
-                depth: 0.2,           // Reducido de 0.4 a 0.2 para que sea más delgada
+                depth: 0.4,
                 bevelEnabled: true,
-                bevelThickness: 0.05, // Reducido de 0.15 a 0.05
-                bevelSize: 0.05,      // Reducido de 0.1 a 0.05
+                bevelThickness: 0.15,
+                bevelSize: 0.1,
                 bevelSegments: 2
             };
             const starGeometry = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
-
-            // Centrar la geometría de la estrella
-            starGeometry.center();
-
             const starMaterial = new THREE.MeshPhongMaterial({
-                color: 0xffdd00,      // Dorado más cálido
-                emissive: 0xffaa00,   // Emisión dorada
-                emissiveIntensity: 0.4,
+                color: 0xffff00,
+                emissive: 0xffdd00,
                 shininess: 100,
                 specular: 0xffffff
             });
             const starMesh = new THREE.Mesh(starGeometry, starMaterial);
 
-            // Posicionar la estrella en la cima del árbol
-            starMesh.position.y = treeHeight + 0.8;  // Ajustado de 0.5 a 0.8
-            starMesh.position.x = 0;
+            // Position star vertically on tree top
+            starMesh.position.y = treeHeight + 0.5;
             starMesh.position.z = 0;
-
-            // Rotar ligeramente para dar más dinamismo
-            starMesh.rotation.y = Math.PI / 10;  // Pequeña rotación en Y
-            starMesh.rotation.z = 0;             // Sin inclinación
+            // No rotation needed - star is vertical by default
 
             ledGroup.add(starMesh);
             const ledsPerLayer = 9;
