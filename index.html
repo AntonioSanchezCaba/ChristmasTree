@@ -878,9 +878,28 @@
                             <input type="checkbox" id="schedulerEnabled" onchange="updateScheduler()" style="width: 20px; height: 20px;">
                             <span>🔌 Activar Programación Automática</span>
                         </label>
-                        <p style="margin-top: 10px; margin-bottom: 0; font-size: 13px; color: #666;">
+                        <p style="margin-top: 10px; margin-bottom: 10px; font-size: 13px; color: #666;">
                             Estado: <span id="scheduleStatusText" style="font-weight: 600;">Desactivado</span>
                         </p>
+                        <div style="margin-top: 10px;">
+                            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">🌍 Zona Horaria:</label>
+                            <select id="timezoneSelect" onchange="saveTimezone()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                                <option value="America/Santo_Domingo">América/Santo Domingo (AST, UTC-4)</option>
+                                <option value="America/New_York">América/New York (EST/EDT, UTC-5/-4)</option>
+                                <option value="America/Chicago">América/Chicago (CST/CDT, UTC-6/-5)</option>
+                                <option value="America/Denver">América/Denver (MST/MDT, UTC-7/-6)</option>
+                                <option value="America/Los_Angeles">América/Los Angeles (PST/PDT, UTC-8/-7)</option>
+                                <option value="America/Mexico_City">América/Ciudad de México (CST/CDT, UTC-6/-5)</option>
+                                <option value="America/Bogota">América/Bogotá (COT, UTC-5)</option>
+                                <option value="America/Lima">América/Lima (PET, UTC-5)</option>
+                                <option value="America/Argentina/Buenos_Aires">América/Buenos Aires (ART, UTC-3)</option>
+                                <option value="America/Sao_Paulo">América/São Paulo (BRT, UTC-3)</option>
+                                <option value="Europe/Madrid">Europa/Madrid (CET/CEST, UTC+1/+2)</option>
+                                <option value="Europe/London">Europa/Londres (GMT/BST, UTC+0/+1)</option>
+                                <option value="Asia/Tokyo">Asia/Tokio (JST, UTC+9)</option>
+                                <option value="UTC">UTC (UTC+0)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
    
@@ -1085,7 +1104,8 @@
         let schedulerInterval = null;
         let lastScheduleState = null;
         let wledIsOn = false; // Rastrea si WLED está encendido o apagado
-        
+        let userTimezone = 'America/Santo_Domingo'; // Zona horaria del usuario
+
         // Días de la semana
         const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
         const DAYS_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -1398,7 +1418,36 @@
                 addDebugLog('📤 Estado del scheduler publicado', 'success');
             }
         }
-        
+
+        function saveTimezone() {
+            const select = document.getElementById('timezoneSelect');
+            if (select) {
+                userTimezone = select.value;
+                localStorage.setItem('userTimezone', userTimezone);
+                addDebugLog(`🌍 Zona horaria cambiada a: ${userTimezone}`, 'info');
+
+                // Reiniciar el estado del scheduler para forzar nueva verificación
+                lastScheduleState = null;
+
+                // Verificar horarios con nueva timezone
+                if (document.getElementById('schedulerEnabled')?.checked) {
+                    setTimeout(() => checkSchedules(), 100);
+                }
+            }
+        }
+
+        function loadTimezone() {
+            const saved = localStorage.getItem('userTimezone');
+            if (saved) {
+                userTimezone = saved;
+                const select = document.getElementById('timezoneSelect');
+                if (select) {
+                    select.value = userTimezone;
+                    addDebugLog(`🌍 Zona horaria cargada: ${userTimezone}`, 'info');
+                }
+            }
+        }
+
         function updateSchedulerStatus() {
             // Verificar que el elemento exista antes de usarlo
             const schedulerCheckbox = document.getElementById('schedulerEnabled');
@@ -1425,9 +1474,24 @@
         }
         
         function getActiveSchedule() {
-            const now = new Date();
-            const currentDay = now.getDay();
-            const currentTime = now.getHours() * 60 + now.getMinutes();
+            // Obtener fecha/hora en la zona horaria configurada por el usuario
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: userTimezone,
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                weekday: 'short'
+            });
+
+            const parts = formatter.formatToParts(new Date());
+            const hours = parseInt(parts.find(p => p.type === 'hour').value);
+            const minutes = parseInt(parts.find(p => p.type === 'minute').value);
+            const weekday = parts.find(p => p.type === 'weekday').value;
+
+            // Mapear día de la semana
+            const dayMap = { 'Sun': 0, 'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6 };
+            const currentDay = dayMap[weekday];
+            const currentTime = hours * 60 + minutes;
 
             for (const schedule of schedules) {
                 if (!schedule.enabled) continue;
@@ -1482,17 +1546,19 @@
             const shouldBeOn = activeSchedule !== null;
 
             // Al inicio, sincronizar lastScheduleState sin enviar comandos
-            if (lastScheduleState === null) {
+            const isFirstRun = lastScheduleState === null;
+            if (isFirstRun) {
                 lastScheduleState = shouldBeOn;
-                addDebugLog(`🔄 Estado inicial del scheduler: ${shouldBeOn ? 'Horario activo' : 'Fuera de horario'} (sin enviar comandos)`, 'info');
-                return; // No enviar comandos al cargar la página
+                addDebugLog(`🔄 Estado inicial del scheduler: ${shouldBeOn ? 'Horario activo' : 'Fuera de horario'} (verificando en 60s...)`, 'info');
+                // Nota: No retornamos aquí, continuamos para verificar desincronización
             }
 
             // Detectar cambios de horario (transición de encendido/apagado)
-            const scheduleStateChanged = lastScheduleState !== shouldBeOn;
+            const scheduleStateChanged = !isFirstRun && (lastScheduleState !== shouldBeOn);
 
             // Detectar desincronización: el estado real no coincide con el horario
-            const isOutOfSync = wledIsOn !== shouldBeOn;
+            // SOLO verificar desincronización después de la primera ejecución
+            const isOutOfSync = !isFirstRun && (wledIsOn !== shouldBeOn);
 
             if (scheduleStateChanged) {
                 // El horario cambió (ej: pasó de 22:59 a 23:00)
@@ -2939,6 +3005,7 @@
             generateStars();
             loadDesigns();
             loadSchedules();
+            loadTimezone(); // Cargar zona horaria guardada
             // PRIMERO establecer conexión MQTT
             setTimeout(() => {
                 initMQTT();
