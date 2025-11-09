@@ -1546,18 +1546,16 @@
             const activeSchedule = getActiveSchedule();
             const shouldBeOn = activeSchedule !== null;
 
-            // Al inicio, sincronizar lastScheduleState sin enviar comandos
+            // Al inicio, sincronizar lastScheduleState
             const isFirstRun = lastScheduleState === null;
             if (isFirstRun) {
                 lastScheduleState = shouldBeOn;
-                addDebugLog(`🔄 Estado inicial del scheduler: ${shouldBeOn ? 'Horario activo' : 'Fuera de horario'} (verificando en 60s...)`, 'info');
-                // Nota: No retornamos aquí, continuamos para verificar desincronización
-            }
-
-            // Si no hemos recibido estado de WLED todavía, esperar
-            if (!wledStateReceived) {
-                addDebugLog('⏳ Esperando recibir estado de WLED antes de verificar...', 'info');
-                return;
+                addDebugLog(`🔄 Estado inicial del scheduler: ${shouldBeOn ? 'Horario activo' : 'Fuera de horario'}`, 'info');
+                // Si no hemos recibido estado de WLED, asumir apagado (wledIsOn = false)
+                if (!wledStateReceived) {
+                    addDebugLog('ℹ️ Estado de WLED no recibido aún, asumiendo apagado inicialmente', 'info');
+                    wledIsOn = false;
+                }
             }
 
             // Detectar cambios de horario (transición de encendido/apagado)
@@ -1676,16 +1674,11 @@
                      mqttClient.subscribe('wled/tree/#', (err) => {
                         if (!err) {
                             addDebugLog('📡 Suscrito a topics WLED', 'success');
-                            addDebugLog('⏳ Esperando estado de WLED...', 'info');
+                            addDebugLog('⏳ Esperando estado de WLED desde wled/tree/v...', 'info');
 
-                            // Solicitar estado actual de WLED
-                            setTimeout(() => {
-                                mqttClient.publish('wled/tree/api', '{}', { qos: 1 }, (err) => {
-                                    if (!err) {
-                                        addDebugLog('📤 Solicitando estado actual de WLED...', 'info');
-                                    }
-                                });
-                            }, 500);
+                            // WLED publica automáticamente su estado al topic wled/tree/v en formato XML
+                            // No es necesario solicitar el estado manualmente
+                            // El estado llegará en los próximos segundos si MQTT está habilitado en WLED
 
                             // Publicar horarios locales después de suscribirse
                             // Si hay horarios retenidos en MQTT, llegarán primero y sobrescribirán estos
