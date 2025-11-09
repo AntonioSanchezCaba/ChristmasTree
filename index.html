@@ -1084,6 +1084,7 @@
         let schedules = [];
         let schedulerInterval = null;
         let lastScheduleState = null;
+        let wledIsOn = false; // Rastrea si WLED está encendido o apagado
         
         // Días de la semana
         const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -1487,26 +1488,40 @@
                 return; // No enviar comandos al cargar la página
             }
 
-            if (lastScheduleState !== shouldBeOn) {
+            // Detectar cambios de horario (transición de encendido/apagado)
+            const scheduleStateChanged = lastScheduleState !== shouldBeOn;
+
+            // Detectar desincronización: el estado real no coincide con el horario
+            const isOutOfSync = wledIsOn !== shouldBeOn;
+
+            if (scheduleStateChanged) {
+                // El horario cambió (ej: pasó de 22:59 a 23:00)
                 lastScheduleState = shouldBeOn;
-                if (shouldBeOn) {
+                addDebugLog(`⏰ Cambio de horario detectado: ${shouldBeOn ? 'Entrando en horario' : 'Saliendo de horario'}`, 'info');
+            }
+
+            // Forzar el estado correcto si hay cambio o desincronización
+            if (scheduleStateChanged || isOutOfSync) {
+                if (shouldBeOn && !wledIsOn) {
+                    // Debe estar encendido pero está apagado
                     addDebugLog('⏰ Horario activo - Encendiendo LEDs', 'success');
                     showStatus('⏰ Horario: Encendiendo LEDs');
-    
-                    // Comando simple para encender
+
                     await sendMQTTCommand({
                         "on": true,
                         "bri": currentBrightness
                     });
-                } else {
-                    addDebugLog('⏰ Fuera de horario - Apagando LEDs', 'info');
-                    showStatus('⏰ Horario: Apagando LEDs');
-    
-                    // Comando simple para apagar
+                    wledIsOn = true;
+                } else if (!shouldBeOn && wledIsOn) {
+                    // Debe estar apagado pero está encendido (forzar apagado)
+                    addDebugLog('⏰ Fuera de horario - Apagando LEDs (forzado)', 'info');
+                    showStatus('⏰ Fuera de horario: Apagando LEDs');
+
                     await sendMQTTCommand({
                         "on": false
                     });
                     updateAllLEDsVisual('#000000');
+                    wledIsOn = false;
                 }
             }
 
@@ -1835,6 +1850,8 @@
             }
 
             // 2. Actualizar Estado (On/Off)
+            wledIsOn = state.on === true; // Actualizar estado global
+
             if (typeof state.on === 'undefined' || !state.on) {
                 addDebugLog('⚫ Apagado', 'info');
                 updateAllLEDsVisual('#000000');
