@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎄 Christmas LED Tree - 3D WLED Edition</title>
     <style>
         * {
@@ -813,7 +813,6 @@
             z-index: 10000;
             opacity: 1;
             transition: opacity 0.3s ease;
-            padding: 20px;
         }
 
         .auth-overlay.hidden {
@@ -830,8 +829,6 @@
             padding: 40px;
             position: relative;
             animation: slideIn 0.4s ease-out;
-            max-height: 90vh;
-            overflow-y: auto;
         }
 
         @keyframes slideIn {
@@ -866,10 +863,9 @@
             display: flex;
             gap: 10px;
             margin-bottom: 25px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+            background: rgba(255, 255, 255, 0.1);
             padding: 5px;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
         }
 
         .auth-tab {
@@ -1110,31 +1106,20 @@
             text-decoration: underline;
         }
 
-        /* ===== RESPONSIVE IMPROVEMENTS ===== */
-
-        /* Tablets */
+        /* Responsive para móviles */
         @media (max-width: 768px) {
             .auth-container {
-                padding: 30px 25px;
-                max-width: 90%;
+                width: 95%;
+                padding: 30px 20px;
             }
 
             .auth-header h2 {
                 font-size: 24px;
             }
 
-            .auth-header p {
-                font-size: 13px;
-            }
-
-            .auth-tab {
-                font-size: 13px;
-                padding: 10px 6px;
-                white-space: nowrap;
-            }
-
             .form-group input {
                 padding: 12px 14px;
+                font-size: 16px; /* Evita zoom en iOS */
             }
 
             .auth-button {
@@ -1145,155 +1130,6 @@
             .oauth-button {
                 padding: 12px;
                 font-size: 14px;
-            }
-        }
-
-        /* Mobile */
-        @media (max-width: 480px) {
-            .auth-overlay {
-                padding: 10px;
-            }
-
-            .auth-container {
-                padding: 25px 20px;
-                max-width: 100%;
-                border-radius: 15px;
-            }
-
-            .auth-header {
-                margin-bottom: 20px;
-            }
-
-            .auth-header h2 {
-                font-size: 22px;
-                margin-bottom: 6px;
-            }
-
-            .auth-header p {
-                font-size: 12px;
-            }
-
-            .auth-tabs {
-                margin-bottom: 20px;
-                padding: 4px;
-            }
-
-            .auth-tab {
-                font-size: 12px;
-                padding: 10px 5px;
-            }
-
-            .form-group {
-                margin-bottom: 16px;
-            }
-
-            .form-group label {
-                font-size: 12px;
-                margin-bottom: 6px;
-            }
-
-            .password-strength {
-                font-size: 11px;
-            }
-
-            .error-message,
-            .success-message {
-                padding: 10px;
-                font-size: 12px;
-            }
-
-            .auth-button {
-                padding: 13px;
-                font-size: 15px;
-                border-radius: 10px;
-            }
-
-            .auth-divider {
-                font-size: 12px;
-                margin: 20px 0;
-            }
-
-            .oauth-button {
-                padding: 12px 10px;
-                font-size: 13px;
-                gap: 8px;
-            }
-
-            .oauth-button svg {
-                width: 18px;
-                height: 18px;
-            }
-
-            .forgot-password {
-                margin-top: 12px;
-            }
-
-            .forgot-password a {
-                font-size: 12px;
-            }
-        }
-
-        /* Small mobile */
-        @media (max-width: 360px) {
-            .auth-container {
-                padding: 20px 15px;
-            }
-
-            .auth-header h2 {
-                font-size: 20px;
-            }
-
-            .auth-tab {
-                font-size: 11px;
-                padding: 9px 4px;
-            }
-
-            .form-group input {
-                padding: 11px 12px;
-            }
-
-            .auth-button {
-                padding: 12px;
-                font-size: 14px;
-            }
-
-            .oauth-button {
-                padding: 11px 8px;
-                font-size: 12px;
-            }
-        }
-
-        /* Mobile landscape */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .auth-container {
-                max-height: 95vh;
-                overflow-y: auto;
-                padding: 20px;
-            }
-
-            .auth-header {
-                margin-bottom: 15px;
-            }
-
-            .auth-header h2 {
-                font-size: 20px;
-                margin-bottom: 4px;
-            }
-
-            .auth-tabs {
-                margin-bottom: 15px;
-            }
-
-            .form-group {
-                margin-bottom: 12px;
-            }
-
-            .auth-divider {
-                margin: 15px 0;
-            }
-
-            .oauth-buttons {
-                gap: 8px;
             }
         }
 
@@ -1325,13 +1161,13 @@
         <div class="auth-container">
             <div class="auth-header">
                 <h2>🎄 Christmas Tree LED</h2>
-                <p>Sign in to control your lights</p>
+                <p>Inicia sesión para controlar tus luces</p>
             </div>
 
             <!-- Tabs -->
             <div class="auth-tabs">
-                <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
-                <button class="auth-tab" onclick="switchAuthTab('register')">Register</button>
+                <button class="auth-tab active" onclick="switchAuthTab('login')">Iniciar Sesión</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">Registrarse</button>
             </div>
 
             <!-- Mensajes de error y éxito -->
@@ -1341,55 +1177,55 @@
             <!-- Formulario de Login -->
             <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label for="loginEmail">📧 Email Address</label>
+                    <label for="loginEmail">📧 Correo Electrónico</label>
                     <input
                         type="email"
                         id="loginEmail"
-                        placeholder="your@email.com"
+                        placeholder="tu@email.com"
                         required
                         autocomplete="email"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="loginPassword">🔒 Password</label>
+                    <label for="loginPassword">🔒 Contraseña</label>
                     <input
                         type="password"
                         id="loginPassword"
-                        placeholder="Your password"
+                        placeholder="Tu contraseña"
                         required
                         autocomplete="current-password"
                     >
                 </div>
 
                 <button type="submit" class="auth-button" id="loginButton">
-                    Sign In
+                    Iniciar Sesión
                 </button>
 
                 <div class="forgot-password">
-                    <a href="#" onclick="handleForgotPassword(); return false;">Forgot your password?</a>
+                    <a href="#" onclick="handleForgotPassword(); return false;">¿Olvidaste tu contraseña?</a>
                 </div>
             </form>
 
             <!-- Formulario de Registro -->
             <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
                 <div class="form-group">
-                    <label for="registerEmail">📧 Email Address</label>
+                    <label for="registerEmail">📧 Correo Electrónico</label>
                     <input
                         type="email"
                         id="registerEmail"
-                        placeholder="your@email.com"
+                        placeholder="tu@email.com"
                         required
                         autocomplete="email"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="registerPassword">🔒 Password</label>
+                    <label for="registerPassword">🔒 Contraseña</label>
                     <input
                         type="password"
                         id="registerPassword"
-                        placeholder="Minimum 8 characters"
+                        placeholder="Mínimo 8 caracteres"
                         required
                         autocomplete="new-password"
                         oninput="checkPasswordStrength(this.value)"
@@ -1403,23 +1239,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="registerPasswordConfirm">🔒 Confirm Password</label>
+                    <label for="registerPasswordConfirm">🔒 Confirmar Contraseña</label>
                     <input
                         type="password"
                         id="registerPasswordConfirm"
-                        placeholder="Repeat your password"
+                        placeholder="Repite tu contraseña"
                         required
                         autocomplete="new-password"
                     >
                 </div>
 
                 <button type="submit" class="auth-button" id="registerButton">
-                    Create Account
+                    Crear Cuenta
                 </button>
             </form>
 
             <!-- Divider -->
-            <div class="auth-divider">or use Google</div>
+            <div class="auth-divider">o usa Google</div>
 
             <!-- OAuth Buttons -->
             <div class="oauth-buttons">
@@ -1430,7 +1266,7 @@
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                     </svg>
-                    Continue with Google
+                    Continuar con Google
                 </button>
             </div>
         </div>
@@ -1443,68 +1279,68 @@
     <div id="scheduleModal" class="schedule-modal">
         <div class="schedule-container">
             <div class="schedule-header">
-                <h2>📅 LED Schedule</h2>
+                <h2>📅 Programación de Horarios LED</h2>
                 <button class="close-schedule" onclick="closeSchedule()" aria-label="Cerrar">✕</button>
             </div>
             
             <div class="schedule-body">
                 <div class="add-schedule-panel">
-                    <h3 style="margin-bottom: 15px; color: #667eea;">⚡ Quick Actions</h3>
+                    <h3 style="margin-bottom: 15px; color: #667eea;">⚡ Acciones Rápidas</h3>
                     <div class="quick-actions">
                         <button class="quick-action-btn" onclick="setWeekdaySchedule()">
-                             💼 Mon-Fri (7:00-21:00)
+                             💼 Lun-Vie (7:00-21:00)
                         </button>
                         <button class="quick-action-btn" onclick="setWeekendSchedule()">
-                            🏖️ Weekend (9:00-23:00)
+                            🏖️ Fin de Semana (9:00-23:00)
                         </button>
                         <button class="quick-action-btn" onclick="setEveningSchedule()">
-                            🌙 Evenings (17:00-23:00)
+                            🌙 Solo Tardes (17:00-23:00)
                         </button>
                         <button class="quick-action-btn" onclick="clearAllSchedules()" style="background: #dc3545;">
-                            🗑️ Clear All
+                            🗑️ Limpiar Todo
                         </button>
                     </div>
     
                     
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                        <h4 style="margin-top: 0; color: #667eea;">➕ Add Custom Schedule</h4>
+                        <h4 style="margin-top: 0; color: #667eea;">➕ Agregar Horario Personalizado</h4>
                         
                         <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 15px;">
                             <label style="display: flex; align-items: center; font-size: 13px;">
-                                <input type="checkbox" id="day-0" style="margin-right: 3px;"> Sun
+                                <input type="checkbox" id="day-0" style="margin-right: 3px;"> Dom
                             </label>
                             <label style="display: flex; align-items: center; font-size: 13px;">
-                                <input type="checkbox" id="day-1" style="margin-right: 3px;"> Mon
+                                <input type="checkbox" id="day-1" style="margin-right: 3px;"> Lun
                             </label>
                             <label style="display: flex; align-items: center; font-size: 13px;">
-                                <input type="checkbox" id="day-2" style="margin-right: 3px;"> Tue
+                                <input type="checkbox" id="day-2" style="margin-right: 3px;"> Mar
                             </label>
                             <label style="display: flex; align-items: center; font-size: 13px;">
-                                <input type="checkbox" id="day-3" style="margin-right: 3px;"> Wed
+                                <input type="checkbox" id="day-3" style="margin-right: 3px;"> Mié
                             </label>
                             <label style="display: flex; align-items: center; font-size: 13px;">
-                                <input type="checkbox" id="day-4" style="margin-right: 3px;"> Thu
+                                <input type="checkbox" id="day-4" style="margin-right: 3px;"> Jue
                             </label>
                             <label style="display: flex; align-items: center; font-size: 13px;">
-                                <input type="checkbox" id="day-5" style="margin-right: 3px;"> Fri
+                                <input type="checkbox" id="day-5" style="margin-right: 3px;"> Vie
                             </label>
                             <label style="display: flex; align-items: center; font-size: 13px;">
-                                <input type="checkbox" id="day-6" style="margin-right: 3px;"> Sat
+                                <input type="checkbox" id="day-6" style="margin-right: 3px;"> Sáb
                             </label>
                         </div>
         
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
                             <div>
-                                <label style="font-size: 12px; color: #666;">Start Time:</label>
+                                <label style="font-size: 12px; color: #666;">Hora Inicio:</label>
                                 <input type="time" id="scheduleStartTime" value="07:00" style="margin: 0;">
                             </div>
                             <div>
-                                 <label style="font-size: 12px; color: #666;">End Time:</label>
+                                 <label style="font-size: 12px; color: #666;">Hora Fin:</label>
                                 <input type="time" id="scheduleEndTime" value="21:00" style="margin: 0;">
                             </div>
                             <button onclick="addSchedule()" style="background: #28a745; margin: 0; width: auto; padding: 10px 20px;">
-                                ➕ Add
+                                ➕ Agregar
                             </button>
                         </div>
                     </div>
@@ -1512,13 +1348,13 @@
                     <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #2196F3;">
                         <label style="display: flex; align-items: center; gap: 10px; font-weight: 600;">
                             <input type="checkbox" id="schedulerEnabled" onchange="updateScheduler()" style="width: 20px; height: 20px;">
-                            <span>🔌 Enable Auto Scheduling</span>
+                            <span>🔌 Activar Programación Automática</span>
                         </label>
                         <p style="margin-top: 10px; margin-bottom: 10px; font-size: 13px; color: #666;">
-                            Status: <span id="scheduleStatusText" style="font-weight: 600;">Disabled</span>
+                            Estado: <span id="scheduleStatusText" style="font-weight: 600;">Desactivado</span>
                         </p>
                         <div style="margin-top: 10px;">
-                            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">🌍 Timezone:</label>
+                            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">🌍 Zona Horaria:</label>
                             <select id="timezoneSelect" onchange="saveTimezone()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
                                 <option value="America/Santo_Domingo">América/Santo Domingo (AST, UTC-4)</option>
                                 <option value="America/New_York">América/New York (EST/EDT, UTC-5/-4)</option>
@@ -1580,10 +1416,10 @@
             <!-- User Info y Logout -->
             <div id="userInfo" style="display: none; padding: 10px 20px; background: rgba(102, 126, 234, 0.1); border-bottom: 1px solid rgba(102, 126, 234, 0.2); text-align: center;">
                 <div style="font-size: 12px; color: #666; margin-bottom: 5px;">
-                    Active session: <span id="userEmail" style="color: #667eea; font-weight: 500;"></span>
+                    Sesión activa: <span id="userEmail" style="color: #667eea; font-weight: 500;"></span>
                 </div>
                 <button onclick="handleLogout()" style="padding: 6px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.3s;">
-                    🚪 Sign Out
+                    🚪 Cerrar Sesión
                 </button>
             </div>
 
@@ -1760,33 +1596,33 @@
 
             // Criterios de contraseña fuerte
             if (password.length >= 8) strength++;
-            else feedback.push('Min 8 characters');
+            else feedback.push('Mínimo 8 caracteres');
 
             if (password.length >= 12) strength++;
 
             if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-            else feedback.push('Upper & lowercase');
+            else feedback.push('Mayúsculas y minúsculas');
 
             if (/[0-9]/.test(password)) strength++;
-            else feedback.push('At least one number');
+            else feedback.push('Al menos un número');
 
             if (/[^a-zA-Z0-9]/.test(password)) strength++;
-            else feedback.push('At least one symbol (!@#$%^&*)');
+            else feedback.push('Al menos un símbolo (!@#$%^&*)');
 
             // Actualizar visualización
             strengthFill.className = 'strength-fill';
 
             if (strength <= 2) {
                 strengthFill.classList.add('weak');
-                strengthText.textContent = '❌ Weak: ' + feedback.join(', ');
+                strengthText.textContent = '❌ Débil: ' + feedback.join(', ');
                 return { strength: 'weak', valid: false };
             } else if (strength <= 4) {
                 strengthFill.classList.add('medium');
-                strengthText.textContent = '⚠️ Medium: ' + (feedback.length > 0 ? feedback.join(', ') : 'Add symbols for better security');
+                strengthText.textContent = '⚠️ Media: ' + (feedback.length > 0 ? feedback.join(', ') : 'Añade símbolos para mayor seguridad');
                 return { strength: 'medium', valid: true };
             } else {
                 strengthFill.classList.add('strong');
-                strengthText.textContent = '✅ Strong: Secure password';
+                strengthText.textContent = '✅ Fuerte: Contraseña segura';
                 return { strength: 'strong', valid: true };
             }
         }
@@ -1825,21 +1661,21 @@
 
             // Validar que las contraseñas coincidan
             if (password !== passwordConfirm) {
-                showAuthError('❌ Passwords do not match');
+                showAuthError('❌ Las contraseñas no coinciden');
                 return;
             }
 
             // Validar fortaleza de contraseña
             const passwordCheck = checkPasswordStrength(password);
             if (!passwordCheck.valid) {
-                showAuthError('❌ Password is not strong enough');
+                showAuthError('❌ La contraseña no es lo suficientemente fuerte');
                 return;
             }
 
             // Deshabilitar botón y mostrar loading
             const button = document.getElementById('registerButton');
             button.disabled = true;
-            button.innerHTML = '<span class="auth-loading"></span> Creating account...';
+            button.innerHTML = '<span class="auth-loading"></span> Creando cuenta...';
 
             try {
                 // Usar la URL completa actual (sin hash ni query params)
@@ -1856,9 +1692,9 @@
                 if (error) throw error;
 
                 if (data.user && !data.user.confirmed_at) {
-                    showAuthSuccess('✅ Account created! Please check your email to confirm your account.');
+                    showAuthSuccess('✅ Cuenta creada! Por favor, revisa tu correo para confirmar tu cuenta.');
                 } else {
-                    showAuthSuccess('✅ Account created successfully!');
+                    showAuthSuccess('✅ Cuenta creada exitosamente!');
                     setTimeout(() => switchAuthTab('login'), 2000);
                 }
 
@@ -1868,10 +1704,10 @@
 
             } catch (error) {
                 console.error('Error en registro:', error);
-                showAuthError('❌ ' + (error.message || 'Error creating account'));
+                showAuthError('❌ ' + (error.message || 'Error al crear la cuenta'));
             } finally {
                 button.disabled = false;
-                button.textContent = 'Create Account';
+                button.textContent = 'Crear Cuenta';
             }
         }
 
@@ -1885,7 +1721,7 @@
 
             const button = document.getElementById('loginButton');
             button.disabled = true;
-            button.innerHTML = '<span class="auth-loading"></span> Signing in...';
+            button.innerHTML = '<span class="auth-loading"></span> Iniciando sesión...';
 
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({
@@ -1896,7 +1732,7 @@
                 if (error) throw error;
 
                 if (data.user) {
-                    showAuthSuccess('✅ Welcome back!');
+                    showAuthSuccess('✅ Bienvenido de vuelta!');
                     currentUser = data.user;
 
                     // Ocultar modal de autenticación y mostrar aplicación
@@ -1909,15 +1745,15 @@
             } catch (error) {
                 console.error('Error en login:', error);
                 if (error.message.includes('Email not confirmed')) {
-                    showAuthError('❌ Please confirm your email before signing in');
+                    showAuthError('❌ Por favor, confirma tu correo electrónico antes de iniciar sesión');
                 } else if (error.message.includes('Invalid login credentials')) {
-                    showAuthError('❌ Incorrect email or password');
+                    showAuthError('❌ Correo o contraseña incorrectos');
                 } else {
-                    showAuthError('❌ ' + (error.message || 'Error signing in'));
+                    showAuthError('❌ ' + (error.message || 'Error al iniciar sesión'));
                 }
             } finally {
                 button.disabled = false;
-                button.textContent = 'Sign In';
+                button.textContent = 'Iniciar Sesión';
             }
         }
 
@@ -1937,7 +1773,7 @@
 
         // FORGOT PASSWORD
         async function handleForgotPassword() {
-            const email = prompt('Enter your email address to recover your password:');
+            const email = prompt('Ingresa tu correo electrónico para recuperar tu contraseña:');
 
             if (!email) return;
 
@@ -1951,11 +1787,11 @@
 
                 if (error) throw error;
 
-                showAuthSuccess('✅ Recovery link sent to your email');
+                showAuthSuccess('✅ Se ha enviado un enlace de recuperación a tu correo');
 
             } catch (error) {
                 console.error('Error al recuperar contraseña:', error);
-                showAuthError('❌ ' + (error.message || 'Error sending email'));
+                showAuthError('❌ ' + (error.message || 'Error al enviar el correo'));
             }
         }
 
@@ -2035,15 +1871,15 @@
                 hideUserInfo();
             } else if (event === 'PASSWORD_RECOVERY') {
                 // Mostrar formulario para cambiar contraseña
-                const newPassword = prompt('Enter your new password:');
+                const newPassword = prompt('Ingresa tu nueva contraseña:');
                 if (newPassword) {
                     const passwordCheck = checkPasswordStrength(newPassword);
                     if (passwordCheck.valid) {
                         supabase.auth.updateUser({ password: newPassword })
-                            .then(() => alert('Password updated successfully'))
-                            .catch(err => alert('Error updating password: ' + err.message));
+                            .then(() => alert('Contraseña actualizada exitosamente'))
+                            .catch(err => alert('Error al actualizar contraseña: ' + err.message));
                     } else {
-                        alert('Password is not strong enough');
+                        alert('La contraseña no es lo suficientemente fuerte');
                     }
                 }
             }
@@ -2099,7 +1935,7 @@
 
         // Días de la semana
         const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const DAYS_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
         // =====================================================
         // FUNCIONES DE SCHEDULE MODAL
         // =====================================================
@@ -3829,24 +3665,65 @@
             animate();
         }
         
+        function createStarShape() {
+            const shape = new THREE.Shape();
+            const outerRadius = 0.8;
+            const innerRadius = 0.35;
+            const points = 5;
+
+            for (let i = 0; i < points * 2; i++) {
+                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                const angle = (i * Math.PI) / points - Math.PI / 2;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+
+                if (i === 0) {
+                    shape.moveTo(x, y);
+                } else {
+                    shape.lineTo(x, y);
+                }
+            }
+            shape.closePath();
+            return shape;
+        }
+
         function createChristmasTree() {
             ledGroup = new THREE.Group();
             const treeHeight = 17;
             const treeRadius = 7;
             const treeGeometry = new THREE.ConeGeometry(treeRadius, treeHeight, 32);
-            const treeMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x0a4d0a, 
-                transparent: true, 
-                opacity: 0.7 
+            const treeMaterial = new THREE.MeshPhongMaterial({
+                color: 0x0a4d0a,
+                transparent: true,
+                opacity: 0.7
             });
             const treeMesh = new THREE.Mesh(treeGeometry, treeMaterial);
             treeMesh.position.y = treeHeight / 2;
             ledGroup.add(treeMesh);
-            
-            const starGeometry = new THREE.SphereGeometry(0.8, 16, 16);
-            const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+
+            // Create 3D star for tree top
+            const starShape = createStarShape();
+            const extrudeSettings = {
+                depth: 0.4,
+                bevelEnabled: true,
+                bevelThickness: 0.15,
+                bevelSize: 0.1,
+                bevelSegments: 2
+            };
+            const starGeometry = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
+            const starMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffff00,
+                emissive: 0xffdd00,
+                shininess: 100,
+                specular: 0xffffff
+            });
             const starMesh = new THREE.Mesh(starGeometry, starMaterial);
-            starMesh.position.y = treeHeight + 0.5;
+
+            // Position and rotate star to sit perfectly on tree top
+            starMesh.position.y = treeHeight + 0.2;
+            starMesh.position.z = -0.2; // Center the extrusion depth
+            starMesh.rotation.x = Math.PI / 2; // Rotate to face forward
+
             ledGroup.add(starMesh);
             const ledsPerLayer = 9;
             const layers = Math.ceil(totalLeds / ledsPerLayer);
