@@ -1410,7 +1410,7 @@
          <div class="control-panel">
             <div class="panel-header">
                 <h1>🎄 Christmas LED Tree</h1>
-                <p>© 2024 AMSC All rights reserved.</p>
+                <p>3D WLED Edition - Mosquitto</p>
             </div>
 
             <!-- User Info y Logout -->
@@ -1675,9 +1675,25 @@
             // Deshabilitar botón y mostrar loading
             const button = document.getElementById('registerButton');
             button.disabled = true;
-            button.innerHTML = '<span class="auth-loading"></span> Creando cuenta...';
+            button.innerHTML = '<span class="auth-loading"></span> Verificando...';
 
             try {
+                // VERIFICAR LÍMITE DE USUARIOS (máximo 3)
+                const { data: userCount, error: countError } = await supabase.rpc('count_registered_users');
+
+                if (countError) {
+                    console.error('Error al contar usuarios:', countError);
+                    // Si hay error al contar, asumir que la función no existe y continuar
+                    // (esto permite que funcione incluso si el usuario no creó la función)
+                } else if (userCount >= 3) {
+                    showAuthError('🚫 Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados.');
+                    button.disabled = false;
+                    button.textContent = 'Crear Cuenta';
+                    return;
+                }
+
+                button.innerHTML = '<span class="auth-loading"></span> Creando cuenta...';
+
                 // Usar la URL completa actual (sin hash ni query params)
                 const currentUrl = window.location.origin + window.location.pathname;
 
