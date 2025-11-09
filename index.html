@@ -3709,8 +3709,8 @@
         
         function createStarShape() {
             const shape = new THREE.Shape();
-            const outerRadius = 0.8;
-            const innerRadius = 0.35;
+            const outerRadius = 0.5;  // Reducido de 0.8 a 0.5
+            const innerRadius = 0.2;  // Reducido de 0.35 a 0.2
             const points = 5;
 
             for (let i = 0; i < points * 2; i++) {
@@ -3745,26 +3745,35 @@
 
             // Create 3D star for tree top
             const starShape = createStarShape();
-            const extrudeSettings = {
-                depth: 0.4,
+                const extrudeSettings = {
+                depth: 0.2,           // Reducido de 0.4 a 0.2 para que sea más delgada
                 bevelEnabled: true,
-                bevelThickness: 0.15,
-                bevelSize: 0.1,
+                bevelThickness: 0.05, // Reducido de 0.15 a 0.05
+                bevelSize: 0.05,      // Reducido de 0.1 a 0.05
                 bevelSegments: 2
             };
             const starGeometry = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
+
+            // Centrar la geometría de la estrella
+            starGeometry.center();
+
             const starMaterial = new THREE.MeshPhongMaterial({
-                color: 0xffff00,
-                emissive: 0xffdd00,
+                color: 0xffdd00,      // Dorado más cálido
+                emissive: 0xffaa00,   // Emisión dorada
+                emissiveIntensity: 0.4,
                 shininess: 100,
                 specular: 0xffffff
             });
             const starMesh = new THREE.Mesh(starGeometry, starMaterial);
 
-            // Position star vertically on tree top
-            starMesh.position.y = treeHeight + 0.5;
+            // Posicionar la estrella en la cima del árbol
+            starMesh.position.y = treeHeight + 0.8;  // Ajustado de 0.5 a 0.8
+            starMesh.position.x = 0;
             starMesh.position.z = 0;
-            // No rotation needed - star is vertical by default
+
+            // Rotar ligeramente para dar más dinamismo
+            starMesh.rotation.y = Math.PI / 10;  // Pequeña rotación en Y
+            starMesh.rotation.z = 0;             // Sin inclinación
 
             ledGroup.add(starMesh);
             const ledsPerLayer = 9;
