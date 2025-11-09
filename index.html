@@ -1440,7 +1440,9 @@
 
                 if (!isOvernight) {
                     // --- Horario Normal ---
-                    if (schedule.days.includes(currentDay) && currentTime >= startMinutes && currentTime <= endMinutes) {
+                    // Encendido desde startTime (inclusive) hasta endTime (exclusive)
+                    // Ejemplo: 18:00-23:00 significa encendido de 18:00 a 22:59, apaga a las 23:00
+                    if (schedule.days.includes(currentDay) && currentTime >= startMinutes && currentTime < endMinutes) {
                         return schedule;
                     }
                 } else {
@@ -1448,11 +1450,13 @@
                     const prevDay = (currentDay === 0) ? 6 : currentDay - 1;
 
                     // 1. ¿Está activo *después* de medianoche? (p.ej. 02:00)
-                    if (schedule.days.includes(prevDay) && currentTime >= 0 && currentTime <= endMinutes) {
+                    // Desde 00:00 (inclusive) hasta endTime (exclusive)
+                    if (schedule.days.includes(prevDay) && currentTime >= 0 && currentTime < endMinutes) {
                         return schedule;
                     }
                     // 2. ¿Está activo *antes* de medianoche? (p.ej. 22:00)
-                    if (schedule.days.includes(currentDay) && currentTime >= startMinutes && currentTime <= 1440) {
+                    // Desde startTime (inclusive) hasta 23:59 (inclusive)
+                    if (schedule.days.includes(currentDay) && currentTime >= startMinutes && currentTime <= 1439) {
                         return schedule;
                     }
                 }
