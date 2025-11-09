@@ -3719,10 +3719,10 @@
             });
             const starMesh = new THREE.Mesh(starGeometry, starMaterial);
 
-            // Position and rotate star to sit perfectly on tree top
-            starMesh.position.y = treeHeight + 0.2;
-            starMesh.position.z = -0.2; // Center the extrusion depth
-            starMesh.rotation.x = Math.PI / 2; // Rotate to face forward
+            // Position star vertically on tree top
+            starMesh.position.y = treeHeight + 0.5;
+            starMesh.position.z = 0;
+            // No rotation needed - star is vertical by default
 
             ledGroup.add(starMesh);
             const ledsPerLayer = 9;
