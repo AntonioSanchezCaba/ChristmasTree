@@ -3665,24 +3665,65 @@
             animate();
         }
         
+        function createStarShape() {
+            const shape = new THREE.Shape();
+            const outerRadius = 0.8;
+            const innerRadius = 0.35;
+            const points = 5;
+
+            for (let i = 0; i < points * 2; i++) {
+                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                const angle = (i * Math.PI) / points - Math.PI / 2;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+
+                if (i === 0) {
+                    shape.moveTo(x, y);
+                } else {
+                    shape.lineTo(x, y);
+                }
+            }
+            shape.closePath();
+            return shape;
+        }
+
         function createChristmasTree() {
             ledGroup = new THREE.Group();
             const treeHeight = 17;
             const treeRadius = 7;
             const treeGeometry = new THREE.ConeGeometry(treeRadius, treeHeight, 32);
-            const treeMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x0a4d0a, 
-                transparent: true, 
-                opacity: 0.7 
+            const treeMaterial = new THREE.MeshPhongMaterial({
+                color: 0x0a4d0a,
+                transparent: true,
+                opacity: 0.7
             });
             const treeMesh = new THREE.Mesh(treeGeometry, treeMaterial);
             treeMesh.position.y = treeHeight / 2;
             ledGroup.add(treeMesh);
-            
-            const starGeometry = new THREE.SphereGeometry(0.8, 16, 16);
-            const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+
+            // Create 3D star for tree top
+            const starShape = createStarShape();
+            const extrudeSettings = {
+                depth: 0.4,
+                bevelEnabled: true,
+                bevelThickness: 0.15,
+                bevelSize: 0.1,
+                bevelSegments: 2
+            };
+            const starGeometry = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
+            const starMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffff00,
+                emissive: 0xffdd00,
+                shininess: 100,
+                specular: 0xffffff
+            });
             const starMesh = new THREE.Mesh(starGeometry, starMaterial);
-            starMesh.position.y = treeHeight + 0.5;
+
+            // Position and rotate star to sit perfectly on tree top
+            starMesh.position.y = treeHeight + 0.2;
+            starMesh.position.z = -0.2; // Center the extrusion depth
+            starMesh.rotation.x = Math.PI / 2; // Rotate to face forward
+
             ledGroup.add(starMesh);
             const ledsPerLayer = 9;
             const layers = Math.ceil(totalLeds / ledsPerLayer);
