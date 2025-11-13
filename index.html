@@ -2014,28 +2014,67 @@
         // =====================================================
         
         function loadSchedules() {
-            const savedSchedules = localStorage.getItem('wledSchedules');
-            if (savedSchedules) {
-                schedules = JSON.parse(savedSchedules);
+            try {
+                // Intentar cargar horarios normales
+                const savedSchedules = localStorage.getItem('wledSchedules');
+                if (savedSchedules && savedSchedules !== 'undefined') {
+                    schedules = JSON.parse(savedSchedules);
+                    addDebugLog(`📅 ${schedules.length} horarios cargados desde localStorage`, 'info');
+                } else {
+                    // Intentar cargar desde respaldo
+                    const backup = localStorage.getItem('wledSchedules_backup');
+                    if (backup && backup !== 'undefined') {
+                        const backupData = JSON.parse(backup);
+                        schedules = backupData.schedules || [];
+                        addDebugLog(`📅 ${schedules.length} horarios recuperados desde respaldo`, 'info');
+                        // Restaurar el archivo principal
+                        localStorage.setItem('wledSchedules', JSON.stringify(schedules));
+                    }
+                }
+
+                const enabled = localStorage.getItem('schedulerEnabled') === 'true';
+                const checkbox = document.getElementById('schedulerEnabled');
+                if (checkbox) {
+                    checkbox.checked = enabled;
+                }
+            } catch (e) {
+                console.error('Error al cargar horarios:', e);
+                addDebugLog('❌ Error al cargar horarios: ' + e.message, 'error');
+                schedules = []; // Resetear a array vacío en caso de error
             }
-            
-            const enabled = localStorage.getItem('schedulerEnabled') === 'true';
-            document.getElementById('schedulerEnabled').checked = enabled;
         }
         
         function saveSchedules() {
-            localStorage.setItem('wledSchedules', JSON.stringify(schedules));
-            renderScheduleGrid();
+            try {
+                // Guardar en localStorage con respaldo
+                const schedulesJson = JSON.stringify(schedules);
+                localStorage.setItem('wledSchedules', schedulesJson);
 
-            // Publicar horarios en MQTT para sincronizar entre dispositivos
-            if (mqttClient && mqttClient.connected) {
-                const schedulesData = {
+                // Respaldo adicional con timestamp
+                const backup = {
                     schedules: schedules,
-                    enabled: document.getElementById('schedulerEnabled').checked,
-                    timestamp: Date.now()
+                    enabled: document.getElementById('schedulerEnabled')?.checked || false,
+                    timezone: userTimezone,
+                    lastSaved: new Date().toISOString()
                 };
-                mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: true });
-                addDebugLog('📤 Horarios publicados para sincronización', 'success');
+                localStorage.setItem('wledSchedules_backup', JSON.stringify(backup));
+
+                renderScheduleGrid();
+
+                // Publicar horarios en MQTT para sincronizar entre dispositivos
+                if (mqttClient && mqttClient.connected) {
+                    const schedulesData = {
+                        schedules: schedules,
+                        enabled: document.getElementById('schedulerEnabled').checked,
+                        timezone: userTimezone,
+                        timestamp: Date.now()
+                    };
+                    mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: true });
+                    addDebugLog('📤 Horarios guardados y publicados', 'success');
+                }
+            } catch (e) {
+                console.error('Error al guardar horarios:', e);
+                addDebugLog('❌ Error al guardar horarios: ' + e.message, 'error');
             }
         }
         
@@ -2307,12 +2346,21 @@
 
         function loadTimezone() {
             const saved = localStorage.getItem('userTimezone');
-            if (saved) {
+            if (saved && saved !== 'undefined' && saved !== 'null') {
                 userTimezone = saved;
                 const select = document.getElementById('timezoneSelect');
                 if (select) {
                     select.value = userTimezone;
                     addDebugLog(`🌍 Zona horaria cargada: ${userTimezone}`, 'info');
+                }
+            } else {
+                // Asegurar que siempre haya un valor válido
+                userTimezone = 'America/Santo_Domingo';
+                localStorage.setItem('userTimezone', userTimezone);
+                addDebugLog(`🌍 Zona horaria establecida por defecto: ${userTimezone}`, 'info');
+                const select = document.getElementById('timezoneSelect');
+                if (select) {
+                    select.value = userTimezone;
                 }
             }
         }
@@ -2343,16 +2391,36 @@
         }
         
         function getActiveSchedule() {
-            // Obtener fecha/hora en la zona horaria configurada por el usuario
-            const formatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: userTimezone,
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-                weekday: 'short'
-            });
+            // Validar que userTimezone esté definida
+            if (!userTimezone || userTimezone === 'undefined') {
+                userTimezone = 'America/Santo_Domingo';
+            }
 
-            const parts = formatter.formatToParts(new Date());
+            // Obtener fecha/hora en la zona horaria configurada por el usuario
+            let formatter, parts;
+            try {
+                formatter = new Intl.DateTimeFormat('en-US', {
+                    timeZone: userTimezone,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    weekday: 'short'
+                });
+                parts = formatter.formatToParts(new Date());
+            } catch (e) {
+                console.error('Error con zona horaria:', e);
+                // Fallback a zona horaria por defecto
+                userTimezone = 'America/Santo_Domingo';
+                formatter = new Intl.DateTimeFormat('en-US', {
+                    timeZone: userTimezone,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    weekday: 'short'
+                });
+                parts = formatter.formatToParts(new Date());
+            }
+
             const hours = parseInt(parts.find(p => p.type === 'hour').value);
             const minutes = parseInt(parts.find(p => p.type === 'minute').value);
             const weekday = parts.find(p => p.type === 'weekday').value;
@@ -2402,10 +2470,20 @@
         async function checkSchedules() {
             // VALIDAR PRIMERO SI HAY CONEXIÓN
             if (!mqttClient || !mqttClient.connected) {
-                addDebugLog('⚠️ No hay conexión MQTT para verificar horarios', 'error');
+                // No mostrar error constantemente, solo la primera vez
+                if (schedulerInterval && !window.schedulerConnectionWarned) {
+                    addDebugLog('⚠️ Esperando conexión MQTT para scheduler...', 'info');
+                    window.schedulerConnectionWarned = true;
+                }
                 return;
             }
-    
+
+            // Resetear warning cuando se reconecta
+            if (window.schedulerConnectionWarned) {
+                addDebugLog('✅ Conexión MQTT restaurada - Scheduler activo', 'success');
+                window.schedulerConnectionWarned = false;
+            }
+
             // VALIDAR SI EL SCHEDULER ESTÁ HABILITADO
             if (!document.getElementById('schedulerEnabled') || !document.getElementById('schedulerEnabled').checked) {
                 return;
@@ -2433,8 +2511,10 @@
             // SOLO verificar desincronización después de la primera ejecución
             const isOutOfSync = !isFirstRun && (wledIsOn !== shouldBeOn);
 
-            // Log para debug
-            addDebugLog(`🔍 Verificación: shouldBeOn=${shouldBeOn}, wledIsOn=${wledIsOn}, isOutOfSync=${isOutOfSync}`, 'info');
+            // Log para debug SOLO cuando hay cambios o desincronización
+            if (scheduleStateChanged || isOutOfSync) {
+                addDebugLog(`🔍 Verificación: shouldBeOn=${shouldBeOn}, wledIsOn=${wledIsOn}, isOutOfSync=${isOutOfSync}`, 'info');
+            }
 
             if (scheduleStateChanged) {
                 // El horario cambió (ej: pasó de 22:59 a 23:00)
@@ -2575,6 +2655,10 @@
                     addDebugLog('🔄 Intentando reconectar...', 'info');
                     document.getElementById('connectionStatus').className = 'connection-status connecting';
                     document.getElementById('connectionStatus').textContent = '🔄 Reconectando...';
+
+                    // Al reconectar, resetear el estado del scheduler para forzar nueva verificación
+                    lastScheduleState = null;
+                    wledStateReceived = false;
                 });
                 mqttClient.on('offline', () => {
                     addDebugLog('⚠️ Cliente MQTT offline', 'error');
@@ -3943,17 +4027,16 @@
             }, 500);
             // DESPUÉS iniciar verificación de horarios (solo si hay conexión)
             setTimeout(() => {
-                // Verificar horarios solo cada 60 segundos en lugar de 30
-                setInterval(() => {
-                    if (mqttClient && mqttClient.connected) {
-                         checkSchedules();
-                    }
-                }, 60000);
-        
-                // Primera verificación después de conectar
-                if (mqttClient && mqttClient.connected) {
+                // Verificar horarios cada 20 segundos para mayor precisión
+                schedulerInterval = setInterval(() => {
                     checkSchedules();
-                }
+                }, 20000);
+
+
+                // Primera verificación inmediata después de iniciar
+                setTimeout(() => {
+                    checkSchedules();
+                }, 3000);
             }, 2000);
         };
     </script>
