@@ -1,0 +1,33 @@
+{
+  "name": "wled-christmas-tree-scheduler",
+  "version": "1.0.0",
+  "description": "Servicio autónomo para gestionar horarios de árbol de Navidad WLED mediante MQTT",
+  "main": "scheduler.js",
+  "scripts": {
+    "start": "node scheduler.js",
+    "dev": "nodemon scheduler.js",
+    "pm2:start": "pm2 start scheduler.js --name wled-scheduler",
+    "pm2:stop": "pm2 stop wled-scheduler",
+    "pm2:restart": "pm2 restart wled-scheduler",
+    "pm2:logs": "pm2 logs wled-scheduler",
+    "pm2:startup": "pm2 startup && pm2 save"
+  },
+  "keywords": [
+    "wled",
+    "mqtt",
+    "scheduler",
+    "christmas",
+    "led"
+  ],
+  "author": "AMSC",
+  "license": "MIT",
+  "dependencies": {
+    "mqtt": "^4.3.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

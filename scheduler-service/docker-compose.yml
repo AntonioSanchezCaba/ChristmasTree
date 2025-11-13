@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  wled-scheduler:
+    build: .
+    image: wled-scheduler:latest
+    container_name: wled-christmas-scheduler
+    restart: unless-stopped
+
+    environment:
+      # Configuración opcional (el script usa valores por defecto)
+      - TZ=America/Santo_Domingo
+      - NODE_ENV=production
+
+    # Opcional: volumen para logs persistentes
+    volumes:
+      - ./logs:/app/logs
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Network mode (usar host si tienes problemas de conexión)
+    # network_mode: "host"
+
+    # Resources limits (opcional)
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+# Opcional: Network para conectar con otros servicios
+networks:
+  default:
+    name: wled-network
