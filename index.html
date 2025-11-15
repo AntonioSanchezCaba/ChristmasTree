@@ -1957,6 +1957,9 @@
         let lastProcessedState = null;
         let lastProcessedTime = 0;
 
+        // Flag para rastrear si ya aplicamos el brillo inicial desde localStorage
+        let initialBrightnessSet = false;
+
         // CONFIGURACIÓN MQTT MOSQUITTO
         let mqttClient = null;
         const MQTT_CONFIG = {
@@ -2866,16 +2869,47 @@
             // 1. Actualizar Brillo
             if (typeof state.bri !== 'undefined') {
                 const brightness = state.bri;
-                document.getElementById('brightness').value = brightness;
-                updateBrightnessLabel(brightness);
-                currentBrightness = brightness;
 
-                // Guardar el brillo en localStorage para persistencia
-                localStorage.setItem('lastBrightness', brightness.toString());
+                // PRIMERA VEZ: Priorizar brillo guardado en localStorage
+                if (!initialBrightnessSet) {
+                    const savedBrightness = localStorage.getItem('lastBrightness');
+                    if (savedBrightness) {
+                        const localBri = parseInt(savedBrightness);
+                        // Si el brillo guardado es diferente al de WLED (más de 2 puntos de diferencia)
+                        if (Math.abs(localBri - brightness) > 2) {
+                            addDebugLog(`💡 Restaurando brillo guardado: ${localBri} (WLED tiene: ${brightness})`, 'info');
+                            currentBrightness = localBri;
+                            document.getElementById('brightness').value = localBri;
+                            updateBrightnessLabel(localBri);
 
-                // Publicar brillo en MQTT para sincronizar entre dispositivos
-                if (mqttClient && mqttClient.connected) {
-                    mqttClient.publish('wled/tree/brightness', brightness.toString(), { retain: true });
+                            // Enviar el brillo guardado a WLED después de un segundo
+                            setTimeout(() => {
+                                sendMQTTCommand({"bri": localBri});
+                                if (mqttClient && mqttClient.connected) {
+                                    mqttClient.publish('wled/tree/brightness', localBri.toString(), { retain: true });
+                                }
+                            }, 1000);
+
+                            initialBrightnessSet = true;
+                            return;
+                        }
+                    }
+                    initialBrightnessSet = true;
+                }
+
+                // SINCRONIZACIÓN NORMAL: Solo actualizar si hay diferencia significativa
+                if (Math.abs(brightness - currentBrightness) > 2) {
+                    document.getElementById('brightness').value = brightness;
+                    updateBrightnessLabel(brightness);
+                    currentBrightness = brightness;
+
+                    // Guardar el brillo en localStorage para persistencia
+                    localStorage.setItem('lastBrightness', brightness.toString());
+
+                    // Publicar brillo en MQTT para sincronizar entre dispositivos
+                    if (mqttClient && mqttClient.connected) {
+                        mqttClient.publish('wled/tree/brightness', brightness.toString(), { retain: true });
+                    }
                 }
             }
 
