@@ -2034,7 +2034,7 @@
                     enabled: document.getElementById('schedulerEnabled').checked,
                     timestamp: Date.now()
                 };
-                mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: false });
+                mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: true });
                 addDebugLog('📤 Horarios publicados para sincronización', 'success');
             }
         }
@@ -2283,7 +2283,7 @@
                     enabled: enabled,
                     timestamp: Date.now()
                 };
-                mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: false });
+                mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: true });
                 addDebugLog('📤 Estado del scheduler publicado', 'success');
             }
         }
@@ -2557,7 +2557,7 @@
                                         enabled: document.getElementById('schedulerEnabled').checked,
                                         timestamp: Date.now()
                                     };
-                                    mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: false });
+                                    mqttClient.publish('wled/tree/schedules', JSON.stringify(schedulesData), { retain: true });
                                     addDebugLog('📤 Horarios locales publicados al conectar', 'info');
                                 }
                             }, 500);
@@ -2791,7 +2791,7 @@
 
                 // Publicar brillo en MQTT para sincronizar entre dispositivos
                 if (mqttClient && mqttClient.connected) {
-                    mqttClient.publish('wled/tree/brightness', brightness.toString(), { retain: false });
+                    mqttClient.publish('wled/tree/brightness', brightness.toString(), { retain: true });
                 }
             }
 
@@ -2860,7 +2860,7 @@
             addDebugLog(`📤 Enviando comando: ${payloadStr.substring(0, 80)}...`, 'info');
             
             try {
-                mqttClient.publish(MQTT_CONFIG.topic, payloadStr, { qos: 1, retain: false }, (err) => {
+                mqttClient.publish(MQTT_CONFIG.topic, payloadStr, { qos: 1, retain: true }, (err) => {
                     if (err) {
                         addDebugLog('❌ Error al publicar: ' + err.message, 'error');
                      } else {
@@ -3539,7 +3539,7 @@
 
                 // Publicar brillo en MQTT para sincronizar entre dispositivos
                 if (mqttClient && mqttClient.connected) {
-                    mqttClient.publish('wled/tree/brightness', currentBrightness.toString(), { retain: false });
+                    mqttClient.publish('wled/tree/brightness', currentBrightness.toString(), { retain: true });
                 }
             }, 300); // 300ms debounce
         }
