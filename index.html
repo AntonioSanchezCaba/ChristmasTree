@@ -3271,15 +3271,15 @@
         async function applyDominicanDesign() {
             addDebugLog('🇩🇴 Aplicando Dominican', 'info');
             const third = Math.floor(totalLeds / 3);
-            
+    
             for (let i = 0; i < totalLeds; i++) {
                 let colorHex;
                 if (i < third) {
-                    colorHex = '#0000ff';
+                    colorHex = '#ff0000';  // ✅ ROJO ABAJO (corregido)
                 } else if (i < third * 2) {
-                    colorHex = '#ffffff';
+                    colorHex = '#ffffff';  // ✓ BLANCO MEDIO (sin cambios)
                 } else {
-                    colorHex = '#ff0000';
+                    colorHex = '#0000ff';  // ✅ AZUL ARRIBA (corregido)
                 }
                 updateLEDVisual(i, colorHex, false);
             }
