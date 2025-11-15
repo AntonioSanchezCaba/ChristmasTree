@@ -2027,7 +2027,7 @@
             localStorage.setItem('wledSchedules', JSON.stringify(schedules));
             renderScheduleGrid();
 
-            // Publicar horarios en MQTT para sincronizar entre dispositivos
+            // Publicar horarios en MQTT para sincronizar con el servidor
             if (mqttClient && mqttClient.connected) {
                 const schedulesData = {
                     schedules: schedules,
