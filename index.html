@@ -1489,10 +1489,10 @@
                     <div class="section-title">🎨 Color Palettes</div>
                     <div class="effects-grid">
                         <button class="effect-btn" onclick="setPalette(2)">💜 Purple Rain</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Dominican')">🇩🇴 Dominican</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Fire')">🔥 Fire</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Ocean')">🌊 Ocean</button>
-                        <button class="effect-btn" onclick="setStaticDesign('Lava')">🌋 Lava</button>
+                        <button class="effect-btn" onclick="setPalette(255)">🇩🇴 Dominican</button>
+                        <button class="effect-btn" onclick="setPalette(35)">🔥 Fire</button>
+                        <button class="effect-btn" onclick="setPalette(9)">🌊 Ocean</button>
+                        <button class="effect-btn" onclick="setPalette(8)">🌋 Lava</button>
                         <button class="effect-btn" onclick="setPalette(11)">🌈 Rainbow</button>
                         <button class="effect-btn" onclick="setPalette(10)">🌲 Forest</button>
                         <button class="effect-btn" onclick="setPalette(13)">🌅 Sunset</button>
@@ -2934,65 +2934,29 @@
                 const segment = state.seg[0];
                 const fx = segment.fx;
                 const pal = segment.pal;
-                const col = segment.col[0] || [255, 0, 0];
+                const col = segment.col[0] || [255, 0, 0]; // Color primario, con fallback
 
+                // Sincronizar efecto y paleta actuales
                 currentEffectId = fx;
                 currentPaletteId = pal || 0;
 
                 const hexColor = rgbToHex(col[0], col[1], col[2]);
+
+                // Actualizar el picker de color de la UI
                 selectedColor = hexColor;
                 document.getElementById('ledColor').value = hexColor;
+
+                // Detener cualquier animación local
                 stopAllAnimations();
 
-                // ✅ CASOS ESPECIALES: Paletas con gradientes personalizados
-                if (pal === 255) {
-                    // Dominican: Azul arriba, Blanco medio, Rojo abajo
-                    addDebugLog(`🔄 Sincronizando: Paleta Dominican`, 'info');
-                    const third = Math.floor(totalLeds / 3);
-                    for (let i = 0; i < totalLeds; i++) {
-                        let colorHex;
-                        if (i < third) colorHex = '#ff0000';
-                        else if (i < third * 2) colorHex = '#ffffff';
-                        else colorHex = '#0000ff';
-                        updateLEDVisual(i, colorHex, false);
-                    }
-                    ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
-                } else if (pal === 35) {
-                    // Fire: Rojo → Naranja → Amarillo → Blanco
-                    addDebugLog(`🔄 Sincronizando: Paleta Fire`, 'info');
-                    const quarter = Math.floor(totalLeds / 4);
-                    for (let i = 0; i < totalLeds; i++) {
-                        let colorHex;
-                        if (i < quarter) colorHex = '#ff0000';
-                        else if (i < quarter * 2) colorHex = '#ff6600';
-                        else if (i < quarter * 3) colorHex = '#ffff00';
-                        else colorHex = '#ffffff';
-                        updateLEDVisual(i, colorHex, false);
-                    }
-                    ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
-                } else if (pal === 9) {
-                    // Ocean: Todo azul
-                    addDebugLog(`🔄 Sincronizando: Paleta Ocean`, 'info');
-                    updateAllLEDsVisual('#0066ff');
-                } else if (pal === 8) {
-                    // Lava: Rojo abajo → Naranja medio → Amarillo arriba
-                    addDebugLog(`🔄 Sincronizando: Paleta Lava`, 'info');
-                    const third = Math.floor(totalLeds / 3);
-                    for (let i = 0; i < totalLeds; i++) {
-                        let colorHex;
-                        if (i < third) colorHex = '#ff0000';
-                        else if (i < third * 2) colorHex = '#ff9900';
-                        else colorHex = '#ffff00';
-                        updateLEDVisual(i, colorHex, false);
-                    }
-                    ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
-                } else if (fx === 0) {
-                    // Efecto Sólido
+                if (fx === 0) {
+                    // --- Efecto Sólido ---
                     addDebugLog(`🔄 Sincronizando: Color Sólido ${hexColor}`, 'info');
                     updateAllLEDsVisual(hexColor);
                 } else {
-                    // Efecto Animado
+                    // --- Efecto Animado ---
                     addDebugLog(`🔄 Sincronizando: Efecto ${fx}, Paleta ${pal || 'default'}`, 'info');
+                    // Mostrar solo el color base - WLED maneja la animación real
                     updateAllLEDsVisual(hexColor);
                 }
             }
@@ -3177,37 +3141,29 @@
                 event.target.classList.add('active');
             }
             
-        switch(designName) {
-            case 'OFF':
-                applyOFFDesign();
-                break;
-            case 'Solid':
-                applySolidDesign();
-                break;
-            case 'Rainbow':
-                applyRainbowDesign();
-                break;
-            case 'Warm':
-                applyWarmDesign();
-                break;
-            case 'Cold':
-                applyColdDesign();
-                break;
-            case 'Purple Rain':
-                applyPurpleRainDesign();
-            break;
-            case 'Dominican':
-                applyDominicanDesign();
-            break;
-            case 'Fire':  // ✅ NUEVO
-                applyFireDesign();
-            break;
-            case 'Ocean':  // ✅ NUEVO
-                applyOceanDesign();
-            break;
-            case 'Lava':  // ✅ NUEVO
-                applyLavaDesign();
-            break;
+            switch(designName) {
+                case 'OFF':
+                    applyOFFDesign();
+                    break;
+                case 'Solid':
+                    applySolidDesign();
+                    break;
+                case 'Rainbow':
+                    applyRainbowDesign();
+                    break;
+                case 'Warm':
+                    applyWarmDesign();
+                    break;
+                case 'Cold':
+                    applyColdDesign();
+                    break;
+                case 'Purple Rain':
+                    applyPurpleRainDesign();
+                    break;
+                case 'Dominican':
+                    applyDominicanDesign();
+                    break;
+            }
         }
 
         async function applyOFFDesign() {
@@ -3315,15 +3271,15 @@
         async function applyDominicanDesign() {
             addDebugLog('🇩🇴 Aplicando Dominican', 'info');
             const third = Math.floor(totalLeds / 3);
-    
+            
             for (let i = 0; i < totalLeds; i++) {
                 let colorHex;
                 if (i < third) {
-                    colorHex = '#ff0000';  // ✅ ROJO ABAJO (corregido)
+                    colorHex = '#0000ff';
                 } else if (i < third * 2) {
-                    colorHex = '#ffffff';  // ✓ BLANCO MEDIO (sin cambios)
+                    colorHex = '#ffffff';
                 } else {
-                    colorHex = '#0000ff';  // ✅ AZUL ARRIBA (corregido)
+                    colorHex = '#ff0000';
                 }
                 updateLEDVisual(i, colorHex, false);
             }
@@ -3338,87 +3294,6 @@
                 }]
             });
             showStatus('✓ Dominican aplicado 🇩🇴');
-        }
-
-        async function applyFireDesign() {
-            addDebugLog('🔥 Aplicando Fire', 'info');
-            const quarter = Math.floor(totalLeds / 4);
-    
-            for (let i = 0; i < totalLeds; i++) {
-                let colorHex;
-                if (i < quarter) {
-                    colorHex = '#ff0000';  // 🔴 ROJO ABAJO
-                } else if (i < quarter * 2) {
-                    colorHex = '#ff6600';  // 🟠 NARANJA
-                } else if (i < quarter * 3) {
-                    colorHex = '#ffff00';  // 🟡 AMARILLO
-                } else {
-                    colorHex = '#ffffff';  // ⚪ BLANCO ARRIBA
-                }
-                updateLEDVisual(i, colorHex, false);
-            }
-    
-            ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
-            await sendMQTTCommand({
-                "on": true,
-                "bri": currentBrightness,
-                "seg": [{
-                    "id": 0,
-                    "fx": 2,
-                    "pal": 35
-                }]
-            });
-            showStatus('✓ Fire aplicado 🔥');
-        }
-
-        async function applyOceanDesign() {
-            addDebugLog('🌊 Aplicando Ocean', 'info');
-    
-            // Ocean es todo azul con ligeras variaciones
-            for (let i = 0; i < totalLeds; i++) {
-                updateLEDVisual(i, '#0066ff', false);
-            }
-    
-            ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
-            await sendMQTTCommand({
-                "on": true,
-                "bri": currentBrightness,
-                "seg": [{
-                    "id": 0,
-                    "fx": 2,
-                    "pal": 9
-                }]
-            });
-            showStatus('✓ Ocean aplicado 🌊');
-        }
-
-        async function applyLavaDesign() {
-            addDebugLog('🌋 Aplicando Lava', 'info');
-            const third = Math.floor(totalLeds / 3);
-    
-            for (let i = 0; i < totalLeds; i++) {
-                let colorHex;
-                if (i < third) {
-                    colorHex = '#ff0000';  // 🔴 ROJO ABAJO
-                } else if (i < third * 2) {
-                    colorHex = '#ff9900';  // 🟠 NARANJA MEDIO
-                } else {
-                    colorHex = '#ffff00';  // 🟡 AMARILLO ARRIBA
-                }
-                updateLEDVisual(i, colorHex, false);
-            }
-    
-            ledMeshes.forEach(mesh => mesh.material.needsUpdate = true);
-            await sendMQTTCommand({
-                "on": true,
-                "bri": currentBrightness,
-                "seg": [{
-                    "id": 0,
-                    "fx": 2,
-                    "pal": 8
-                }]
-            });
-            showStatus('✓ Lava aplicado 🌋');
         }
         
         // EFECTOS ANIMADOS (mantener todas las funciones existentes)
