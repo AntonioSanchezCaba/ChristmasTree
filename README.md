@@ -528,4 +528,4 @@ Esta documentación está bajo licencia MIT. Úsala libremente.
 Configurado y documentado para proyecto de árbol de Navidad LED con control MQTT.
 
 **Versión:** 1.0.0  
-**Última actualización:** Diciembre 2024
+**Última actualización:** Diciembre 2025 - Antonio Sánchez
