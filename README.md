@@ -979,22 +979,6 @@ ChristmasTree/
 
 ---
 
-## 🔄 Actualizaciones Futuras
-
-### En Progreso
-- [ ] Soporte para múltiples árboles/dispositivos WLED
-- [ ] Integración con Amazon Alexa / Google Home
-- [ ] App móvil nativa (React Native)
-- [ ] Grabación y reproducción de secuencias personalizadas
-
-### Consideraciones
-- [ ] Autenticación de usuarios en el controlador web
-- [ ] Base de datos para almacenar diseños compartidos
-- [ ] API REST para control programático
-- [ ] Integración con Home Assistant
-
----
-
 ## 🤝 Contribuciones
 
 Las contribuciones son bienvenidas. Para cambios importantes:
@@ -1029,7 +1013,7 @@ Las contribuciones son bienvenidas. Para cambios importantes:
 
 ## ✨ Créditos
 
-Desarrollado por Antonio Sánchez Cabrera para control de árbol de Navidad LED con tecnología IoT.
+Desarrollado por Antonio Sánchez Caba para control de árbol de Navidad LED con tecnología IoT.
 
 **Tecnologías utilizadas:**
 - WLED Firmware (Aircoookie)
@@ -1041,4 +1025,4 @@ Desarrollado por Antonio Sánchez Cabrera para control de árbol de Navidad LED 
 **Repositorio:** [github.com/AntonioSanchezCaba/ChristmasTree](https://github.com/AntonioSanchezCaba/ChristmasTree)
 
 **Versión:** 2.0.0  
-**Última actualización:** Diciembre 2025 - Antonio Sánchez
+**Última actualización:** Diciembre 2025
