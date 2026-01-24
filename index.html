@@ -847,7 +847,7 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(10px);
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 10000;
@@ -1914,6 +1914,8 @@
                     document.getElementById('authOverlay').classList.add('hidden');
                     updateUserInfo(session.user);
                 } else {
+                    // No session - show login
+                    document.getElementById('authOverlay').style.display = 'flex';
                     document.getElementById('authOverlay').classList.remove('hidden');
                     hideUserInfo();
                 }
@@ -1922,6 +1924,7 @@
 
             } catch (error) {
                 console.error('Error al verificar sesión:', error);
+                document.getElementById('authOverlay').style.display = 'flex';
                 document.getElementById('authOverlay').classList.remove('hidden');
                 hideUserInfo();
                 authInitialized = true;
