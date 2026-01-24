@@ -1691,7 +1691,7 @@
 
             // VERIFICAR LÍMITE DE USUARIOS (máximo 3)
             try {
-                const { data: userCount, error: countError } = await supabase.rpc('count_registered_users');
+                const { data: userCount, error: countError } = await supabaseClient.rpc('count_registered_users');
 
                 if (countError) {
                     console.error('Error al verificar límite de usuarios:', countError);
@@ -1719,7 +1719,7 @@
                 // Usar la URL completa actual (sin hash ni query params)
                 const currentUrl = window.location.origin + window.location.pathname;
 
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -1762,7 +1762,7 @@
             button.innerHTML = '<span class="auth-loading"></span> Iniciando sesión...';
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
@@ -1798,7 +1798,7 @@
         // LOGOUT
         async function handleLogout() {
             try {
-                const { error } = await supabase.auth.signOut();
+                const { error } = await supabaseClient.auth.signOut();
                 if (error) throw error;
 
                 currentUser = null;
@@ -1819,7 +1819,7 @@
                 // Usar la URL completa actual (sin hash ni query params)
                 const currentUrl = window.location.origin + window.location.pathname;
 
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
                     redirectTo: currentUrl
                 });
 
@@ -1841,7 +1841,7 @@
                 // Usar la URL completa actual (sin hash ni query params)
                 const currentUrl = window.location.origin + window.location.pathname;
 
-                const { data, error } = await supabase.auth.signInWithOAuth({
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: provider,
                     options: {
                         redirectTo: currentUrl
@@ -1859,7 +1859,7 @@
         // VERIFICAR SESIÓN AL CARGAR
         async function checkAuthSession() {
             try {
-                const { data: { session }, error } = await supabase.auth.getSession();
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
 
                 if (error) throw error;
 
@@ -1894,50 +1894,6 @@
         function hideUserInfo() {
             document.getElementById('userInfo').style.display = 'none';
         }
-
-        // ESCUCHAR CAMBIOS DE AUTENTICACIÓN
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log('Auth event:', event);
-
-            if (event === 'SIGNED_IN' && session) {
-                // Verificar límite de usuarios (especialmente para OAuth)
-                try {
-                    const { data: userCount, error: countError } = await supabase.rpc('count_registered_users');
-
-                    if (!countError && userCount > 3) {
-                        // Si se excedió el límite, cerrar sesión inmediatamente
-                        console.error('Límite de usuarios excedido:', userCount);
-                        await supabase.auth.signOut();
-                        showAuthError('🚫 Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados. Si configuraste el Database Trigger en Supabase, este error no debería ocurrir.');
-                        document.getElementById('authOverlay').classList.remove('hidden');
-                        return;
-                    }
-                } catch (e) {
-                    console.error('Error verificando límite en auth change:', e);
-                }
-
-                currentUser = session.user;
-                document.getElementById('authOverlay').classList.add('hidden');
-                updateUserInfo(session.user);
-            } else if (event === 'SIGNED_OUT') {
-                currentUser = null;
-                document.getElementById('authOverlay').classList.remove('hidden');
-                hideUserInfo();
-            } else if (event === 'PASSWORD_RECOVERY') {
-                // Mostrar formulario para cambiar contraseña
-                const newPassword = prompt('Ingresa tu nueva contraseña:');
-                if (newPassword) {
-                    const passwordCheck = checkPasswordStrength(newPassword);
-                    if (passwordCheck.valid) {
-                        supabase.auth.updateUser({ password: newPassword })
-                            .then(() => alert('Contraseña actualizada exitosamente'))
-                            .catch(err => alert('Error al actualizar contraseña: ' + err.message));
-                    } else {
-                        alert('La contraseña no es lo suficientemente fuerte');
-                    }
-                }
-            }
-        });
 
         // =====================================================
         // VARIABLES GLOBALES
