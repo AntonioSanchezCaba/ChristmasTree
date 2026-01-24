@@ -4276,7 +4276,7 @@
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
                 console.log('Auth event:', event);
 
-                if (event === 'SIGNED_IN' && session) {
+                if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
                     // Verificar límite de usuarios (especialmente para OAuth)
                     try {
                         const { data: userCount, error: countError } = await supabaseClient.rpc('count_registered_users');
