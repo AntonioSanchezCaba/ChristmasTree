@@ -2112,23 +2112,33 @@
         function updateUserInfo(user) {
             if (user && user.email) {
                 // Update sidebar info
-                document.getElementById('userEmail').textContent = user.email;
-                document.getElementById('userInfo').style.display = 'block';
+                const userEmailEl = document.getElementById('userEmail');
+                const userInfoEl = document.getElementById('userInfo');
+                if (userEmailEl) userEmailEl.textContent = user.email;
+                if (userInfoEl) userInfoEl.style.display = 'block';
         
                 // Update nav bar - show user, hide login
-                document.getElementById('navAuthButtons').style.display = 'none';
-                document.getElementById('navUserDropdown').style.display = 'flex';
-                document.getElementById('navUserName').textContent = user.email.split('@')[0];
+                const navAuthButtons = document.getElementById('navAuthButtons');
+                const navUserDropdown = document.getElementById('navUserDropdown');
+                const navUserName = document.getElementById('navUserName');
+        
+                if (navAuthButtons) navAuthButtons.style.display = 'none';
+                if (navUserDropdown) navUserDropdown.style.display = 'flex';
+                if (navUserName) navUserName.textContent = user.email.split('@')[0];
             }
         }
 
         // OCULTAR INFO DE USUARIO
         function hideUserInfo() {
-            document.getElementById('userInfo').style.display = 'none';
+            const userInfoEl = document.getElementById('userInfo');
+            if (userInfoEl) userInfoEl.style.display = 'none';
     
             // Update nav bar - show login, hide user
-            document.getElementById('navAuthButtons').style.display = 'flex';
-            document.getElementById('navUserDropdown').style.display = 'none';
+            const navAuthButtons = document.getElementById('navAuthButtons');
+            const navUserDropdown = document.getElementById('navUserDropdown');
+    
+            if (navAuthButtons) navAuthButtons.style.display = 'flex';
+            if (navUserDropdown) navUserDropdown.style.display = 'none';
         }
 
         // =====================================================
