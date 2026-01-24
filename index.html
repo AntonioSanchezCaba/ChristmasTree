@@ -4049,8 +4049,72 @@
         // INICIALIZACIÓN
         // =====================================================
         
+        // Initialize Supabase client (must be called after SDK loads)
+        function initSupabase() {
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase client initialized');
+                return true;
+            } else {
+                console.error('❌ Supabase SDK not loaded');
+                return false;
+            }
+        }
+        
         window.onload = function() {
-            // PRIMERO verificar sesión de autenticación
+            // PRIMERO inicializar Supabase
+            if (!initSupabase()) {
+                console.error('Failed to initialize Supabase');
+                document.getElementById('authError').textContent = 'Error: No se pudo cargar el sistema de autenticación';
+                document.getElementById('authError').classList.add('show');
+                return;
+            }
+            
+            // Configurar listener de cambios de autenticación
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                console.log('Auth event:', event);
+
+                if (event === 'SIGNED_IN' && session) {
+                    // Verificar límite de usuarios (especialmente para OAuth)
+                    try {
+                        const { data: userCount, error: countError } = await supabaseClient.rpc('count_registered_users');
+
+                        if (!countError && userCount > 3) {
+                            // Si se excedió el límite, cerrar sesión inmediatamente
+                            console.error('Límite de usuarios excedido:', userCount);
+                            await supabaseClient.auth.signOut();
+                            showAuthError('🚫 Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados.');
+                            document.getElementById('authOverlay').classList.remove('hidden');
+                            return;
+                        }
+                    } catch (e) {
+                        console.error('Error verificando límite en auth change:', e);
+                    }
+
+                    currentUser = session.user;
+                    document.getElementById('authOverlay').classList.add('hidden');
+                    updateUserInfo(session.user);
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    document.getElementById('authOverlay').classList.remove('hidden');
+                    hideUserInfo();
+                } else if (event === 'PASSWORD_RECOVERY') {
+                    // Mostrar formulario para cambiar contraseña
+                    const newPassword = prompt('Ingresa tu nueva contraseña:');
+                    if (newPassword) {
+                        const passwordCheck = checkPasswordStrength(newPassword);
+                        if (passwordCheck.valid) {
+                            supabaseClient.auth.updateUser({ password: newPassword })
+                                .then(() => alert('Contraseña actualizada exitosamente'))
+                                .catch(err => alert('Error al actualizar contraseña: ' + err.message));
+                        } else {
+                            alert('La contraseña no es lo suficientemente fuerte');
+                        }
+                    }
+                }
+            });
+            
+            // AHORA verificar sesión de autenticación
             checkAuthSession();
 
             addDebugLog('🚀 Aplicación iniciada', 'success');
@@ -4071,17 +4135,18 @@
             loadDesigns();
             loadSchedules();
             loadTimezone(); // Cargar zona horaria guardada
+            
             // PRIMERO establecer conexión MQTT
             setTimeout(() => {
                 initMQTT();
             }, 500);
+            
             // DESPUÉS iniciar verificación de horarios (solo si hay conexión)
             setTimeout(() => {
                 // Verificar horarios cada 20 segundos para mayor precisión
                 schedulerInterval = setInterval(() => {
                     checkSchedules();
                 }, 20000);
-
 
                 // Primera verificación inmediata después de iniciar
                 setTimeout(() => {
