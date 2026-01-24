@@ -1549,7 +1549,19 @@
         const SUPABASE_URL = 'https://mcwsdinbxwfomkgtolhf.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jd3NkaW5ieHdmb21rZ3RvbGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2NjU2MzcsImV4cCI6MjA3ODI0MTYzN30.rjJpb2OQRui-1uIsn2VwE_zX-I5V2CKgM3MveZSXxW4';
 
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Use different variable name to avoid conflict with window.supabase
+        let supabaseClient = null;
+
+        function initSupabase() {
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase client initialized');
+                return true;
+            } else {
+                console.error('❌ Supabase SDK not loaded');
+                return false;
+            }
+        }
 
         let currentUser = null;
         let authInitialized = false;
