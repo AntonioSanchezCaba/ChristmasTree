@@ -61,7 +61,8 @@
             display: flex !important;
             align-items: center;
             gap: 15px;
-            margin-left: auto; /* Push to right side */
+            margin-left: auto;
+            min-width: 100px; /* Ensure it has space */
         }
 
         .nav-auth-buttons {
@@ -134,7 +135,6 @@
         /* Dropdown menu */
         .nav-dropdown {
             position: relative;
-            display: none; /* Hidden by default, JS will show it */
         }
         
         .nav-dropdown[style*="display: flex"] {
@@ -2068,12 +2068,12 @@
         </div>
     
         <div class="nav-auth">
-            <!-- Show when NOT logged in -->
-            <div class="nav-auth-buttons" id="navAuthButtons" style="display: none;">
+            <!-- Show when NOT logged in - VISIBLE by default -->
+            <div class="nav-auth-buttons" id="navAuthButtons" style="display: flex;">
                 <a href="#" class="login-btn" onclick="showLoginModal(); return false;">🔐 Login</a>
             </div>
         
-            <!-- Show when logged in -->
+            <!-- Show when logged in - HIDDEN by default -->
             <div class="nav-dropdown" id="navUserDropdown" style="display: none;">
                 <div class="nav-user" onclick="toggleUserDropdown()">
                     <div class="nav-user-avatar">👤</div>
@@ -2849,7 +2849,7 @@
         
         // ACTUALIZAR INFO DE USUARIO EN UI
         function updateUserInfo(user) {
-            console.log('updateUserInfo called with:', user?.email);
+            console.log('🔄 updateUserInfo called with:', user?.email);
             
             if (user && user.email) {
                 // Update sidebar info
@@ -2863,31 +2863,35 @@
                 const navUserDropdown = document.getElementById('navUserDropdown');
                 const navUserName = document.getElementById('navUserName');
         
-                console.log('Nav elements found:', {
-                    navAuthButtons: !!navAuthButtons,
-                    navUserDropdown: !!navUserDropdown,
-                    navUserName: !!navUserName
+                console.log('📍 Nav elements:', {
+                    navAuthButtons: navAuthButtons ? 'found' : 'NOT FOUND',
+                    navUserDropdown: navUserDropdown ? 'found' : 'NOT FOUND',
+                    navUserName: navUserName ? 'found' : 'NOT FOUND'
                 });
         
                 if (navAuthButtons) {
-                    navAuthButtons.style.display = 'none';
-                    navAuthButtons.style.setProperty('display', 'none', 'important');
+                    navAuthButtons.style.cssText = 'display: none !important;';
                 }
                 if (navUserDropdown) {
-                    navUserDropdown.style.display = 'flex';
-                    navUserDropdown.style.setProperty('display', 'flex', 'important');
+                    navUserDropdown.style.cssText = 'display: flex !important; position: relative;';
                 }
                 if (navUserName) {
                     navUserName.textContent = user.email.split('@')[0];
                 }
                 
                 console.log('✅ Nav bar updated for user:', user.email);
+                
+                // Verify the change took effect
+                setTimeout(() => {
+                    const dropdown = document.getElementById('navUserDropdown');
+                    console.log('🔍 Verification - navUserDropdown display:', dropdown?.style.display);
+                }, 100);
             }
         }
         
         // OCULTAR INFO DE USUARIO
         function hideUserInfo() {
-            console.log('hideUserInfo called');
+            console.log('🔄 hideUserInfo called');
             
             const userInfoEl = document.getElementById('userInfo');
             if (userInfoEl) userInfoEl.style.display = 'none';
@@ -2897,15 +2901,13 @@
             const navUserDropdown = document.getElementById('navUserDropdown');
         
             if (navAuthButtons) {
-                navAuthButtons.style.display = 'flex';
-                navAuthButtons.style.setProperty('display', 'flex', 'important');
+                navAuthButtons.style.cssText = 'display: flex !important;';
             }
             if (navUserDropdown) {
-                navUserDropdown.style.display = 'none';
-                navUserDropdown.style.setProperty('display', 'none', 'important');
+                navUserDropdown.style.cssText = 'display: none !important;';
             }
             
-            console.log('✅ Nav bar hidden (logged out state)');
+            console.log('✅ Nav bar reset to logged-out state');
         }
 
         // =====================================================
@@ -5143,6 +5145,23 @@
                     checkSchedules();
                 }, 3000);
             }, 2000);
+
+            // Backup auth UI check after everything loads
+            setTimeout(async () => {
+                console.log('🔍 Running backup auth UI check...');
+                try {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session && session.user) {
+                        console.log('✅ Backup check: User is logged in, ensuring UI is updated');
+                        updateUserInfo(session.user);
+                    } else {
+                        console.log('ℹ️ Backup check: No session, showing login');
+                        hideUserInfo();
+                    }
+                } catch (e) {
+                    console.error('❌ Backup auth check failed:', e);
+                }
+            }, 1500);
         };
     </script>
 </body>
