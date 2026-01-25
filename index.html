@@ -58,9 +58,10 @@
 
         /* Auth section in nav */
         .nav-auth {
-            display: flex;
+            display: flex !important;
             align-items: center;
             gap: 15px;
+            margin-left: auto; /* Push to right side */
         }
 
         .nav-auth-buttons {
@@ -133,6 +134,11 @@
         /* Dropdown menu */
         .nav-dropdown {
             position: relative;
+            display: none; /* Hidden by default, JS will show it */
+        }
+        
+        .nav-dropdown[style*="display: flex"] {
+            display: flex !important;
         }
 
         .nav-dropdown-menu {
@@ -2843,6 +2849,8 @@
         
         // ACTUALIZAR INFO DE USUARIO EN UI
         function updateUserInfo(user) {
+            console.log('updateUserInfo called with:', user?.email);
+            
             if (user && user.email) {
                 // Update sidebar info
                 const userEmailEl = document.getElementById('userEmail');
@@ -2855,23 +2863,49 @@
                 const navUserDropdown = document.getElementById('navUserDropdown');
                 const navUserName = document.getElementById('navUserName');
         
-                if (navAuthButtons) navAuthButtons.style.display = 'none';
-                if (navUserDropdown) navUserDropdown.style.display = 'flex';
-                if (navUserName) navUserName.textContent = user.email.split('@')[0];
+                console.log('Nav elements found:', {
+                    navAuthButtons: !!navAuthButtons,
+                    navUserDropdown: !!navUserDropdown,
+                    navUserName: !!navUserName
+                });
+        
+                if (navAuthButtons) {
+                    navAuthButtons.style.display = 'none';
+                    navAuthButtons.style.setProperty('display', 'none', 'important');
+                }
+                if (navUserDropdown) {
+                    navUserDropdown.style.display = 'flex';
+                    navUserDropdown.style.setProperty('display', 'flex', 'important');
+                }
+                if (navUserName) {
+                    navUserName.textContent = user.email.split('@')[0];
+                }
+                
+                console.log('✅ Nav bar updated for user:', user.email);
             }
         }
-
+        
         // OCULTAR INFO DE USUARIO
         function hideUserInfo() {
+            console.log('hideUserInfo called');
+            
             const userInfoEl = document.getElementById('userInfo');
             if (userInfoEl) userInfoEl.style.display = 'none';
-    
+        
             // Update nav bar - show login, hide user
             const navAuthButtons = document.getElementById('navAuthButtons');
             const navUserDropdown = document.getElementById('navUserDropdown');
-    
-            if (navAuthButtons) navAuthButtons.style.display = 'flex';
-            if (navUserDropdown) navUserDropdown.style.display = 'none';
+        
+            if (navAuthButtons) {
+                navAuthButtons.style.display = 'flex';
+                navAuthButtons.style.setProperty('display', 'flex', 'important');
+            }
+            if (navUserDropdown) {
+                navUserDropdown.style.display = 'none';
+                navUserDropdown.style.setProperty('display', 'none', 'important');
+            }
+            
+            console.log('✅ Nav bar hidden (logged out state)');
         }
 
         // =====================================================
@@ -5008,13 +5042,14 @@
             // Configurar listener de cambios de autenticación
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
                 console.log('Auth event:', event, 'Session:', session ? 'exists' : 'null');
-
-                if (session && session.user) {
+            
+                // Handle any event that has a valid session
+                if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session && session.user) {
                     // Verificar límite de usuarios (especialmente para OAuth)
                     if (event === 'SIGNED_IN') {
                         try {
                             const { data: userCount, error: countError } = await supabaseClient.rpc('count_registered_users');
-
+            
                             if (!countError && userCount > 3) {
                                 console.error('Límite de usuarios excedido:', userCount);
                                 await supabaseClient.auth.signOut();
@@ -5028,31 +5063,26 @@
                             console.error('Error verificando límite en auth change:', e);
                         }
                     }
-
+            
                     // User is logged in
                     currentUser = session.user;
                     document.getElementById('authOverlay').style.display = 'none';
                     document.getElementById('authOverlay').classList.add('hidden');
+                    
+                    // CRITICAL: Update nav bar
                     updateUserInfo(session.user);
+                    
                     console.log('✅ User authenticated:', session.user.email);
             
-                } else if (event === 'SIGNED_OUT') {
-                    // User signed out
+                } else if (event === 'SIGNED_OUT' || !session) {
+                    // User signed out or no session
                     currentUser = null;
                     document.getElementById('authOverlay').style.display = 'flex';
                     document.getElementById('authOverlay').classList.remove('hidden');
                     hideUserInfo();
-                    console.log('👋 User signed out');
-            
-                } else if (!session) {
-                    // No session (not logged in)
-                    currentUser = null;
-                    document.getElementById('authOverlay').style.display = 'flex';
-                    document.getElementById('authOverlay').classList.remove('hidden');
-                    hideUserInfo();
-                    console.log('🔒 No active session');
+                    console.log('👋 User signed out or no session');
                 }
-        
+            
                 if (event === 'PASSWORD_RECOVERY') {
                     const newPassword = prompt('Ingresa tu nueva contraseña:');
                     if (newPassword) {
@@ -5066,9 +5096,9 @@
                         }
                     }
                 }
-        
-            authInitialized = true;
-        });
+            
+                authInitialized = true;
+            });
     
             // NO llamar checkAuthSession() - onAuthStateChange maneja todo
 
