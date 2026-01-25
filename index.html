@@ -4271,37 +4271,56 @@
                 document.getElementById('authError').classList.add('show');
                 return;
             }
-            
+    
             // Configurar listener de cambios de autenticación
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                console.log('Auth event:', event);
+                console.log('Auth event:', event, 'Session:', session ? 'exists' : 'null');
 
-                if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+                if (session && session.user) {
                     // Verificar límite de usuarios (especialmente para OAuth)
-                    try {
-                        const { data: userCount, error: countError } = await supabaseClient.rpc('count_registered_users');
+                    if (event === 'SIGNED_IN') {
+                        try {
+                            const { data: userCount, error: countError } = await supabaseClient.rpc('count_registered_users');
 
-                        if (!countError && userCount > 3) {
-                            // Si se excedió el límite, cerrar sesión inmediatamente
-                            console.error('Límite de usuarios excedido:', userCount);
-                            await supabaseClient.auth.signOut();
-                            showAuthError('🚫 Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados.');
-                            document.getElementById('authOverlay').classList.remove('hidden');
-                            return;
+                            if (!countError && userCount > 3) {
+                                console.error('Límite de usuarios excedido:', userCount);
+                                await supabaseClient.auth.signOut();
+                                showAuthError('🚫 Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados.');
+                                document.getElementById('authOverlay').style.display = 'flex';
+                                document.getElementById('authOverlay').classList.remove('hidden');
+                                hideUserInfo();
+                                return;
+                            }
+                        } catch (e) {
+                            console.error('Error verificando límite en auth change:', e);
                         }
-                    } catch (e) {
-                        console.error('Error verificando límite en auth change:', e);
                     }
 
+                    // User is logged in
                     currentUser = session.user;
+                    document.getElementById('authOverlay').style.display = 'none';
                     document.getElementById('authOverlay').classList.add('hidden');
                     updateUserInfo(session.user);
+                    console.log('✅ User authenticated:', session.user.email);
+            
                 } else if (event === 'SIGNED_OUT') {
+                    // User signed out
                     currentUser = null;
+                    document.getElementById('authOverlay').style.display = 'flex';
                     document.getElementById('authOverlay').classList.remove('hidden');
                     hideUserInfo();
-                } else if (event === 'PASSWORD_RECOVERY') {
-                    // Mostrar formulario para cambiar contraseña
+                    console.log('👋 User signed out');
+            
+                } else if (!session) {
+                    // No session (not logged in)
+                    currentUser = null;
+                    document.getElementById('authOverlay').style.display = 'flex';
+                    document.getElementById('authOverlay').classList.remove('hidden');
+                    hideUserInfo();
+                    console.log('🔒 No active session');
+                }
+        
+                if (event === 'PASSWORD_RECOVERY') {
                     const newPassword = prompt('Ingresa tu nueva contraseña:');
                     if (newPassword) {
                         const passwordCheck = checkPasswordStrength(newPassword);
@@ -4314,7 +4333,13 @@
                         }
                     }
                 }
-            });
+        
+            authInitialized = true;
+        });
+    
+            // NO llamar checkAuthSession() - onAuthStateChange maneja todo
+
+            addDebugLog('🚀 Aplicación iniciada', 'success');
             
             // AHORA verificar sesión de autenticación
             checkAuthSession();
