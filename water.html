@@ -25,9 +25,15 @@
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 0 30px;
             z-index: 1000;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .top-nav .nav-links {
+            display: flex;
+            align-items: center;
         }
 
         .top-nav a {
@@ -52,6 +58,122 @@
         .top-nav .separator {
             color: rgba(255,255,255,0.3);
             margin: 0 10px;
+        }
+
+        /* Auth section in nav */
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-auth-buttons a {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .nav-auth-buttons .login-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .nav-auth-buttons .login-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-user:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .nav-user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-user-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-user-dropdown {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Dropdown menu */
+        .nav-dropdown {
+            position: relative;
+        }
+
+        .nav-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            min-width: 200px;
+            display: none;
+            overflow: hidden;
+        }
+
+        .nav-dropdown-menu.show {
+            display: block;
+        }
+
+        .nav-dropdown-menu a,
+        .nav-dropdown-menu button {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-dropdown-menu a:hover,
+        .nav-dropdown-menu button:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-dropdown-menu .logout-btn {
+            color: #dc3545;
+            border-top: 1px solid #eee;
         }
 
         .main-content {
@@ -80,12 +202,38 @@
             font-size: 18px;
         }
     </style>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <nav class="top-nav">
-        <a href="index.html">🎄 Christmas Tree</a>
-        <span class="separator">|</span>
-        <a href="water.html" class="active">💧 Water Tank System</a>
+        <div class="nav-links">
+            <a href="index.html">🎄 Christmas Tree</a>
+            <span class="separator">|</span>
+            <a href="water.html" class="active">💧 Water Tank System</a>
+        </div>
+
+        <div class="nav-auth">
+            <!-- Show when NOT logged in -->
+            <div class="nav-auth-buttons" id="navAuthButtons" style="display: none;">
+                <a href="index.html" class="login-btn">🔐 Login</a>
+            </div>
+
+            <!-- Show when logged in -->
+            <div class="nav-dropdown" id="navUserDropdown" style="display: none;">
+                <div class="nav-user" onclick="toggleUserDropdown()">
+                    <div class="nav-user-avatar">👤</div>
+                    <div class="nav-user-info">
+                        <span class="nav-user-name" id="navUserName">User</span>
+                    </div>
+                    <span class="nav-user-dropdown">▼</span>
+                </div>
+                <div class="nav-dropdown-menu" id="navDropdownMenu">
+                    <a href="index.html">🎄 Go to Tree Controls</a>
+                    <button class="logout-btn" onclick="handleLogout()">🚪 Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
     </nav>
 
     <div class="main-content">
@@ -95,5 +243,112 @@
             <p>Coming soon - Add your water tank monitoring here</p>
         </div>
     </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://mcwsdinbxwfomkgtolhf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jd3NkaW5ieHdmb21rZ3RvbGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2NjU2MzcsImV4cCI6MjA3ODI0MTYzN30.rjJpb2OQRui-1uIsn2VwE_zX-I5V2CKgM3MveZSXxW4';
+
+        let supabaseClient = null;
+        let currentUser = null;
+
+        function initSupabase() {
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                return true;
+            }
+            return false;
+        }
+
+        function toggleUserDropdown() {
+            const menu = document.getElementById('navDropdownMenu');
+            menu.classList.toggle('show');
+        }
+
+        function closeUserDropdown() {
+            const menu = document.getElementById('navDropdownMenu');
+            menu.classList.remove('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('navUserDropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                closeUserDropdown();
+            }
+        });
+
+        function updateUserInfo(user) {
+            if (user && user.email) {
+                const navAuthButtons = document.getElementById('navAuthButtons');
+                const navUserDropdown = document.getElementById('navUserDropdown');
+                const navUserName = document.getElementById('navUserName');
+
+                if (navAuthButtons) navAuthButtons.style.display = 'none';
+                if (navUserDropdown) navUserDropdown.style.display = 'flex';
+                if (navUserName) navUserName.textContent = user.email.split('@')[0];
+            }
+        }
+
+        function hideUserInfo() {
+            const navAuthButtons = document.getElementById('navAuthButtons');
+            const navUserDropdown = document.getElementById('navUserDropdown');
+
+            if (navAuthButtons) navAuthButtons.style.display = 'flex';
+            if (navUserDropdown) navUserDropdown.style.display = 'none';
+        }
+
+        async function handleLogout() {
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+                currentUser = null;
+                hideUserInfo();
+                // Redirect to main page after logout
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+            }
+        }
+
+        async function checkAuthSession() {
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) throw error;
+
+                if (session && session.user) {
+                    currentUser = session.user;
+                    updateUserInfo(session.user);
+                } else {
+                    hideUserInfo();
+                }
+            } catch (error) {
+                console.error('Error al verificar sesión:', error);
+                hideUserInfo();
+            }
+        }
+
+        window.onload = function() {
+            if (!initSupabase()) {
+                console.error('Failed to initialize Supabase');
+                return;
+            }
+
+            // Listen for auth state changes
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                console.log('Auth event:', event);
+
+                if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+                    currentUser = session.user;
+                    updateUserInfo(session.user);
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    hideUserInfo();
+                }
+            });
+
+            // Check existing session
+            checkAuthSession();
+        };
+    </script>
 </body>
 </html>
