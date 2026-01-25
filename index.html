@@ -2055,24 +2055,24 @@
 
         // VERIFICAR SESIÓN AL CARGAR
         async function checkAuthSession() {
+            // This is now just a fallback, onAuthStateChange handles most cases
+            if (authInitialized) return; // Already handled by onAuthStateChange
+    
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
-
                 if (error) throw error;
 
                 if (session && session.user) {
                     currentUser = session.user;
+                    document.getElementById('authOverlay').style.display = 'none';
                     document.getElementById('authOverlay').classList.add('hidden');
                     updateUserInfo(session.user);
                 } else {
-                    // No session - show login
                     document.getElementById('authOverlay').style.display = 'flex';
                     document.getElementById('authOverlay').classList.remove('hidden');
                     hideUserInfo();
                 }
-
                 authInitialized = true;
-
             } catch (error) {
                 console.error('Error al verificar sesión:', error);
                 document.getElementById('authOverlay').style.display = 'flex';
