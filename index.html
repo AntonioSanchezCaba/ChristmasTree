@@ -2069,7 +2069,7 @@
     
         <div class="nav-auth">
             <!-- Show when NOT logged in - VISIBLE by default -->
-            <div class="nav-auth-buttons" id="navAuthButtons" style="display: flex;">
+            <div class="nav-auth-buttons" id="navAuthButtons" style="display: none;">
                 <a href="#" class="login-btn" onclick="showLoginModal(); return false;">🔐 Login</a>
             </div>
         
@@ -2093,7 +2093,7 @@
     <div id="stars" class="stars"></div>
 
     <!-- Modal de Autenticación -->
-    <div id="authOverlay" class="auth-overlay">
+    <div id="authOverlay" class="auth-overlay" style="display: none;">
         <div class="auth-container">
             <div class="auth-header">
                 <h2>🎄 Christmas Tree LED</h2>
@@ -2794,13 +2794,10 @@
 
         // VERIFICAR SESIÓN AL CARGAR
         async function checkAuthSession() {
-            // This is now just a fallback, onAuthStateChange handles most cases
-            if (authInitialized) return; // Already handled by onAuthStateChange
-    
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
                 if (error) throw error;
-
+        
                 if (session && session.user) {
                     currentUser = session.user;
                     document.getElementById('authOverlay').style.display = 'none';
