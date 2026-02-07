@@ -5030,58 +5030,45 @@
         }
         
         window.onload = function() {
-            // PRIMERO inicializar Supabase
             if (!initSupabase()) {
                 console.error('Failed to initialize Supabase');
                 document.getElementById('authError').textContent = 'Error: No se pudo cargar el sistema de autenticación';
                 document.getElementById('authError').classList.add('show');
                 return;
             }
-    
-            // Configurar listener de cambios de autenticación
+        
+            // SINGLE SOURCE OF TRUTH for auth state
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
                 console.log('Auth event:', event, 'Session:', session ? 'exists' : 'null');
-            
-                // Handle any event that has a valid session
-                if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session && session.user) {
-                    // Verificar límite de usuarios (especialmente para OAuth)
-                    if (event === 'SIGNED_IN') {
-                        try {
-                            const { data: userCount, error: countError } = await supabaseClient.rpc('count_registered_users');
-            
-                            if (!countError && userCount > 3) {
-                                console.error('Límite de usuarios excedido:', userCount);
-                                await supabaseClient.auth.signOut();
-                                showAuthError('🚫 Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados.');
-                                document.getElementById('authOverlay').style.display = 'flex';
-                                document.getElementById('authOverlay').classList.remove('hidden');
-                                hideUserInfo();
-                                return;
-                            }
-                        } catch (e) {
-                            console.error('Error verificando límite en auth change:', e);
-                        }
-                    }
-            
-                    // User is logged in
+        
+                if (session && session.user) {
                     currentUser = session.user;
                     document.getElementById('authOverlay').style.display = 'none';
                     document.getElementById('authOverlay').classList.add('hidden');
-                    
-                    // CRITICAL: Update nav bar
                     updateUserInfo(session.user);
-                    
                     console.log('✅ User authenticated:', session.user.email);
-            
-                } else if (event === 'SIGNED_OUT' || !session) {
-                    // User signed out or no session
+        
+                    // Verify user limit on new sign-ins
+                    if (event === 'SIGNED_IN') {
+                        try {
+                            const { data: userCount, error: countError } = await supabaseClient.rpc('count_registered_users');
+                            if (!countError && userCount > 3) {
+                                await supabaseClient.auth.signOut();
+                                showAuthError('🚫 Límite de usuarios alcanzado.');
+                                return;
+                            }
+                        } catch (e) {
+                            console.error('Error verificando límite:', e);
+                        }
+                    }
+                } else if (event === 'SIGNED_OUT') {
                     currentUser = null;
                     document.getElementById('authOverlay').style.display = 'flex';
                     document.getElementById('authOverlay').classList.remove('hidden');
                     hideUserInfo();
-                    console.log('👋 User signed out or no session');
+                    console.log('👋 User signed out');
                 }
-            
+        
                 if (event === 'PASSWORD_RECOVERY') {
                     const newPassword = prompt('Ingresa tu nueva contraseña:');
                     if (newPassword) {
@@ -5089,23 +5076,42 @@
                         if (passwordCheck.valid) {
                             supabaseClient.auth.updateUser({ password: newPassword })
                                 .then(() => alert('Contraseña actualizada exitosamente'))
-                                .catch(err => alert('Error al actualizar contraseña: ' + err.message));
+                                .catch(err => alert('Error: ' + err.message));
                         } else {
                             alert('La contraseña no es lo suficientemente fuerte');
                         }
                     }
                 }
-            
+        
                 authInitialized = true;
             });
-    
-            // NO llamar checkAuthSession() - onAuthStateChange maneja todo
-
-            addDebugLog('🚀 Aplicación iniciada', 'success');
-            
-            // AHORA verificar sesión de autenticación
-            checkAuthSession();
-
+        
+            // FALLBACK: If onAuthStateChange doesn't fire within 3s, check manually ONCE
+            setTimeout(async () => {
+                if (!authInitialized) {
+                    console.log('⏰ Fallback auth check...');
+                    try {
+                        const { data: { session } } = await supabaseClient.auth.getSession();
+                        if (session && session.user) {
+                            currentUser = session.user;
+                            document.getElementById('authOverlay').style.display = 'none';
+                            updateUserInfo(session.user);
+                        } else {
+                            document.getElementById('authOverlay').style.display = 'flex';
+                            hideUserInfo();
+                        }
+                    } catch (e) {
+                        document.getElementById('authOverlay').style.display = 'flex';
+                        hideUserInfo();
+                    }
+                    authInitialized = true;
+                }
+            }, 3000);
+        
+            // DELETE these lines (remove checkAuthSession call and the backup setTimeout at 1500ms):
+            // checkAuthSession();                    ← REMOVE
+            // setTimeout(async () => { ... }, 1500); ← REMOVE
+        
             addDebugLog('🚀 Aplicación iniciada', 'success');
             addDebugLog('📝 Versión completa con Scheduler', 'info');
 
