@@ -1686,11 +1686,14 @@
         
             .auth-tabs {
                 margin-bottom: 15px;
+                gap: 3px;
+                padding: 3px;
             }
-        
+            
             .auth-tab {
-                padding: 10px 8px;
+                padding: 8px 6px;
                 font-size: 12px;
+                line-height: 1.2;
             }
         
             .form-group {
@@ -1794,30 +1797,38 @@
 
         .auth-tabs {
             display: flex;
-            gap: 10px;
+            gap: 4px;
             margin-bottom: 25px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 3px;
+            border-radius: 10px;
         }
-
+        
         .auth-tab {
             flex: 1;
-            padding: 12px;
+            padding: 10px 8px;
             border: none;
             background: transparent;
             color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            border-radius: 10px;
-            transition: all 0.3s;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            line-height: 1.2;
         }
-
+        
+        .auth-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
         .auth-tab.active {
             background: white;
             color: #667eea;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .auth-form {
