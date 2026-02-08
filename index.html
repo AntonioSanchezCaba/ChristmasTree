@@ -892,6 +892,8 @@
             z-index: 10000;
             opacity: 1;
             transition: opacity 0.3s ease;
+            overflow-y: auto;
+            padding: 20px;
         }
 
         .auth-overlay.hidden {
@@ -907,7 +909,20 @@
             max-width: 420px;
             padding: 40px;
             position: relative;
-            animation: slideIn 0.4s ease-out;
+            animation: authSlideIn 0.4s ease-out;
+            margin: auto;
+            flex-shrink: 0;
+        }
+        
+        @keyframes authSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         @keyframes slideIn {
@@ -1662,74 +1677,84 @@
            AUTH OVERLAY RESPONSIVE
            ===================================================== */
         
-        @media (max-width: 500px) {
+        @media (max-width: 600px) {
             .auth-overlay {
-                align-items: flex-start;
-                padding-top: 50px;
+                padding: 0;
+                align-items: stretch;
             }
         
             .auth-container {
                 width: 100%;
                 max-width: 100%;
-                min-height: calc(100vh - 50px);
+                min-height: 100vh;
+                min-height: 100dvh;
                 border-radius: 0;
-                padding: 20px 15px;
+                padding: 60px 24px 40px;
+                box-shadow: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                margin: 0;
+            }
+        
+            .auth-header {
+                margin-bottom: 24px;
             }
         
             .auth-header h2 {
-                font-size: 20px;
+                font-size: 24px;
             }
         
             .auth-header p {
-                font-size: 12px;
+                font-size: 13px;
             }
         
             .auth-tabs {
-                margin-bottom: 15px;
-                gap: 3px;
+                margin-bottom: 20px;
+                gap: 0;
                 padding: 3px;
             }
-            
+        
             .auth-tab {
-                padding: 8px 6px;
-                font-size: 12px;
+                padding: 10px 8px;
+                font-size: 13px;
                 line-height: 1.2;
             }
         
             .form-group {
-                margin-bottom: 12px;
+                margin-bottom: 16px;
             }
         
             .form-group label {
-                font-size: 11px;
-                margin-bottom: 5px;
+                font-size: 12px;
+                margin-bottom: 6px;
             }
         
             .form-group input {
-                padding: 12px;
-                font-size: 16px; /* Prevents iOS zoom */
+                padding: 14px;
+                font-size: 16px;
                 border-radius: 10px;
             }
         
             .auth-button {
-                padding: 12px;
-                font-size: 14px;
+                padding: 14px;
+                font-size: 15px;
                 border-radius: 10px;
             }
         
             .oauth-button {
-                padding: 11px;
-                font-size: 13px;
+                padding: 13px;
+                font-size: 14px;
                 border-radius: 10px;
             }
         
             .auth-divider {
-                margin: 15px 0;
-                font-size: 11px;
+                margin: 20px 0;
+                font-size: 12px;
             }
         
             .forgot-password a {
-                font-size: 12px;
+                font-size: 13px;
             }
         
             .error-message,
@@ -1740,7 +1765,71 @@
             }
         
             .password-strength {
-                font-size: 10px;
+                font-size: 11px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .auth-container {
+                padding: 50px 16px 30px;
+            }
+        
+            .auth-header h2 {
+                font-size: 20px;
+            }
+        
+            .form-group input {
+                padding: 12px;
+            }
+        
+            .auth-button {
+                padding: 12px;
+                font-size: 14px;
+            }
+        
+            .auth-tab {
+                font-size: 12px;
+                padding: 8px 6px;
+            }
+        }
+        
+        /* Landscape phone auth fix */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .auth-container {
+                min-height: auto;
+                padding: 20px 24px;
+                justify-content: flex-start;
+            }
+        
+            .auth-overlay {
+                overflow-y: auto;
+                padding: 0;
+                align-items: flex-start;
+            }
+        
+            .auth-header {
+                margin-bottom: 12px;
+            }
+        
+            .auth-header h2 {
+                font-size: 20px;
+            }
+        
+            .form-group {
+                margin-bottom: 10px;
+            }
+        
+            .form-group input {
+                padding: 10px;
+            }
+        
+            .auth-button,
+            .oauth-button {
+                padding: 10px;
+            }
+        
+            .auth-divider {
+                margin: 12px 0;
             }
         }
         
