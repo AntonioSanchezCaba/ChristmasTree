@@ -1679,25 +1679,28 @@
         
         @media (max-width: 600px) {
             .auth-overlay {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                backdrop-filter: none !important;
                 padding: 0 !important;
                 align-items: stretch !important;
                 overflow-y: auto !important;
             }
         
             .auth-container {
+                background: transparent !important;
+                animation: none !important;
                 width: 100% !important;
-                max-width: 100% !important;
+                max-width: none !important;
                 min-height: 100vh !important;
                 min-height: 100dvh !important;
                 border-radius: 0 !important;
-                padding: 60px 24px 40px !important;
                 box-shadow: none !important;
+                margin: 0 !important;
+                padding: 60px 24px 40px !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: center !important;
-                margin: 0 !important;
                 flex: 1 !important;
-                flex-shrink: 0 !important;
             }
         
             .auth-header {
@@ -1798,17 +1801,21 @@
         
         /* Landscape phone auth fix */
         @media (max-height: 600px) and (orientation: landscape) {
+            .auth-overlay {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                backdrop-filter: none !important;
+                overflow-y: auto !important;
+                padding: 0 !important;
+                align-items: flex-start !important;
+            }
+        
             .auth-container {
+                background: transparent !important;
+                animation: none !important;
                 min-height: auto !important;
                 padding: 20px 24px !important;
                 justify-content: flex-start !important;
                 flex: none !important;
-            }
-        
-            .auth-overlay {
-                overflow-y: auto !important;
-                padding: 0 !important;
-                align-items: flex-start !important;
             }
         
             .auth-header {
