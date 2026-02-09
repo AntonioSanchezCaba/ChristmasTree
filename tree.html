@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎄 Christmas LED Tree - 3D WLED Edition</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/tree.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-links">
+            <a href="tree.html" class="active">🎄 Christmas Tree</a>
+            <span class="separator">|</span>
+            <a href="water.html">💧 Water Tank System</a>
+        </div>
+
+        <div class="nav-auth">
+            <div class="nav-auth-buttons" id="navAuthButtons" style="display: none;">
+                <a href="index.html" class="login-btn">🔐 Login</a>
+            </div>
+            <div class="nav-dropdown" id="navUserDropdown" style="display: none;">
+                <div class="nav-user" onclick="toggleUserDropdown()">
+                    <div class="nav-user-avatar">👤</div>
+                    <div class="nav-user-info">
+                        <span class="nav-user-name" id="navUserName">User</span>
+                    </div>
+                    <span class="nav-user-dropdown">▼</span>
+                </div>
+                <div class="nav-dropdown-menu" id="navDropdownMenu">
+                    <a href="#" onclick="openSchedule(); closeUserDropdown(); return false;">📅 Schedule</a>
+                    <button class="logout-btn" onclick="handleLogout()">🚪 Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="stars" class="stars"></div>
+
+    <button class="schedule-button" onclick="openSchedule()">
+        📅 <span style="font-size: 12px;">Schedule</span>
+    </button>
+
+    <div id="scheduleModal" class="schedule-modal">
+        <div class="schedule-container">
+            <div class="schedule-header">
+                <h2>📅 Programación de Horarios LED</h2>
+                <button class="close-schedule" onclick="closeSchedule()" aria-label="Cerrar">✕</button>
+            </div>
+
+            <div class="schedule-body">
+                <div class="add-schedule-panel">
+                    <h3 style="margin-bottom: 15px; color: #667eea;">⚡ Acciones Rápidas</h3>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" onclick="setWeekdaySchedule()">
+                             💼 Lun-Vie (7:00-21:00)
+                        </button>
+                        <button class="quick-action-btn" onclick="setWeekendSchedule()">
+                            🏖️ Fin de Semana (9:00-23:00)
+                        </button>
+                        <button class="quick-action-btn" onclick="setEveningSchedule()">
+                            🌙 Solo Tardes (17:00-23:00)
+                        </button>
+                        <button class="quick-action-btn" onclick="clearAllSchedules()" style="background: #dc3545;">
+                            🗑️ Limpiar Todo
+                        </button>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                        <h4 style="margin-top: 0; color: #667eea;">➕ Agregar Horario Personalizado</h4>
+
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-0" style="margin-right: 3px;"> Dom
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-1" style="margin-right: 3px;"> Lun
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-2" style="margin-right: 3px;"> Mar
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-3" style="margin-right: 3px;"> Mié
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-4" style="margin-right: 3px;"> Jue
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-5" style="margin-right: 3px;"> Vie
+                            </label>
+                            <label style="display: flex; align-items: center; font-size: 13px;">
+                                <input type="checkbox" id="day-6" style="margin-right: 3px;"> Sáb
+                            </label>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
+                            <div>
+                                <label style="font-size: 12px; color: #666;">Hora Inicio:</label>
+                                <input type="time" id="scheduleStartTime" value="07:00" style="margin: 0;">
+                            </div>
+                            <div>
+                                 <label style="font-size: 12px; color: #666;">Hora Fin:</label>
+                                <input type="time" id="scheduleEndTime" value="21:00" style="margin: 0;">
+                            </div>
+                            <button onclick="addSchedule()" style="background: #28a745; margin: 0; width: auto; padding: 10px 20px;">
+                                ➕ Agregar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #2196F3;">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 600;">
+                            <input type="checkbox" id="schedulerEnabled" onchange="updateScheduler()" style="width: 20px; height: 20px;">
+                            <span>🔌 Activar Programación Automática</span>
+                        </label>
+                        <p style="margin-top: 10px; margin-bottom: 10px; font-size: 13px; color: #666;">
+                            Estado: <span id="scheduleStatusText" style="font-weight: 600;">Desactivado</span>
+                        </p>
+                        <div style="margin-top: 10px;">
+                            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">🌍 Zona Horaria:</label>
+                            <select id="timezoneSelect" onchange="saveTimezone()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                                <option value="America/Santo_Domingo">América/Santo Domingo (AST, UTC-4)</option>
+                                <option value="America/New_York">América/New York (EST/EDT, UTC-5/-4)</option>
+                                <option value="America/Chicago">América/Chicago (CST/CDT, UTC-6/-5)</option>
+                                <option value="America/Denver">América/Denver (MST/MDT, UTC-7/-6)</option>
+                                <option value="America/Los_Angeles">América/Los Angeles (PST/PDT, UTC-8/-7)</option>
+                                <option value="America/Mexico_City">América/Ciudad de México (CST/CDT, UTC-6/-5)</option>
+                                <option value="America/Bogota">América/Bogotá (COT, UTC-5)</option>
+                                <option value="America/Lima">América/Lima (PET, UTC-5)</option>
+                                <option value="America/Argentina/Buenos_Aires">América/Buenos Aires (ART, UTC-3)</option>
+                                <option value="America/Sao_Paulo">América/São Paulo (BRT, UTC-3)</option>
+                                <option value="Europe/Madrid">Europa/Madrid (CET/CEST, UTC+1/+2)</option>
+                                <option value="Europe/London">Europa/Londres (GMT/BST, UTC+0/+1)</option>
+                                <option value="Asia/Tokyo">Asia/Tokio (JST, UTC+9)</option>
+                                <option value="UTC">UTC (UTC+0)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schedule-grid">
+                    <div class="time-column">
+                        <div class="time-label">00:00</div>
+                         <div class="time-label">02:00</div>
+                        <div class="time-label">04:00</div>
+                        <div class="time-label">06:00</div>
+                        <div class="time-label">08:00</div>
+                         <div class="time-label">10:00</div>
+                        <div class="time-label">12:00</div>
+                        <div class="time-label">14:00</div>
+                        <div class="time-label">16:00</div>
+                         <div class="time-label">18:00</div>
+                        <div class="time-label">20:00</div>
+                        <div class="time-label">22:00</div>
+                    </div>
+
+                    <div class="days-grid" id="scheduleGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="tree-view">
+            <div class="tree-container">
+                <canvas id="treeCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="panel-header">
+                <h1>🎄 Christmas LED Tree</h1>
+                <p>© 2024 AMSC All rights reserved.</p>
+            </div>
+
+            <!-- User Info -->
+            <div id="userInfo" style="display: none; padding: 10px 20px; background: rgba(102, 126, 234, 0.1); border-bottom: 1px solid rgba(102, 126, 234, 0.2); text-align: center;">
+                <div style="font-size: 12px; color: #666; margin-bottom: 5px;">
+                    Sesión activa: <span id="userEmail" style="color: #667eea; font-weight: 500;"></span>
+                </div>
+                <button onclick="handleLogout()" style="padding: 6px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.3s;">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
+
+            <div class="panel-content">
+                <div class="section">
+                    <div class="section-title">🔌 Conexión MQTT</div>
+                    <div class="connection-status connecting" id="connectionStatus">🔄 Conectando...</div>
+                    <div class="info-box">
+                         <strong>📡 Servidor:</strong> mqtt.vittence.com<br>
+                        <strong>🔒 Protocolo:</strong> WebSocket Secure (WSS) - Puerto 8084<br>
+                        <strong>🎯 Topic:</strong> wled/tree/api<br>
+                        <strong>✅ SSL:</strong> Certificado Let's Encrypt válido<br>
+                         <strong>🌐 Compatible:</strong> Funciona desde HTTPS
+                    </div>
+                    <button onclick="reconnectMQTT()">🔄 Reconectar MQTT</button>
+                     <button onclick="sendTestMessage()">📤 Enviar Mensaje de Prueba</button>
+                    <button onclick="resetWLED()" class="danger">🔴 Apagar LEDs</button>
+                    <div class="debug-log" id="debugLog"></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">🎨 LED Color</div>
+                    <div class="color-selector">
+                         <input type="color" id="ledColor" value="#ff0000" onchange="updateSelectedColor()">
+                        <button onclick="activatePaintMode()" id="paintBtn">Activar Paint Mode</button>
+                    </div>
+                     <div id="colorPalette" class="color-palette" style="display: none;">
+                        <div class="palette-color selected" style="background: #ff0000" onclick="selectPaletteColor('#ff0000')"></div>
+                        <div class="palette-color" style="background: #ffa500" onclick="selectPaletteColor('#ffa500')"></div>
+                        <div class="palette-color" style="background: #ffff00" onclick="selectPaletteColor('#ffff00')"></div>
+                         <div class="palette-color" style="background: #ffffff" onclick="selectPaletteColor('#ffffff')"></div>
+                        <div class="palette-color" style="background: #00ff00" onclick="selectPaletteColor('#00ff00')"></div>
+                        <div class="palette-color" style="background: #0000ff" onclick="selectPaletteColor('#0000ff')"></div>
+                         <div class="palette-color" style="background: #4b0082" onclick="selectPaletteColor('#4b0082')"></div>
+                        <div class="palette-color" style="background: #ee82ee" onclick="selectPaletteColor('#ee82ee')"></div>
+                        <div class="palette-color" style="background: #333333" onclick="selectPaletteColor('#333333')"></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">💡 Brightness</div>
+                    <div class="brightness-control">
+                         <input type="range" id="brightness" min="0" max="255" value="128" oninput="setBrightness(this.value)">
+                        <span class="brightness-value" id="brightVal">50%</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">⚡ Control</div>
+                    <div class="effects-grid">
+                        <button class="effect-btn" onclick="setStaticDesign('OFF')" style="background: #dc3545;">🔴 OFF</button>
+                        <button class="effect-btn" onclick="runEffect(0)">⚪ Solid (Static)</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">🎨 Color Palettes</div>
+                    <div class="effects-grid">
+                        <button class="effect-btn" onclick="setPalette(2)">💜 Purple Rain</button>
+                        <button class="effect-btn" onclick="setPalette(255)">🇩🇴 Dominican</button>
+                        <button class="effect-btn" onclick="setPalette(35)">🔥 Fire</button>
+                        <button class="effect-btn" onclick="setPalette(9)">🌊 Ocean</button>
+                        <button class="effect-btn" onclick="setPalette(8)">🌋 Lava</button>
+                        <button class="effect-btn" onclick="setPalette(11)">🌈 Rainbow</button>
+                        <button class="effect-btn" onclick="setPalette(10)">🌲 Forest</button>
+                        <button class="effect-btn" onclick="setPalette(13)">🌅 Sunset</button>
+                        <button class="effect-btn" onclick="setPalette(26)">🏖️ Beach</button>
+                        <button class="effect-btn" onclick="setPalette(6)">🎉 Party</button>
+                        <button class="effect-btn" onclick="setPalette(20)">🌸 Pastel</button>
+                        <button class="effect-btn" onclick="setPalette(7)">☁️ Cloud</button>
+                        <button class="effect-btn" onclick="setPalette(50)">✨ Aurora</button>
+                        <button class="effect-btn" onclick="setPalette(48)">🎄 C9 (Christmas)</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">⚡ Effect Modes</div>
+                    <div class="effects-grid">
+                        <button class="effect-btn" onclick="runEffect(1)">💫 Blink</button>
+                        <button class="effect-btn" onclick="runEffect(2)">🌬️ Breathe</button>
+                        <button class="effect-btn" onclick="runEffect(9)">🌈 Rainbow</button>
+                        <button class="effect-btn" onclick="runEffect(10)">📡 Scan</button>
+                        <button class="effect-btn" onclick="runEffect(17)">✨ Twinkle</button>
+                        <button class="effect-btn" onclick="runEffect(20)">⭐ Sparkle</button>
+                        <button class="effect-btn" onclick="runEffect(28)">🏃 Chase</button>
+                        <button class="effect-btn" onclick="runEffect(38)">🌌 Aurora</button>
+                        <button class="effect-btn" onclick="runEffect(42)">🎆 Fireworks</button>
+                        <button class="effect-btn" onclick="runEffect(45)">🌋 Lava</button>
+                        <button class="effect-btn" onclick="runEffect(67)">🌀 Colorwaves</button>
+                        <button class="effect-btn" onclick="runEffect(76)">☄️ Meteor</button>
+                        <button class="effect-btn" onclick="runEffect(79)">💧 Ripple</button>
+                        <button class="effect-btn" onclick="runEffect(101)">🌴 Pacifica</button>
+                        <button class="effect-btn" onclick="runEffect(110)">🎨 Flow</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">📁 Saved Designs</div>
+                     <input type="text" id="designName" placeholder="Design name">
+                    <button onclick="saveDesign()">💾 Save Current Design</button>
+                    <div id="designsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
+
+    <script src="js/auth.js"></script>
+    <script src="js/tree.js"></script>
+</body>
+</html>

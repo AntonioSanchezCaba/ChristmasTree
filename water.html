@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💧 Water Tank System</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
     <link rel="stylesheet" href="css/water.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <nav class="top-nav">
         <div class="nav-links">
-            <a href="index.html">🎄 Christmas Tree</a>
+            <a href="tree.html">🎄 Christmas Tree</a>
             <span class="separator">|</span>
             <a href="water.html" class="active">💧 Water Tank System</a>
         </div>
@@ -26,7 +27,7 @@
                     <span class="nav-user-dropdown-arrow">▼</span>
                 </div>
                 <div class="nav-dropdown-menu" id="navDropdownMenu">
-                    <a href="index.html">🎄 Go to Tree Controls</a>
+                    <a href="tree.html">🎄 Go to Tree Controls</a>
                     <button class="logout-btn" onclick="handleLogout()">🚪 Cerrar Sesión</button>
                 </div>
             </div>
@@ -206,6 +207,7 @@
         </div>
     </div>
 
+    <script src="js/auth.js"></script>
     <script src="js/water.js"></script>
 </body>
 </html>

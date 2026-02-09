@@ -1,69 +1,4 @@
 // =====================================================
-// SUPABASE CONFIG
-// =====================================================
-
-const SUPABASE_URL = 'https://mcwsdinbxwfomkgtolhf.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jd3NkaW5ieHdmb21rZ3RvbGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2NjU2MzcsImV4cCI6MjA3ODI0MTYzN30.rjJpb2OQRui-1uIsn2VwE_zX-I5V2CKgM3MveZSXxW4';
-
-let supabaseClient = null;
-let currentUser = null;
-let authInitialized = false;
-
-function initSupabase() {
-    if (window.supabase && window.supabase.createClient) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        return true;
-    }
-    return false;
-}
-
-// =====================================================
-// NAV USER DROPDOWN
-// =====================================================
-
-function toggleUserDropdown() {
-    document.getElementById('navDropdownMenu').classList.toggle('show');
-}
-
-function closeUserDropdown() {
-    document.getElementById('navDropdownMenu').classList.remove('show');
-}
-
-document.addEventListener('click', e => {
-    const d = document.getElementById('navUserDropdown');
-    if (d && !d.contains(e.target)) closeUserDropdown();
-});
-
-function updateUserInfo(user) {
-    if (!user || !user.email) return;
-
-    const authButtons = document.getElementById('navAuthButtons');
-    const userDropdown = document.getElementById('navUserDropdown');
-    const userName = document.getElementById('navUserName');
-
-    if (authButtons) authButtons.style.cssText = 'display:none!important;';
-    if (userDropdown) userDropdown.style.cssText = 'display:flex!important;position:relative;';
-    if (userName) userName.textContent = user.email.split('@')[0];
-}
-
-function hideUserInfo() {
-    const authButtons = document.getElementById('navAuthButtons');
-    const userDropdown = document.getElementById('navUserDropdown');
-
-    if (authButtons) authButtons.style.cssText = 'display:flex!important;';
-    if (userDropdown) userDropdown.style.cssText = 'display:none!important;';
-}
-
-async function handleLogout() {
-    try {
-        await supabaseClient.auth.signOut();
-    } catch (e) {}
-    currentUser = null;
-    hideUserInfo();
-    window.location.href = 'index.html';
-}
-
-// =====================================================
 // CLOCK
 // =====================================================
 
@@ -148,41 +83,9 @@ function setTab(btn) {
 // INITIALIZATION
 // =====================================================
 
-window.onload = function () {
-    if (!initSupabase()) return;
-
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-        if (session && session.user) {
-            currentUser = session.user;
-            updateUserInfo(session.user);
-        } else if (event === 'SIGNED_OUT') {
-            currentUser = null;
-            hideUserInfo();
-        }
-        authInitialized = true;
-    });
-
-    // Fallback: check session after 3s if auth state hasn't fired
-    setTimeout(async () => {
-        if (!authInitialized) {
-            try {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (session && session.user) {
-                    currentUser = session.user;
-                    updateUserInfo(session.user);
-                } else {
-                    hideUserInfo();
-                }
-            } catch (e) {
-                hideUserInfo();
-            }
-            authInitialized = true;
-        }
-    }, 3000);
-
-    // Start clock and simulation
+window.addEventListener('DOMContentLoaded', function () {
     tick();
     setInterval(tick, 1000);
     setTimeout(sim, 1500);
     setInterval(sim, 5000);
-};
+});
