@@ -1,0 +1,38 @@
+/* =====================================================
+   GLOBAL STYLES - Reset, Print, HiDPI
+   ===================================================== */
+
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== HIGH DPI / RETINA DISPLAY ===== */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .effect-btn,
+    button {
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+/* ===== PRINT ===== */
+@media print {
+    .top-nav,
+    .schedule-button,
+    .auth-overlay,
+    .schedule-modal,
+    .control-panel {
+        display: none !important;
+    }
+
+    .tree-view {
+        width: 100%;
+        height: auto;
+    }
+
+    body {
+        padding: 0;
+    }
+}

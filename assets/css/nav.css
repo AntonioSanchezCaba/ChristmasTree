@@ -1,0 +1,328 @@
+/* =====================================================
+   NAVIGATION BAR STYLES
+   ===================================================== */
+
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.top-nav .nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.top-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.top-nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.top-nav a.active {
+    background: rgba(102, 126, 234, 0.3);
+    border-bottom: 2px solid #667eea;
+}
+
+.top-nav .separator {
+    color: rgba(255, 255, 255, 0.3);
+    margin: 0 10px;
+}
+
+/* ===== AUTH SECTION IN NAV ===== */
+.nav-auth {
+    display: flex !important;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+    min-width: 100px;
+}
+
+.nav-auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-auth-buttons a {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.nav-auth-buttons .login-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.nav-auth-buttons .login-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+}
+
+/* ===== USER DROPDOWN ===== */
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.nav-user:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-user-avatar {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.nav-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-user-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-user-email {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.nav-user-dropdown {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown[style*="display: flex"] {
+    display: flex !important;
+}
+
+.nav-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    min-width: 200px;
+    display: none;
+    overflow: hidden;
+}
+
+.nav-dropdown-menu.show {
+    display: block;
+}
+
+.nav-dropdown-menu a,
+.nav-dropdown-menu button {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.nav-dropdown-menu a:hover,
+.nav-dropdown-menu button:hover {
+    background: #f5f5f5;
+}
+
+.nav-dropdown-menu .logout-btn {
+    color: #dc3545;
+    border-top: 1px solid #eee;
+}
+
+/* =====================================================
+   NAV RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1024px) {
+    .top-nav {
+        padding: 0 20px;
+    }
+
+    .top-nav a {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .top-nav {
+        height: 50px;
+        padding: 0 15px;
+    }
+
+    .top-nav .nav-links {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .top-nav .nav-links a {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .top-nav .separator {
+        margin: 0 5px;
+        font-size: 12px;
+    }
+
+    .nav-auth {
+        flex-shrink: 0;
+    }
+
+    .nav-auth-buttons a {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .nav-user {
+        padding: 5px 8px;
+        gap: 6px;
+    }
+
+    .nav-user-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .nav-user-name {
+        font-size: 11px;
+        max-width: 70px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .nav-user-dropdown {
+        font-size: 10px;
+    }
+
+    .nav-dropdown-menu {
+        min-width: 160px;
+        right: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .top-nav .nav-links a {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+
+    .nav-user-info {
+        max-width: 60px;
+    }
+
+    .nav-user-name {
+        font-size: 10px;
+        max-width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-nav {
+        height: 50px;
+        padding: 0 10px;
+    }
+
+    .top-nav .nav-links a {
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+
+    .top-nav .separator {
+        margin: 0 3px;
+        font-size: 10px;
+    }
+
+    .nav-user-info {
+        display: none;
+    }
+
+    .nav-user {
+        padding: 4px;
+    }
+
+    .nav-user-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .nav-user-dropdown {
+        display: none;
+    }
+
+    .nav-auth-buttons .login-btn {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+
+    .nav-dropdown-menu {
+        min-width: 150px;
+        right: -5px;
+    }
+
+    .nav-dropdown-menu a,
+    .nav-dropdown-menu button {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 360px) {
+    .top-nav .nav-links a {
+        padding: 3px 5px;
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+    .top-nav {
+        height: 45px;
+    }
+}

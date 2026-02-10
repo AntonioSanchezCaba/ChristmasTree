@@ -3,32 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💧 Water Tank System</title>
+    <title>Water Tank System</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/shared.css">
-    <link rel="stylesheet" href="css/water.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/nav.css">
+    <link rel="stylesheet" href="assets/css/water.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <nav class="top-nav">
         <div class="nav-links">
-            <a href="tree.html">🎄 Christmas Tree</a>
+            <a href="index.html">Christmas Tree</a>
             <span class="separator">|</span>
-            <a href="water.html" class="active">💧 Water Tank System</a>
+            <a href="water.html" class="active">Water Tank System</a>
         </div>
         <div class="nav-auth">
             <div class="nav-auth-buttons" id="navAuthButtons" style="display: none;">
-                <a href="index.html" class="login-btn">🔐 Login</a>
+                <a href="login.html" class="login-btn">Login</a>
             </div>
             <div class="nav-dropdown" id="navUserDropdown" style="display: none;">
                 <div class="nav-user" onclick="toggleUserDropdown()">
-                    <div class="nav-user-avatar">👤</div>
+                    <div class="nav-user-avatar">&#128100;</div>
                     <div class="nav-user-info"><span class="nav-user-name" id="navUserName">User</span></div>
-                    <span class="nav-user-dropdown-arrow">▼</span>
+                    <span class="nav-user-dropdown">&#9660;</span>
                 </div>
                 <div class="nav-dropdown-menu" id="navDropdownMenu">
-                    <a href="tree.html">🎄 Go to Tree Controls</a>
-                    <button class="logout-btn" onclick="handleLogout()">🚪 Cerrar Sesión</button>
+                    <a href="index.html">Go to Tree Controls</a>
+                    <button class="logout-btn" onclick="handleLogout()">Cerrar Sesión</button>
                 </div>
             </div>
         </div>
@@ -37,22 +38,22 @@
     <div class="dashboard">
         <div class="dash-header">
             <div class="dash-header-row">
-                <div><h1>💧 Water Tank System</h1><p>Dual Tinaco Monitoring — Supply &amp; Consumption</p></div>
+                <div><h1>Water Tank System</h1><p>Dual Tinaco Monitoring — Supply &amp; Consumption</p></div>
                 <div class="live-badge"><span class="dot"></span><span id="clock">--</span></div>
             </div>
         </div>
 
         <div class="overview-row">
-            <div class="o-card t1"><div class="o-label">Tinaco 1 Level</div><div class="o-val" id="ov-t1">78<span>%</span></div><div class="o-tag up">▲ 3% /hr</div></div>
-            <div class="o-card t2"><div class="o-label">Tinaco 2 Level</div><div class="o-val" id="ov-t2">62<span>%</span></div><div class="o-tag down">▼ 5% /hr</div></div>
-            <div class="o-card ok"><div class="o-label">Total Supply Today</div><div class="o-val" id="ov-sup">584<span> L</span></div><div class="o-tag up">▲ 8% vs avg</div></div>
-            <div class="o-card warn"><div class="o-label">Total Consumed Today</div><div class="o-val" id="ov-con">421<span> L</span></div><div class="o-tag flat">● Normal</div></div>
+            <div class="o-card t1"><div class="o-label">Tinaco 1 Level</div><div class="o-val" id="ov-t1">78<span>%</span></div><div class="o-tag up">&#9650; 3% /hr</div></div>
+            <div class="o-card t2"><div class="o-label">Tinaco 2 Level</div><div class="o-val" id="ov-t2">62<span>%</span></div><div class="o-tag down">&#9660; 5% /hr</div></div>
+            <div class="o-card ok"><div class="o-label">Total Supply Today</div><div class="o-val" id="ov-sup">584<span> L</span></div><div class="o-tag up">&#9650; 8% vs avg</div></div>
+            <div class="o-card warn"><div class="o-label">Total Consumed Today</div><div class="o-val" id="ov-con">421<span> L</span></div><div class="o-tag flat">&#9679; Normal</div></div>
         </div>
 
         <div class="tanks-row">
             <!-- TINACO 1 -->
             <div class="tank-card t1">
-                <div class="tc-header"><div class="tc-title">💧 Tinaco 1</div><div class="tc-badge">ROOF — FRONT</div></div>
+                <div class="tc-header"><div class="tc-title">Tinaco 1</div><div class="tc-badge">ROOF — FRONT</div></div>
                 <div class="tc-body">
                     <div class="tank-vis">
                         <div class="tank-wrap">
@@ -104,7 +105,7 @@
             </div>
             <!-- TINACO 2 -->
             <div class="tank-card t2">
-                <div class="tc-header"><div class="tc-title">💧 Tinaco 2</div><div class="tc-badge">ROOF — BACK</div></div>
+                <div class="tc-header"><div class="tc-title">Tinaco 2</div><div class="tc-badge">ROOF — BACK</div></div>
                 <div class="tc-body">
                     <div class="tank-vis">
                         <div class="tank-wrap">
@@ -195,19 +196,25 @@
             <div class="panel">
                 <div class="panel-head"><div class="panel-title">Activity Log</div></div>
                 <div class="act-list">
-                    <div class="act-item"><div class="act-icon i-in">💧</div><div class="act-body"><strong>Tinaco 1</strong> supply pump ON — refilling</div><div class="act-time">2m</div></div>
-                    <div class="act-item"><div class="act-icon i-out">📉</div><div class="act-body"><strong>Tinaco 2</strong> consumption spike — 2.8 L/min</div><div class="act-time">12m</div></div>
-                    <div class="act-item"><div class="act-icon i-ok">✅</div><div class="act-body"><strong>Both sensors</strong> OK — system check passed</div><div class="act-time">30m</div></div>
-                    <div class="act-item"><div class="act-icon i-warn">⚠️</div><div class="act-body"><strong>Tinaco 2</strong> below 60% threshold</div><div class="act-time">45m</div></div>
-                    <div class="act-item"><div class="act-icon i-in">💧</div><div class="act-body"><strong>Tinaco 1</strong> reached 85% — pump OFF</div><div class="act-time">1h</div></div>
-                    <div class="act-item"><div class="act-icon i-out">📉</div><div class="act-body"><strong>Tinaco 1</strong> high usage — 15% above avg</div><div class="act-time">2h</div></div>
-                    <div class="act-item"><div class="act-icon i-ok">✅</div><div class="act-body"><strong>Daily backup</strong> completed OK</div><div class="act-time">3h</div></div>
+                    <div class="act-item"><div class="act-icon i-in">&#128167;</div><div class="act-body"><strong>Tinaco 1</strong> supply pump ON — refilling</div><div class="act-time">2m</div></div>
+                    <div class="act-item"><div class="act-icon i-out">&#128201;</div><div class="act-body"><strong>Tinaco 2</strong> consumption spike — 2.8 L/min</div><div class="act-time">12m</div></div>
+                    <div class="act-item"><div class="act-icon i-ok">&#9989;</div><div class="act-body"><strong>Both sensors</strong> OK — system check passed</div><div class="act-time">30m</div></div>
+                    <div class="act-item"><div class="act-icon i-warn">&#9888;</div><div class="act-body"><strong>Tinaco 2</strong> below 60% threshold</div><div class="act-time">45m</div></div>
+                    <div class="act-item"><div class="act-icon i-in">&#128167;</div><div class="act-body"><strong>Tinaco 1</strong> reached 85% — pump OFF</div><div class="act-time">1h</div></div>
+                    <div class="act-item"><div class="act-icon i-out">&#128201;</div><div class="act-body"><strong>Tinaco 1</strong> high usage — 15% above avg</div><div class="act-time">2h</div></div>
+                    <div class="act-item"><div class="act-icon i-ok">&#9989;</div><div class="act-body"><strong>Daily backup</strong> completed OK</div><div class="act-time">3h</div></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script src="js/water.js"></script>
+    <!-- Core -->
+    <script src="assets/js/core/config.js"></script>
+    <script src="assets/js/core/nav.js"></script>
+    <script src="assets/js/core/auth.js"></script>
+
+    <!-- Water Features -->
+    <script src="assets/js/features/water/water-sim.js"></script>
+    <script src="assets/js/features/water/water-charts.js"></script>
 </body>
 </html>

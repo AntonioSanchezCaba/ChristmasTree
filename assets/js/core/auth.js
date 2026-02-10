@@ -1,27 +1,14 @@
 // =====================================================
-// SUPABASE CONFIG
+// AUTHENTICATION - Login, Register, Session Management
 // =====================================================
-
-const SUPABASE_URL = 'https://mcwsdinbxwfomkgtolhf.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jd3NkaW5ieHdmb21rZ3RvbGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2NjU2MzcsImV4cCI6MjA3ODI0MTYzN30.rjJpb2OQRui-1uIsn2VwE_zX-I5V2CKgM3MveZSXxW4';
-
-let supabaseClient = null;
-let currentUser = null;
-let authInitialized = false;
 
 // Detect which page we're on
-const isLoginPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/';
-
-function initSupabase() {
-    if (window.supabase && window.supabase.createClient) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        return true;
-    }
-    return false;
-}
+const isLoginPage = window.location.pathname.endsWith('login.html')
+    || window.location.pathname === '/'
+    || window.location.pathname.endsWith('/');
 
 // =====================================================
-// AUTH TAB SWITCHING (login page only)
+// AUTH TAB SWITCHING
 // =====================================================
 
 function switchAuthTab(tab) {
@@ -76,15 +63,15 @@ function checkPasswordStrength(password) {
 
     if (strength <= 2) {
         strengthFill.classList.add('weak');
-        strengthText.textContent = '❌ Débil: ' + feedback.join(', ');
+        strengthText.textContent = 'Débil: ' + feedback.join(', ');
         return { strength: 'weak', valid: false };
     } else if (strength <= 4) {
         strengthFill.classList.add('medium');
-        strengthText.textContent = '⚠️ Media: ' + (feedback.length > 0 ? feedback.join(', ') : 'Añade símbolos para mayor seguridad');
+        strengthText.textContent = 'Media: ' + (feedback.length > 0 ? feedback.join(', ') : 'Añade símbolos para mayor seguridad');
         return { strength: 'medium', valid: true };
     } else {
         strengthFill.classList.add('strong');
-        strengthText.textContent = '✅ Fuerte: Contraseña segura';
+        strengthText.textContent = 'Fuerte: Contraseña segura';
         return { strength: 'strong', valid: true };
     }
 }
@@ -129,13 +116,13 @@ async function handleRegister(event) {
     const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
 
     if (password !== passwordConfirm) {
-        showAuthError('❌ Las contraseñas no coinciden');
+        showAuthError('Las contraseñas no coinciden');
         return;
     }
 
     const passwordCheck = checkPasswordStrength(password);
     if (!passwordCheck.valid) {
-        showAuthError('❌ La contraseña no es lo suficientemente fuerte');
+        showAuthError('La contraseña no es lo suficientemente fuerte');
         return;
     }
 
@@ -143,25 +130,24 @@ async function handleRegister(event) {
     button.disabled = true;
     button.innerHTML = '<span class="auth-loading"></span> Creando cuenta...';
 
-    // Verify user limit (max 3)
     try {
         const { data: userCount, error: countError } = await supabaseClient.rpc('count_registered_users');
 
         if (countError) {
-            showAuthError('❌ Error al verificar disponibilidad.');
+            showAuthError('Error al verificar disponibilidad.');
             button.disabled = false;
             button.textContent = 'Crear Cuenta';
             return;
         }
 
         if (userCount >= 3) {
-            showAuthError('🚫 Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados.');
+            showAuthError('Límite de usuarios alcanzado. Solo se permiten 3 usuarios registrados.');
             button.disabled = false;
             button.textContent = 'Crear Cuenta';
             return;
         }
     } catch (e) {
-        showAuthError('❌ Error al verificar disponibilidad.');
+        showAuthError('Error al verificar disponibilidad.');
         button.disabled = false;
         button.textContent = 'Crear Cuenta';
         return;
@@ -179,9 +165,9 @@ async function handleRegister(event) {
         if (error) throw error;
 
         if (data.user && !data.user.confirmed_at) {
-            showAuthSuccess('✅ Cuenta creada! Revisa tu correo para confirmar tu cuenta.');
+            showAuthSuccess('Cuenta creada! Revisa tu correo para confirmar tu cuenta.');
         } else {
-            showAuthSuccess('✅ Cuenta creada exitosamente!');
+            showAuthSuccess('Cuenta creada exitosamente!');
             setTimeout(() => switchAuthTab('login'), 2000);
         }
 
@@ -189,7 +175,7 @@ async function handleRegister(event) {
         document.getElementById('passwordStrength').classList.remove('show');
 
     } catch (error) {
-        showAuthError('❌ ' + (error.message || 'Error al crear la cuenta'));
+        showAuthError(error.message || 'Error al crear la cuenta');
     } finally {
         button.disabled = false;
         button.textContent = 'Crear Cuenta';
@@ -221,21 +207,20 @@ async function handleLogin(event) {
 
         if (data.user) {
             currentUser = data.user;
-            showAuthSuccess('✅ Bienvenido de vuelta!');
+            showAuthSuccess('Bienvenido de vuelta!');
 
-            // Redirect to tree page after login
             setTimeout(() => {
-                window.location.href = 'tree.html';
+                window.location.href = 'index.html';
             }, 1000);
         }
 
     } catch (error) {
         if (error.message.includes('Email not confirmed')) {
-            showAuthError('❌ Por favor, confirma tu correo electrónico antes de iniciar sesión');
+            showAuthError('Por favor, confirma tu correo electrónico antes de iniciar sesión');
         } else if (error.message.includes('Invalid login credentials')) {
-            showAuthError('❌ Correo o contraseña incorrectos');
+            showAuthError('Correo o contraseña incorrectos');
         } else {
-            showAuthError('❌ ' + (error.message || 'Error al iniciar sesión'));
+            showAuthError(error.message || 'Error al iniciar sesión');
         }
     } finally {
         button.disabled = false;
@@ -252,7 +237,7 @@ async function handleLogout() {
         await supabaseClient.auth.signOut();
     } catch (e) {}
     currentUser = null;
-    window.location.href = 'index.html';
+    window.location.href = 'login.html';
 }
 
 // =====================================================
@@ -269,9 +254,9 @@ async function handleForgotPassword() {
             redirectTo: currentUrl
         });
         if (error) throw error;
-        showAuthSuccess('✅ Se ha enviado un enlace de recuperación a tu correo');
+        showAuthSuccess('Se ha enviado un enlace de recuperación a tu correo');
     } catch (error) {
-        showAuthError('❌ ' + (error.message || 'Error al enviar el correo'));
+        showAuthError(error.message || 'Error al enviar el correo');
     }
 }
 
@@ -283,68 +268,15 @@ async function handleOAuthLogin(provider) {
     hideAuthMessages();
 
     try {
-        const redirectUrl = window.location.origin + '/tree.html';
+        const redirectUrl = window.location.origin + '/index.html';
         const { error } = await supabaseClient.auth.signInWithOAuth({
             provider: provider,
             options: { redirectTo: redirectUrl }
         });
         if (error) throw error;
     } catch (error) {
-        showAuthError('❌ ' + (error.message || 'Error al iniciar sesión con ' + provider));
+        showAuthError(error.message || 'Error al iniciar sesión con ' + provider);
     }
-}
-
-// =====================================================
-// NAV USER DROPDOWN
-// =====================================================
-
-function toggleUserDropdown() {
-    document.getElementById('navDropdownMenu').classList.toggle('show');
-}
-
-function closeUserDropdown() {
-    document.getElementById('navDropdownMenu').classList.remove('show');
-}
-
-document.addEventListener('click', function (e) {
-    const dropdown = document.getElementById('navUserDropdown');
-    if (dropdown && !dropdown.contains(e.target)) {
-        closeUserDropdown();
-    }
-});
-
-// =====================================================
-// UPDATE UI FOR AUTH STATE
-// =====================================================
-
-function updateUserInfo(user) {
-    if (!user || !user.email) return;
-
-    // Update sidebar info (tree page only)
-    const userEmailEl = document.getElementById('userEmail');
-    const userInfoEl = document.getElementById('userInfo');
-    if (userEmailEl) userEmailEl.textContent = user.email;
-    if (userInfoEl) userInfoEl.style.display = 'block';
-
-    // Update nav bar
-    const navAuthButtons = document.getElementById('navAuthButtons');
-    const navUserDropdown = document.getElementById('navUserDropdown');
-    const navUserName = document.getElementById('navUserName');
-
-    if (navAuthButtons) navAuthButtons.style.cssText = 'display: none !important;';
-    if (navUserDropdown) navUserDropdown.style.cssText = 'display: flex !important; position: relative;';
-    if (navUserName) navUserName.textContent = user.email.split('@')[0];
-}
-
-function hideUserInfo() {
-    const userInfoEl = document.getElementById('userInfo');
-    if (userInfoEl) userInfoEl.style.display = 'none';
-
-    const navAuthButtons = document.getElementById('navAuthButtons');
-    const navUserDropdown = document.getElementById('navUserDropdown');
-
-    if (navAuthButtons) navAuthButtons.style.cssText = 'display: flex !important;';
-    if (navUserDropdown) navUserDropdown.style.cssText = 'display: none !important;';
 }
 
 // =====================================================
@@ -359,26 +291,23 @@ function initAuth() {
             currentUser = session.user;
 
             if (isLoginPage) {
-                // Already logged in, redirect to tree
-                window.location.href = 'tree.html';
+                window.location.href = 'index.html';
             } else {
                 updateUserInfo(session.user);
             }
         } else {
             if (!isLoginPage) {
-                // Not logged in, redirect to login
-                window.location.href = 'index.html';
+                window.location.href = 'login.html';
             }
         }
         authInitialized = true;
     }).catch(() => {
         if (!isLoginPage) {
-            window.location.href = 'index.html';
+            window.location.href = 'login.html';
         }
         authInitialized = true;
     });
 
-    // Listen for auth state changes
     supabaseClient.auth.onAuthStateChange((event, session) => {
         if (session && session.user) {
             currentUser = session.user;
@@ -390,5 +319,4 @@ function initAuth() {
     });
 }
 
-// Auto-initialize on page load
 window.addEventListener('DOMContentLoaded', initAuth);

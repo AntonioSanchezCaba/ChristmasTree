@@ -1,5 +1,5 @@
 // =====================================================
-// CLOCK
+// WATER TANK - Clock & Simulation
 // =====================================================
 
 function tick() {
@@ -12,9 +12,7 @@ function tick() {
     });
 }
 
-// =====================================================
-// TANK SIMULATION
-// =====================================================
+// ===== TANK SIMULATION =====
 
 let t1Level = 78;
 let t2Level = 62;
@@ -70,18 +68,7 @@ function sim() {
     document.getElementById('t2-ts').textContent = 'Updated just now';
 }
 
-// =====================================================
-// CHART TABS
-// =====================================================
-
-function setTab(btn) {
-    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-// =====================================================
-// INITIALIZATION
-// =====================================================
+// ===== INITIALIZATION =====
 
 window.addEventListener('DOMContentLoaded', function () {
     tick();

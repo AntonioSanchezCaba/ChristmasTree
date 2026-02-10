@@ -226,7 +226,7 @@ body {
     align-items: stretch;
 }
 
-/* TANK DRAWING */
+/* ===== TANK DRAWING ===== */
 .tank-vis {
     display: flex;
     flex-direction: column;
@@ -683,11 +683,6 @@ body {
     .tanks-row { grid-template-columns: 1fr; }
     .tc-body { flex-direction: column; align-items: center; }
     .tc-info-grid { width: 100%; }
-    .top-nav { padding: 0 14px; }
-    .top-nav a { padding: 6px 10px; font-size: 12px; }
-    .top-nav .separator { margin: 0 5px; }
-    .nav-user-info,
-    .nav-user-dropdown-arrow { display: none; }
     .o-val { font-size: 20px; }
     .dash-header h1 { font-size: 21px; }
 }
