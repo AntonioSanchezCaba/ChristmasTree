@@ -3,9 +3,12 @@
 // =====================================================
 
 // Detect which page we're on
-const isLoginPage = window.location.pathname.endsWith('login.html')
-    || window.location.pathname === '/'
-    || window.location.pathname.endsWith('/');
+const isLoginPage = window.location.pathname.endsWith('login.html');
+
+// Hide protected pages until auth is verified (prevents content flash)
+if (!isLoginPage) {
+    document.documentElement.style.visibility = 'hidden';
+}
 
 // =====================================================
 // AUTH TAB SWITCHING
@@ -294,6 +297,7 @@ function initAuth() {
                 window.location.href = 'index.html';
             } else {
                 updateUserInfo(session.user);
+                document.documentElement.style.visibility = '';
             }
         } else {
             if (!isLoginPage) {
