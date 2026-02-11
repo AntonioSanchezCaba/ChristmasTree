@@ -5,11 +5,6 @@
 // Detect which page we're on
 const isLoginPage = window.location.pathname.endsWith('login.html');
 
-// Hide protected pages until auth is verified (prevents content flash)
-if (!isLoginPage) {
-    document.documentElement.style.visibility = 'hidden';
-}
-
 // =====================================================
 // AUTH TAB SWITCHING
 // =====================================================
@@ -286,8 +281,18 @@ async function handleOAuthLogin(provider) {
 // SESSION CHECK ON PAGE LOAD
 // =====================================================
 
+function showProtectedPage() {
+    document.body.style.visibility = '';
+}
+
 function initAuth() {
-    if (!initSupabase()) return;
+    if (!initSupabase()) {
+        // Supabase SDK not loaded — redirect protected pages to login
+        if (!isLoginPage) {
+            window.location.href = 'login.html';
+        }
+        return;
+    }
 
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         if (session && session.user) {
@@ -297,7 +302,7 @@ function initAuth() {
                 window.location.href = 'index.html';
             } else {
                 updateUserInfo(session.user);
-                document.documentElement.style.visibility = '';
+                showProtectedPage();
             }
         } else {
             if (!isLoginPage) {
@@ -323,4 +328,9 @@ function initAuth() {
     });
 }
 
-window.addEventListener('DOMContentLoaded', initAuth);
+// Run auth check as soon as possible
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAuth);
+} else {
+    initAuth();
+}
