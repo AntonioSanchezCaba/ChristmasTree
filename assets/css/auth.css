@@ -351,53 +351,67 @@
    AUTH RESPONSIVE
    ===================================================== */
 
-@media (max-width: 600px) {
-    .auth-overlay {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        backdrop-filter: none !important;
-        padding: 0 !important;
-        align-items: stretch !important;
-        overflow-y: auto !important;
-    }
-
+/* --- Tablets & small desktops --- */
+@media (max-width: 768px) {
     .auth-container {
-        background: transparent !important;
-        animation: none !important;
-        width: 100% !important;
-        max-width: none !important;
-        min-height: 100vh !important;
-        min-height: 100dvh !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        margin: 0 !important;
-        padding: 60px 24px 40px !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        flex: 1 !important;
-    }
-
-    .auth-header {
-        margin-bottom: 24px;
+        padding: 32px;
     }
 
     .auth-header h2 {
-        font-size: 24px;
+        font-size: 26px;
+    }
+}
+
+/* --- Mobile: full-screen auth --- */
+@media (max-width: 600px) {
+    .auth-overlay {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        backdrop-filter: none;
+        padding: 0;
+        align-items: stretch;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .auth-container {
+        background: transparent;
+        animation: none;
+        width: 100%;
+        max-width: none;
+        min-height: 100vh;
+        min-height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0;
+        padding: 0 24px;
+        padding-top: max(24px, env(safe-area-inset-top));
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
+    }
+
+    .auth-header {
+        margin-bottom: 28px;
+    }
+
+    .auth-header h2 {
+        font-size: 26px;
     }
 
     .auth-header p {
-        font-size: 13px;
+        font-size: 14px;
     }
 
     .auth-tabs {
-        margin-bottom: 20px;
-        gap: 0;
-        padding: 3px;
+        margin-bottom: 22px;
+        padding: 4px;
     }
 
     .auth-tab {
-        padding: 10px 8px;
-        font-size: 13px;
+        padding: 12px 8px;
+        font-size: 14px;
         line-height: 1.2;
     }
 
@@ -406,42 +420,58 @@
     }
 
     .form-group label {
-        font-size: 12px;
+        font-size: 13px;
         margin-bottom: 6px;
     }
 
     .form-group input {
-        padding: 14px;
+        padding: 14px 16px;
         font-size: 16px;
         border-radius: 10px;
     }
 
     .auth-button {
-        padding: 14px;
-        font-size: 15px;
+        padding: 16px;
+        font-size: 16px;
         border-radius: 10px;
+        min-height: 50px;
+    }
+
+    .auth-button:hover {
+        transform: none;
     }
 
     .oauth-button {
-        padding: 13px;
-        font-size: 14px;
+        padding: 14px;
+        font-size: 15px;
         border-radius: 10px;
+        min-height: 50px;
+    }
+
+    .oauth-button:hover {
+        transform: none;
     }
 
     .auth-divider {
         margin: 20px 0;
-        font-size: 12px;
+        font-size: 13px;
+    }
+
+    .forgot-password {
+        margin-top: 12px;
     }
 
     .forgot-password a {
-        font-size: 13px;
+        font-size: 14px;
+        padding: 8px;
+        display: inline-block;
     }
 
     .error-message,
     .success-message {
-        padding: 10px;
-        font-size: 12px;
-        border-radius: 8px;
+        padding: 12px;
+        font-size: 13px;
+        border-radius: 10px;
     }
 
     .password-strength {
@@ -449,70 +479,166 @@
     }
 }
 
-@media (max-width: 360px) {
+/* --- Small phones (iPhone SE, Galaxy S series) --- */
+@media (max-width: 380px) {
     .auth-container {
-        padding: 50px 16px 30px !important;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .auth-header {
+        margin-bottom: 20px;
+    }
+
+    .auth-header h2 {
+        font-size: 22px;
+    }
+
+    .auth-header p {
+        font-size: 13px;
+    }
+
+    .auth-tab {
+        padding: 10px 6px;
+        font-size: 13px;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-group input {
+        padding: 12px 14px;
+    }
+
+    .auth-button {
+        padding: 14px;
+        font-size: 15px;
+        min-height: 46px;
+    }
+
+    .oauth-button {
+        padding: 12px;
+        font-size: 14px;
+        min-height: 46px;
+    }
+
+    .auth-divider {
+        margin: 16px 0;
+    }
+}
+
+/* --- Very small phones (320px) --- */
+@media (max-width: 340px) {
+    .auth-container {
+        padding-left: 12px;
+        padding-right: 12px;
     }
 
     .auth-header h2 {
         font-size: 20px;
     }
 
+    .auth-tabs {
+        margin-bottom: 16px;
+    }
+
+    .auth-tab {
+        font-size: 12px;
+        padding: 9px 4px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+    }
+
     .form-group input {
-        padding: 12px;
+        padding: 11px 12px;
+        font-size: 15px;
     }
 
     .auth-button {
         padding: 12px;
         font-size: 14px;
     }
-
-    .auth-tab {
-        font-size: 12px;
-        padding: 8px 6px;
-    }
 }
 
-@media (max-height: 600px) and (orientation: landscape) {
+/* --- Landscape phones --- */
+@media (max-height: 500px) and (orientation: landscape) {
     .auth-overlay {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        backdrop-filter: none !important;
-        overflow-y: auto !important;
-        padding: 0 !important;
-        align-items: flex-start !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        backdrop-filter: none;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0;
+        align-items: flex-start;
     }
 
     .auth-container {
-        background: transparent !important;
-        animation: none !important;
-        min-height: auto !important;
-        padding: 20px 24px !important;
-        justify-content: flex-start !important;
-        flex: none !important;
+        background: transparent;
+        animation: none;
+        min-height: auto;
+        padding: 16px 32px;
+        justify-content: flex-start;
+        flex: none;
     }
 
     .auth-header {
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
 
     .auth-header h2 {
         font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .auth-header p {
+        font-size: 12px;
+    }
+
+    .auth-tabs {
+        margin-bottom: 12px;
+    }
+
+    .auth-tab {
+        padding: 8px 6px;
+        font-size: 13px;
     }
 
     .form-group {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
+    }
+
+    .form-group label {
+        margin-bottom: 4px;
+        font-size: 12px;
     }
 
     .form-group input {
-        padding: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
     }
 
     .auth-button,
     .oauth-button {
         padding: 10px;
+        font-size: 14px;
+        min-height: 40px;
     }
 
     .auth-divider {
-        margin: 12px 0;
+        margin: 10px 0;
+        font-size: 12px;
+    }
+
+    .forgot-password {
+        margin-top: 6px;
+    }
+}
+
+/* --- Tall phones: keep form comfortably centered --- */
+@media (min-height: 750px) and (max-width: 600px) {
+    .auth-container {
+        justify-content: center;
     }
 }
