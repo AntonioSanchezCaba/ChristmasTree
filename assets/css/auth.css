@@ -50,14 +50,6 @@
     }
 }
 
-/* ===== AUTH LOGO ===== */
-.auth-logo {
-    font-size: 48px;
-    line-height: 1;
-    margin-bottom: 12px;
-    display: none;
-}
-
 /* ===== AUTH HEADER ===== */
 .auth-header {
     text-align: center;
@@ -356,7 +348,7 @@
 }
 
 /* =====================================================
-   AUTH RESPONSIVE
+   AUTH RESPONSIVE — Card stays compact at all sizes
    ===================================================== */
 
 /* --- Tablets --- */
@@ -370,94 +362,61 @@
     }
 }
 
-/* --- Mobile: full-screen login --- */
+/* --- Small tablets / large phones --- */
 @media (max-width: 600px) {
     .auth-overlay {
-        background: linear-gradient(160deg, #667eea 0%, #764ba2 50%, #5b3d8f 100%);
-        backdrop-filter: none;
-        padding: 0;
-        align-items: stretch;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        padding: 16px;
     }
 
     .auth-container {
-        background: transparent;
-        animation: none;
-        width: 100%;
-        max-width: none;
-        min-height: 100vh;
-        min-height: 100dvh;
-        border-radius: 0;
-        box-shadow: none;
-        margin: 0;
-        padding: 0 28px;
-        padding-top: max(48px, env(safe-area-inset-top, 48px));
-        padding-bottom: max(32px, env(safe-area-inset-bottom, 32px));
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-    }
-
-    /* Show the tree emoji logo on mobile */
-    .auth-logo {
-        display: block;
-        font-size: 56px;
-        margin-bottom: 16px;
+        padding: 28px 24px;
+        max-width: 400px;
+        border-radius: 16px;
     }
 
     .auth-header {
-        margin-bottom: 32px;
-        padding-top: 4vh;
+        margin-bottom: 22px;
     }
 
     .auth-header h2 {
-        font-size: 28px;
-        margin-bottom: 8px;
+        font-size: 22px;
+        margin-bottom: 6px;
     }
 
     .auth-header p {
-        font-size: 15px;
-        color: rgba(255, 255, 255, 0.85);
+        font-size: 13px;
     }
 
     .auth-tabs {
-        margin-bottom: 24px;
-        padding: 4px;
-        border-radius: 12px;
+        margin-bottom: 20px;
+        padding: 3px;
     }
 
     .auth-tab {
-        padding: 13px 8px;
-        font-size: 15px;
-        border-radius: 10px;
+        padding: 10px 6px;
+        font-size: 13px;
     }
 
     .form-group {
-        margin-bottom: 18px;
+        margin-bottom: 14px;
     }
 
     .form-group label {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        letter-spacing: 0.01em;
+        font-size: 12px;
+        margin-bottom: 6px;
     }
 
     .form-group input {
-        padding: 16px 18px;
+        padding: 12px 14px;
         font-size: 16px;
-        border-radius: 12px;
-        border: 2px solid rgba(255, 255, 255, 0.25);
+        border-radius: 10px;
     }
 
     .auth-button {
-        padding: 16px;
-        font-size: 16px;
-        font-weight: 700;
-        border-radius: 12px;
-        min-height: 52px;
-        margin-bottom: 12px;
+        padding: 13px;
+        font-size: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
     }
 
     .auth-button:hover {
@@ -467,29 +426,23 @@
 
     .forgot-password {
         margin-top: 8px;
-        margin-bottom: 4px;
     }
 
     .forgot-password a {
-        font-size: 14px;
-        padding: 10px;
+        font-size: 13px;
+        padding: 6px;
         display: inline-block;
     }
 
-    /* Push the OAuth section to the bottom */
     .auth-divider {
-        margin: auto 0 20px 0;
-        padding-top: 24px;
-        font-size: 13px;
+        margin: 16px 0;
+        font-size: 12px;
     }
 
     .oauth-button {
-        padding: 16px;
-        font-size: 15px;
-        font-weight: 600;
-        border-radius: 12px;
-        min-height: 52px;
-        border: 2px solid rgba(255, 255, 255, 0.35);
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 10px;
     }
 
     .oauth-button:hover {
@@ -498,189 +451,176 @@
 
     .error-message,
     .success-message {
-        padding: 12px 14px;
-        font-size: 13px;
-        border-radius: 10px;
+        padding: 10px;
+        font-size: 12px;
+        border-radius: 8px;
     }
 
     .password-strength {
-        font-size: 12px;
+        font-size: 11px;
     }
 }
 
-/* --- Small phones (iPhone SE, 375px) --- */
-@media (max-width: 400px) {
-    .auth-container {
-        padding-left: 20px;
-        padding-right: 20px;
+/* --- Phones (< 420px) --- */
+@media (max-width: 420px) {
+    .auth-overlay {
+        padding: 12px;
     }
 
-    .auth-logo {
-        font-size: 48px;
-        margin-bottom: 12px;
+    .auth-container {
+        padding: 24px 20px;
+        border-radius: 14px;
     }
 
     .auth-header {
-        margin-bottom: 24px;
-        padding-top: 2vh;
-    }
-
-    .auth-header h2 {
-        font-size: 24px;
-    }
-
-    .auth-header p {
-        font-size: 14px;
-    }
-
-    .auth-tab {
-        padding: 12px 6px;
-        font-size: 14px;
-    }
-
-    .form-group {
-        margin-bottom: 14px;
-    }
-
-    .form-group input {
-        padding: 14px 16px;
-    }
-
-    .auth-button {
-        padding: 14px;
-        font-size: 15px;
-        min-height: 48px;
-    }
-
-    .oauth-button {
-        padding: 14px;
-        font-size: 14px;
-        min-height: 48px;
-    }
-
-    .auth-divider {
-        padding-top: 16px;
-    }
-}
-
-/* --- Very small phones (320px) --- */
-@media (max-width: 340px) {
-    .auth-container {
-        padding-left: 16px;
-        padding-right: 16px;
-    }
-
-    .auth-logo {
-        font-size: 40px;
-    }
-
-    .auth-header h2 {
-        font-size: 22px;
-    }
-
-    .auth-tabs {
         margin-bottom: 18px;
     }
 
+    .auth-header h2 {
+        font-size: 20px;
+    }
+
+    .auth-header p {
+        font-size: 12px;
+    }
+
     .auth-tab {
-        font-size: 13px;
-        padding: 10px 4px;
+        padding: 9px 5px;
+        font-size: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
     }
 
     .form-group label {
-        font-size: 13px;
+        font-size: 11px;
+        margin-bottom: 4px;
     }
 
     .form-group input {
-        padding: 12px 14px;
-        font-size: 15px;
+        padding: 11px 12px;
+        font-size: 16px;
+        border-radius: 8px;
     }
 
     .auth-button {
-        padding: 13px;
+        padding: 12px;
         font-size: 14px;
-        min-height: 44px;
+        border-radius: 8px;
+    }
+
+    .auth-divider {
+        margin: 12px 0;
+        font-size: 11px;
     }
 
     .oauth-button {
-        padding: 12px;
+        padding: 11px;
         font-size: 13px;
-        min-height: 44px;
+        border-radius: 8px;
+    }
+}
+
+/* --- Very small phones (< 360px) --- */
+@media (max-width: 360px) {
+    .auth-overlay {
+        padding: 8px;
+    }
+
+    .auth-container {
+        padding: 20px 16px;
+        border-radius: 12px;
+    }
+
+    .auth-header h2 {
+        font-size: 18px;
+    }
+
+    .auth-tabs {
+        margin-bottom: 14px;
+    }
+
+    .auth-tab {
+        font-size: 11px;
+        padding: 8px 4px;
+    }
+
+    .form-group input {
+        padding: 10px;
+    }
+
+    .auth-button {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .oauth-button {
+        padding: 10px;
+        font-size: 12px;
     }
 }
 
 /* --- Landscape phones --- */
 @media (max-height: 500px) and (orientation: landscape) {
     .auth-overlay {
-        background: linear-gradient(160deg, #667eea 0%, #764ba2 50%, #5b3d8f 100%);
-        backdrop-filter: none;
+        padding: 8px;
+        align-items: flex-start;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding: 0;
-        align-items: flex-start;
     }
 
     .auth-container {
-        background: transparent;
-        animation: none;
-        min-height: auto;
-        padding: 16px 32px;
-        flex: none;
-    }
-
-    .auth-logo {
-        display: none;
+        padding: 16px 20px;
+        margin: 8px auto;
     }
 
     .auth-header {
-        margin-bottom: 10px;
-        padding-top: 0;
+        margin-bottom: 8px;
     }
 
     .auth-header h2 {
-        font-size: 20px;
+        font-size: 18px;
         margin-bottom: 2px;
     }
 
     .auth-header p {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .auth-tabs {
-        margin-bottom: 10px;
-    }
-
-    .auth-tab {
-        padding: 8px 6px;
-        font-size: 13px;
-    }
-
-    .form-group {
         margin-bottom: 8px;
     }
 
-    .form-group label {
-        margin-bottom: 3px;
+    .auth-tab {
+        padding: 7px 5px;
         font-size: 12px;
     }
 
+    .form-group {
+        margin-bottom: 6px;
+    }
+
+    .form-group label {
+        margin-bottom: 2px;
+        font-size: 11px;
+    }
+
     .form-group input {
-        padding: 9px 12px;
+        padding: 8px 10px;
         font-size: 14px;
     }
 
     .auth-button,
     .oauth-button {
-        padding: 9px;
-        font-size: 14px;
-        min-height: 38px;
-        margin-bottom: 6px;
+        padding: 8px;
+        font-size: 13px;
+        margin-bottom: 4px;
     }
 
     .auth-divider {
-        margin: 8px 0;
-        padding-top: 0;
-        font-size: 12px;
+        margin: 6px 0;
+        font-size: 11px;
     }
 
     .forgot-password {
